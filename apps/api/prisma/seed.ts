@@ -4,7 +4,6 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed categories
   const categories = [
     { name: 'Veículos', slug: 'veiculos', iconName: 'car' },
     { name: 'Imóveis', slug: 'imoveis', iconName: 'home' },
@@ -26,8 +25,9 @@ async function main() {
     });
   }
 
-  // Seed admin user
-  const adminHash = await bcrypt.hash('admin123456', 12);
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'admin123456';
+  const adminHash = await bcrypt.hash(adminPassword, 12);
+
   const admin = await prisma.user.upsert({
     where: { email: 'admin@palmital.digital' },
     update: {},

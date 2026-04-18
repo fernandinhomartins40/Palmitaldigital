@@ -29,15 +29,12 @@ services:
         condition: service_healthy
     ports:
       - '3001:3001'
+    env_file:
+      - ../.env
     environment:
       NODE_ENV: development
       DATABASE_URL: postgresql://palmital:palmital_dev@postgres:5432/palmital_db
-      JWT_SECRET: dev_jwt_secret_change_in_production
-      JWT_REFRESH_SECRET: dev_refresh_secret_change_in_production
-      JWT_EXPIRES_IN: 15m
-      JWT_REFRESH_EXPIRES_IN: 30d
       PORT: 3001
-      UPLOAD_DIR: /uploads
       FRONTEND_URL: http://localhost:3000
     volumes:
       - ../apps/api/src:/app/apps/api/src

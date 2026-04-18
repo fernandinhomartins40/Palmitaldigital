@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { Spinner } from '@palmital/ui';
 import { AppLayout } from './components/layout/AppLayout';
 import { AuthGuard } from './components/layout/AuthGuard';
+import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 
@@ -22,6 +23,14 @@ const Loader = () => (
   </div>
 );
 
+function Page({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<Loader />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
@@ -32,42 +41,15 @@ export const router = createBrowserRouter([
       </AuthGuard>
     ),
     children: [
-      {
-        index: true,
-        element: <Suspense fallback={<Loader />}><FeedPage /></Suspense>,
-      },
-      {
-        path: '/classifieds',
-        element: <Suspense fallback={<Loader />}><ClassifiedsPage /></Suspense>,
-      },
-      {
-        path: '/classifieds/:id',
-        element: <Suspense fallback={<Loader />}><ClassifiedDetailPage /></Suspense>,
-      },
-      {
-        path: '/companies',
-        element: <Suspense fallback={<Loader />}><CompaniesPage /></Suspense>,
-      },
-      {
-        path: '/companies/:slug',
-        element: <Suspense fallback={<Loader />}><CompanyProfilePage /></Suspense>,
-      },
-      {
-        path: '/chat',
-        element: <Suspense fallback={<Loader />}><ConversationsPage /></Suspense>,
-      },
-      {
-        path: '/chat/:conversationId',
-        element: <Suspense fallback={<Loader />}><ChatPage /></Suspense>,
-      },
-      {
-        path: '/profile',
-        element: <Suspense fallback={<Loader />}><ProfilePage /></Suspense>,
-      },
-      {
-        path: '/create',
-        element: <Suspense fallback={<Loader />}><CreatePostPage /></Suspense>,
-      },
+      { index: true, element: <Page><FeedPage /></Page> },
+      { path: '/classifieds', element: <Page><ClassifiedsPage /></Page> },
+      { path: '/classifieds/:id', element: <Page><ClassifiedDetailPage /></Page> },
+      { path: '/companies', element: <Page><CompaniesPage /></Page> },
+      { path: '/companies/:slug', element: <Page><CompanyProfilePage /></Page> },
+      { path: '/chat', element: <Page><ConversationsPage /></Page> },
+      { path: '/chat/:conversationId', element: <Page><ChatPage /></Page> },
+      { path: '/profile', element: <Page><ProfilePage /></Page> },
+      { path: '/create', element: <Page><CreatePostPage /></Page> },
     ],
   },
 ]);
