@@ -14,13 +14,16 @@ CMD ["pnpm", "--filter", "api", "dev"]
 FROM base AS build
 ARG RELEASE_VERSION=dev
 RUN pnpm install
+RUN pnpm --filter @palmital/types build
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
 RUN echo "$RELEASE_VERSION" > /app/.release-version
 
 FROM base AS predeploy
 RUN pnpm install
+RUN pnpm --filter @palmital/types build
 RUN pnpm --filter api --prod deploy /deploy
+COPY --from=build /app/packages/types/dist /deploy/node_modules/.pnpm/@palmital+types@file+packages+types/node_modules/@palmital/types/dist
 
 FROM node:20-alpine AS production
 WORKDIR /app
