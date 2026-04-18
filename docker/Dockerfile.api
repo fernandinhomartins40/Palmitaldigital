@@ -22,7 +22,7 @@ FROM base AS predeploy
 RUN pnpm install
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api --prod deploy /deploy
-RUN cp -r /app/node_modules/.prisma /deploy/node_modules/.prisma 2>/dev/null || true
+RUN cp -r /app/node_modules/.prisma /deploy/node_modules/.prisma
 
 FROM node:20-alpine AS production
 RUN apk add --no-cache curl

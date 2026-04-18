@@ -162,25 +162,43 @@ jobs:
             cd "\$CURRENT_DIR"
             docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
-            # Wait for API health (direct curl to port 3001 inside container via exec)
+            # Verify api and web containers actually started (catch immediate crashes)
+            echo "Waiting 15s for containers to stabilize..."
+            sleep 15
+            for SERVICE in api web; do
+              CONTAINER="palmital-\${SERVICE}-1"
+              STATUS=\$(docker inspect --format='{{.State.Status}}' "\$CONTAINER" 2>/dev/null || echo "not_found")
+              echo "  \$CONTAINER: \$STATUS"
+              if [ "\$STATUS" != "running" ]; then
+                echo "ERROR: \$CONTAINER failed to start (status: \$STATUS)" >&2
+                docker logs "\$CONTAINER" --tail=80 >&2 || true
+                exit 1
+              fi
+            done
+
+            # Wait for API health
             echo "Waiting for API to be healthy..."
             for i in \$(seq 1 30); do
-              if docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api \
-                curl -sf http://localhost:3001/health 2>/dev/null | grep -q '"status"'; then
+              API_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-api-1 2>/dev/null || echo "not_found")
+              if [ "\$API_STATUS" != "running" ]; then
+                echo "ERROR: API container stopped unexpectedly (status: \$API_STATUS)" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              if docker exec palmital-api-1 curl -sf http://localhost:3001/health 2>/dev/null | grep -q '"status"'; then
                 echo "API is healthy after \${i}0s"
                 break
               fi
               if [ "\$i" -eq 30 ]; then
                 echo "API did not become healthy in 300s" >&2
-                docker compose -p palmital -f docker-compose.production.yml --env-file .env logs api --tail=50
+                docker logs palmital-api-1 --tail=80 >&2
                 exit 1
               fi
               sleep 10
             done
 
             # Verify release version
-            DEPLOYED_VERSION=\$(docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api \
-              cat /app/.release-version 2>/dev/null || echo "")
+            DEPLOYED_VERSION=\$(docker exec palmital-api-1 cat /app/.release-version 2>/dev/null || echo "")
             if [ "\$DEPLOYED_VERSION" != "\$RELEASE" ]; then
               echo "Release version mismatch: expected=\$RELEASE got=\$DEPLOYED_VERSION" >&2
               exit 1
@@ -302,10 +320,12 @@ jobs:
               sleep 5
             done
             echo "Health check failed after 120s" >&2
-            echo "--- Web container status ---" >&2
-            docker ps --filter "name=palmital" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" >&2 || true
-            echo "--- Web logs (last 30 lines) ---" >&2
-            docker compose -f /opt/palmital/current/docker-compose.production.yml logs web --tail=30 >&2 || true
+            echo "--- All container states ---" >&2
+            docker ps -a --filter "name=palmital" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" >&2 || true
+            echo "--- API logs ---" >&2
+            docker logs palmital-api-1 --tail=40 >&2 || true
+            echo "--- Web logs ---" >&2
+            docker logs palmital-web-1 --tail=40 >&2 || true
             exit 1
           ENDSSH
 

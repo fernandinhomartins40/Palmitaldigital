@@ -8,8 +8,12 @@ import { join } from 'path';
 import { mkdirSync } from 'fs';
 
 async function bootstrap() {
-  mkdirSync(join(process.cwd(), 'uploads', 'media'), { recursive: true });
-  mkdirSync(join(process.cwd(), 'uploads', 'avatars'), { recursive: true });
+  try {
+    mkdirSync(join(process.cwd(), 'uploads', 'media'), { recursive: true });
+    mkdirSync(join(process.cwd(), 'uploads', 'avatars'), { recursive: true });
+  } catch (err) {
+    console.warn('Warning: could not create upload directories:', err);
+  }
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 

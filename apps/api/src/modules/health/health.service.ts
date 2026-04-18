@@ -7,7 +7,10 @@ export class HealthService {
 
   async check() {
     try {
-      await this.prisma.$queryRaw`SELECT 1`;
+      await Promise.race([
+        this.prisma.$queryRaw`SELECT 1`,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+      ]);
       return { status: 'ok', db: 'ok' };
     } catch {
       return { status: 'ok', db: 'degraded' };

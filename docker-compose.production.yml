@@ -77,7 +77,8 @@ services:
     networks:
       - palmital-internal
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   palmital-postgres-data:
