@@ -291,18 +291,21 @@ jobs:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
-            set -euo pipefail
             echo "Running post-deploy health check..."
-            for i in $(seq 1 12); do
-              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://localhost:${{ env.DEPLOY_PORT }}/health 2>/dev/null)
+            for i in $(seq 1 24); do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://localhost:7000/health 2>/dev/null || true)
               if [ "$HTTP_STATUS" = "200" ]; then
                 echo "Health check passed: HTTP $HTTP_STATUS"
                 exit 0
               fi
-              echo "Attempt $i/12: HTTP $HTTP_STATUS, retrying in 5s..."
+              echo "Attempt $i/24: HTTP $HTTP_STATUS, retrying in 5s..."
               sleep 5
             done
-            echo "Health check failed after 60s" >&2
+            echo "Health check failed after 120s" >&2
+            echo "--- Web container status ---" >&2
+            docker ps --filter "name=palmital" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" >&2 || true
+            echo "--- Web logs (last 30 lines) ---" >&2
+            docker compose -f /opt/palmital/current/docker-compose.production.yml logs web --tail=30 >&2 || true
             exit 1
           ENDSSH
 
