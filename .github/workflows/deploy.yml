@@ -162,18 +162,33 @@ jobs:
             cd "\$CURRENT_DIR"
             docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
-            # Verify api and web containers actually started (catch immediate crashes)
-            echo "Waiting 15s for containers to stabilize..."
-            sleep 15
-            for SERVICE in api web; do
-              CONTAINER="palmital-\${SERVICE}-1"
-              STATUS=\$(docker inspect --format='{{.State.Status}}' "\$CONTAINER" 2>/dev/null || echo "not_found")
-              echo "  \$CONTAINER: \$STATUS"
-              if [ "\$STATUS" != "running" ]; then
-                echo "ERROR: \$CONTAINER failed to start (status: \$STATUS)" >&2
-                docker logs "\$CONTAINER" --tail=80 >&2 || true
+            # Wait for api and web containers to be running (web waits for api healthy — up to 120s)
+            echo "Waiting for api and web containers to be running..."
+            for i in \$(seq 1 24); do
+              API_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-api-1 2>/dev/null || echo "not_found")
+              WEB_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-web-1 2>/dev/null || echo "not_found")
+              echo "  [\${i}/24] api=\$API_STATUS web=\$WEB_STATUS"
+              if [ "\$API_STATUS" = "running" ] && [ "\$WEB_STATUS" = "running" ]; then
+                echo "Both containers are running"
+                break
+              fi
+              if [ "\$API_STATUS" = "exited" ] || [ "\$API_STATUS" = "dead" ]; then
+                echo "ERROR: api container crashed (status: \$API_STATUS)" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
                 exit 1
               fi
+              if [ "\$WEB_STATUS" = "exited" ] || [ "\$WEB_STATUS" = "dead" ]; then
+                echo "ERROR: web container crashed (status: \$WEB_STATUS)" >&2
+                docker logs palmital-web-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              if [ "\$i" -eq 24 ]; then
+                echo "ERROR: containers did not reach running state within 120s" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
+                docker logs palmital-web-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              sleep 5
             done
 
             # Wait for API health
