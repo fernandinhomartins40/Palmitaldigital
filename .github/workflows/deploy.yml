@@ -60,9 +60,13 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
             set -euo pipefail
             ENV_FILE="/opt/palmital/.env"
-            if [ ! -f "$ENV_FILE" ]; then
-              echo "Creating $ENV_FILE with generated secrets..."
-              mkdir -p /opt/palmital
+            mkdir -p /opt/palmital
+
+            # Recreate .env if it doesn't exist OR if POSTGRES_PASSWORD is empty/missing
+            # (an earlier deploy may have written the file with blank values via heredoc indentation)
+            EXISTING_PW=$(grep '^POSTGRES_PASSWORD=' "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '[:space:]' || true)
+            if [ ! -f "$ENV_FILE" ] || [ -z "$EXISTING_PW" ]; then
+              echo "Creating/fixing $ENV_FILE with generated secrets..."
               POSTGRES_PASSWORD=$(openssl rand -hex 32)
               JWT_SECRET=$(openssl rand -hex 32)
               JWT_REFRESH_SECRET=$(openssl rand -hex 32)
@@ -80,9 +84,9 @@ jobs:
               printf 'FRONTEND_URL=https://palmitaldigital.com.br\n' >> "$ENV_FILE"
               printf 'SEED_ADMIN_PASSWORD=%s\n' "$SEED_ADMIN_PASSWORD" >> "$ENV_FILE"
               chmod 600 "$ENV_FILE"
-              echo ".env created successfully"
+              echo ".env created/fixed successfully"
             else
-              echo ".env already exists, skipping"
+              echo ".env already exists with valid POSTGRES_PASSWORD, skipping"
             fi
           ENDSSH
 
