@@ -53,16 +53,21 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/
 
-      - name: Write .env on VPS
+      - name: Ensure .env exists on VPS
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "mkdir -p ${{ env.APP_ROOT }} && cat > ${{ env.APP_ROOT }}/.env << 'ENVEOF'
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
+            set -euo pipefail
+            ENV_FILE="/opt/palmital/.env"
+            if [ ! -f "$ENV_FILE" ]; then
+              echo "Creating $ENV_FILE with generated secrets..."
+              mkdir -p /opt/palmital
+              POSTGRES_PASSWORD=$(openssl rand -hex 32)
+              JWT_SECRET=$(openssl rand -hex 32)
+              JWT_REFRESH_SECRET=$(openssl rand -hex 32)
+              SEED_ADMIN_PASSWORD=$(openssl rand -hex 12)
+              cat > "$ENV_FILE" << EOF
           POSTGRES_USER=palmital
           POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
           POSTGRES_DB=palmital
@@ -75,7 +80,13 @@ jobs:
           PORT=3001
           FRONTEND_URL=https://palmitaldigital.com.br
           SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
-          ENVEOF"
+          EOF
+              chmod 600 "$ENV_FILE"
+              echo ".env created successfully"
+            else
+              echo ".env already exists, skipping"
+            fi
+          ENDSSH
 
       - name: Deploy on VPS
         env:
