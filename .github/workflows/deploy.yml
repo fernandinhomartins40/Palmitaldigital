@@ -108,24 +108,27 @@ jobs:
             cp "\$ENV_FILE" "\$RELEASE_DIR/.env"
             echo "RELEASE_VERSION=\$RELEASE" >> "\$RELEASE_DIR/.env"
 
+            # Stop previous deployment (same volume cannot be used by two postgres instances)
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env down --remove-orphans 2>/dev/null || true
+
             # Build images
             cd "\$RELEASE_DIR"
-            docker compose -f docker-compose.production.yml --env-file .env build \
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env build \
               --build-arg RELEASE_VERSION="\$RELEASE" \
               --no-cache
 
-            # Run migrations
-            docker compose -f docker-compose.production.yml --env-file .env run --rm migrator
+            # Run migrations (fixed project name ensures no volume conflict)
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env run --rm migrator
 
             # Swap current symlink atomically
             ln -sfn "\$RELEASE_DIR" "\$APP_ROOT/current_new"
             mv -Tf "\$APP_ROOT/current_new" "\$CURRENT_DIR"
 
-            # Restart services
+            # Start services
             cd "\$CURRENT_DIR"
-            docker compose -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
-            # Wait for API health (check through web/nginx on port 7000 — port 3001 not exposed to host)
+            # Wait for API health (port 7000 via nginx — port 3001 not exposed to host)
             echo "Waiting for API to be healthy..."
             for i in \$(seq 1 30); do
               if wget -qO- http://localhost:7000/api/health 2>/dev/null | grep -q '"status":"ok"'; then
@@ -134,14 +137,14 @@ jobs:
               fi
               if [ "\$i" -eq 30 ]; then
                 echo "API did not become healthy in 300s" >&2
-                docker compose -f docker-compose.production.yml --env-file .env logs api --tail=50
+                docker compose -p palmital -f docker-compose.production.yml --env-file .env logs api --tail=50
                 exit 1
               fi
               sleep 10
             done
 
             # Verify release version
-            DEPLOYED_VERSION=\$(docker compose -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
+            DEPLOYED_VERSION=\$(docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
             if [ "\$DEPLOYED_VERSION" != "\$RELEASE" ]; then
               echo "Release version mismatch: expected=\$RELEASE got=\$DEPLOYED_VERSION" >&2
               exit 1
