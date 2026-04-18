@@ -99,17 +99,28 @@ jobs:
             CURRENT_DIR="\$APP_ROOT/current"
             ENV_FILE="\$APP_ROOT/.env"
 
-            # Create required Docker volumes
+            # Create required Docker volumes (preserving data)
             docker volume create palmital-postgres-data 2>/dev/null || true
             docker volume create palmital-uploads 2>/dev/null || true
             docker volume create palmital-logs 2>/dev/null || true
 
+            # ── CLEANUP: stop and remove all containers from previous deploys ──
+            # Uses compose project label filter so volumes are never touched
+            echo "Stopping previous palmital containers..."
+            PALMITAL_CONTAINERS=\$(docker ps -aq --filter "label=com.docker.compose.project=palmital" 2>/dev/null || true)
+            if [ -n "\$PALMITAL_CONTAINERS" ]; then
+              docker stop \$PALMITAL_CONTAINERS 2>/dev/null || true
+              docker rm   \$PALMITAL_CONTAINERS 2>/dev/null || true
+              echo "Removed previous containers"
+            else
+              echo "No previous containers found"
+            fi
+            # Remove dangling networks from old compose projects
+            docker network prune -f --filter "label=com.docker.compose.project=palmital" 2>/dev/null || true
+
             # Copy env file into release
             cp "\$ENV_FILE" "\$RELEASE_DIR/.env"
             echo "RELEASE_VERSION=\$RELEASE" >> "\$RELEASE_DIR/.env"
-
-            # Stop previous deployment (same volume cannot be used by two postgres instances)
-            docker compose -p palmital -f docker-compose.production.yml --env-file .env down --remove-orphans 2>/dev/null || true
 
             # Build images
             cd "\$RELEASE_DIR"
@@ -117,7 +128,7 @@ jobs:
               --build-arg RELEASE_VERSION="\$RELEASE" \
               --no-cache
 
-            # Run migrations (fixed project name ensures no volume conflict)
+            # Run migrations
             docker compose -p palmital -f docker-compose.production.yml --env-file .env run --rm migrator
 
             # Swap current symlink atomically
@@ -128,10 +139,11 @@ jobs:
             cd "\$CURRENT_DIR"
             docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
-            # Wait for API health (port 7000 via nginx — port 3001 not exposed to host)
+            # Wait for API health (direct curl to port 3001 inside container via exec)
             echo "Waiting for API to be healthy..."
             for i in \$(seq 1 30); do
-              if wget -qO- http://localhost:7000/api/health 2>/dev/null | grep -q '"status":"ok"'; then
+              if docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api \
+                curl -sf http://localhost:3001/health 2>/dev/null | grep -q '"status"'; then
                 echo "API is healthy after \${i}0s"
                 break
               fi
@@ -144,7 +156,8 @@ jobs:
             done
 
             # Verify release version
-            DEPLOYED_VERSION=\$(docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
+            DEPLOYED_VERSION=\$(docker compose -p palmital -f docker-compose.production.yml --env-file .env exec -T api \
+              cat /app/.release-version 2>/dev/null || echo "")
             if [ "\$DEPLOYED_VERSION" != "\$RELEASE" ]; then
               echo "Release version mismatch: expected=\$RELEASE got=\$DEPLOYED_VERSION" >&2
               exit 1
