@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: palmital
+      POSTGRES_PASSWORD: palmital_dev
+      POSTGRES_DB: palmital_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U palmital']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+      target: development
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://palmital:palmital_dev@postgres:5432/palmital_db
+      JWT_SECRET: dev_jwt_secret_change_in_production
+      JWT_REFRESH_SECRET: dev_refresh_secret_change_in_production
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 30d
+      PORT: 3001
+      UPLOAD_DIR: /uploads
+      FRONTEND_URL: http://localhost:3000
+    volumes:
+      - ../apps/api/src:/app/apps/api/src
+      - ../packages:/app/packages
+      - uploads_data:/app/uploads
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web
+      target: development
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - '3000:3000'
+    environment:
+      VITE_API_URL: http://localhost:3001/api/v1
+      VITE_WS_URL: ws://localhost:3001
+    volumes:
+      - ../apps/web/src:/app/apps/web/src
+      - ../packages:/app/packages
+
+volumes:
+  postgres_data:
+  uploads_data:
