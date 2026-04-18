@@ -11,11 +11,11 @@ services:
     networks:
       - palmital-internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-palmital}"]
+      test: ["CMD-SHELL", "pg_isready -U palmital -h 127.0.0.1"]
       interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 15
+      start_period: 60s
 
   migrator:
     build:

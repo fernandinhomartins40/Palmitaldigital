@@ -128,7 +128,26 @@ jobs:
               --build-arg RELEASE_VERSION="\$RELEASE" \
               --no-cache
 
-            # Run migrations
+            # Start postgres first so we can capture logs if it fails
+            echo "Starting postgres..."
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d postgres
+            echo "Waiting for postgres to be healthy (up to 135s)..."
+            for i in \$(seq 1 27); do
+              PG_STATUS=\$(docker inspect --format='{{.State.Health.Status}}' palmital-postgres-1 2>/dev/null || echo "not_found")
+              echo "  postgres[\$i/27]: \$PG_STATUS"
+              if [ "\$PG_STATUS" = "healthy" ]; then
+                echo "Postgres is healthy"
+                break
+              fi
+              if [ "\$PG_STATUS" = "unhealthy" ] || [ "\$i" -eq 27 ]; then
+                echo "ERROR: postgres failed to become healthy. Container logs:" >&2
+                docker logs palmital-postgres-1 --tail=100 >&2
+                exit 1
+              fi
+              sleep 5
+            done
+
+            # Run migrations (postgres already healthy — no dependency wait needed)
             docker compose -p palmital -f docker-compose.production.yml --env-file .env run --rm migrator
 
             # Swap current symlink atomically
