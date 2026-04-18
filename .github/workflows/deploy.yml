@@ -253,15 +253,21 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sleep 5
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 15 \
-            http://${{ env.VPS_HOST }}:${{ env.DEPLOY_PORT }}/health || echo "000")
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "Health check failed: HTTP $HTTP_STATUS" >&2
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
+            set -euo pipefail
+            echo "Running post-deploy health check..."
+            for i in $(seq 1 12); do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://localhost:${{ env.DEPLOY_PORT }}/health 2>/dev/null)
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "Health check passed: HTTP $HTTP_STATUS"
+                exit 0
+              fi
+              echo "Attempt $i/12: HTTP $HTTP_STATUS, retrying in 5s..."
+              sleep 5
+            done
+            echo "Health check failed after 60s" >&2
             exit 1
-          fi
-          echo "Health check passed: HTTP $HTTP_STATUS"
+          ENDSSH
 
       - name: Notify success
         run: |
