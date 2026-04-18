@@ -15,7 +15,9 @@ ARG VITE_API_URL=/api/v1
 ARG VITE_WS_URL=
 ARG RELEASE_VERSION=dev
 RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm --filter @palmital/utils build
 RUN pnpm --filter @palmital/types build
+RUN pnpm --filter @palmital/ui build
 RUN pnpm --filter web build
 RUN echo "$RELEASE_VERSION" > /app/apps/web/dist/release.txt
 
