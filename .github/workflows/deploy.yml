@@ -60,31 +60,33 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
             set -euo pipefail
             ENV_FILE="/opt/palmital/.env"
-            if [ ! -f "$ENV_FILE" ]; then
-              echo "Creating $ENV_FILE with generated secrets..."
-              mkdir -p /opt/palmital
+            mkdir -p /opt/palmital
+
+            # Recreate .env if it doesn't exist OR if POSTGRES_PASSWORD is empty/missing
+            # (an earlier deploy may have written the file with blank values via heredoc indentation)
+            EXISTING_PW=$(grep '^POSTGRES_PASSWORD=' "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '[:space:]' || true)
+            if [ ! -f "$ENV_FILE" ] || [ -z "$EXISTING_PW" ]; then
+              echo "Creating/fixing $ENV_FILE with generated secrets..."
               POSTGRES_PASSWORD=$(openssl rand -hex 32)
               JWT_SECRET=$(openssl rand -hex 32)
               JWT_REFRESH_SECRET=$(openssl rand -hex 32)
               SEED_ADMIN_PASSWORD=$(openssl rand -hex 12)
-              cat > "$ENV_FILE" << EOF
-          POSTGRES_USER=palmital
-          POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-          POSTGRES_DB=palmital
-          DATABASE_URL=postgresql://palmital:${POSTGRES_PASSWORD}@postgres:5432/palmital
-          JWT_SECRET=${JWT_SECRET}
-          JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-          JWT_EXPIRES_IN=15m
-          JWT_REFRESH_EXPIRES_IN=30d
-          NODE_ENV=production
-          PORT=3001
-          FRONTEND_URL=https://palmitaldigital.com.br
-          SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
-          EOF
+              printf 'POSTGRES_USER=palmital\n' > "$ENV_FILE"
+              printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD" >> "$ENV_FILE"
+              printf 'POSTGRES_DB=palmital\n' >> "$ENV_FILE"
+              printf 'DATABASE_URL=postgresql://palmital:%s@postgres:5432/palmital\n' "$POSTGRES_PASSWORD" >> "$ENV_FILE"
+              printf 'JWT_SECRET=%s\n' "$JWT_SECRET" >> "$ENV_FILE"
+              printf 'JWT_REFRESH_SECRET=%s\n' "$JWT_REFRESH_SECRET" >> "$ENV_FILE"
+              printf 'JWT_EXPIRES_IN=15m\n' >> "$ENV_FILE"
+              printf 'JWT_REFRESH_EXPIRES_IN=30d\n' >> "$ENV_FILE"
+              printf 'NODE_ENV=production\n' >> "$ENV_FILE"
+              printf 'PORT=3001\n' >> "$ENV_FILE"
+              printf 'FRONTEND_URL=https://palmitaldigital.com.br\n' >> "$ENV_FILE"
+              printf 'SEED_ADMIN_PASSWORD=%s\n' "$SEED_ADMIN_PASSWORD" >> "$ENV_FILE"
               chmod 600 "$ENV_FILE"
-              echo ".env created successfully"
+              echo ".env created/fixed successfully"
             else
-              echo ".env already exists, skipping"
+              echo ".env already exists with valid POSTGRES_PASSWORD, skipping"
             fi
           ENDSSH
 
@@ -101,10 +103,24 @@ jobs:
             CURRENT_DIR="\$APP_ROOT/current"
             ENV_FILE="\$APP_ROOT/.env"
 
-            # Create required Docker volumes
+            # Create required Docker volumes (preserving data)
             docker volume create palmital-postgres-data 2>/dev/null || true
             docker volume create palmital-uploads 2>/dev/null || true
             docker volume create palmital-logs 2>/dev/null || true
+
+            # ── CLEANUP: stop and remove all containers from previous deploys ──
+            # Uses compose project label filter so volumes are never touched
+            echo "Stopping previous palmital containers..."
+            PALMITAL_CONTAINERS=\$(docker ps -aq --filter "label=com.docker.compose.project=palmital" 2>/dev/null || true)
+            if [ -n "\$PALMITAL_CONTAINERS" ]; then
+              docker stop \$PALMITAL_CONTAINERS 2>/dev/null || true
+              docker rm   \$PALMITAL_CONTAINERS 2>/dev/null || true
+              echo "Removed previous containers"
+            else
+              echo "No previous containers found"
+            fi
+            # Remove dangling networks from old compose projects
+            docker network prune -f --filter "label=com.docker.compose.project=palmital" 2>/dev/null || true
 
             # Copy env file into release
             cp "\$ENV_FILE" "\$RELEASE_DIR/.env"
@@ -112,43 +128,119 @@ jobs:
 
             # Build images
             cd "\$RELEASE_DIR"
-            docker compose -f docker-compose.production.yml --env-file .env build \
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env build \
               --build-arg RELEASE_VERSION="\$RELEASE" \
               --no-cache
 
-            # Run migrations
-            docker compose -f docker-compose.production.yml --env-file .env run --rm migrator
+            # Start postgres first so we can capture logs if it fails
+            echo "Starting postgres..."
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d postgres
+            echo "Waiting for postgres to be healthy (up to 135s)..."
+            for i in \$(seq 1 27); do
+              PG_STATUS=\$(docker inspect --format='{{.State.Health.Status}}' palmital-postgres-1 2>/dev/null || echo "not_found")
+              echo "  postgres[\$i/27]: \$PG_STATUS"
+              if [ "\$PG_STATUS" = "healthy" ]; then
+                echo "Postgres is healthy"
+                break
+              fi
+              if [ "\$PG_STATUS" = "unhealthy" ] || [ "\$i" -eq 27 ]; then
+                echo "ERROR: postgres failed to become healthy. Container logs:" >&2
+                docker logs palmital-postgres-1 --tail=100 >&2
+                exit 1
+              fi
+              sleep 5
+            done
+
+            # Run migrations (postgres already healthy — no dependency wait needed)
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env run --rm migrator
 
             # Swap current symlink atomically
             ln -sfn "\$RELEASE_DIR" "\$APP_ROOT/current_new"
             mv -Tf "\$APP_ROOT/current_new" "\$CURRENT_DIR"
 
-            # Restart services
+            # Start services
             cd "\$CURRENT_DIR"
-            docker compose -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
+            docker compose -p palmital -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
+
+            # Wait for api and web containers to be running (web waits for api healthy — up to 120s)
+            echo "Waiting for api and web containers to be running..."
+            for i in \$(seq 1 24); do
+              API_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-api-1 2>/dev/null || echo "not_found")
+              WEB_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-web-1 2>/dev/null || echo "not_found")
+              echo "  [\${i}/24] api=\$API_STATUS web=\$WEB_STATUS"
+              if [ "\$API_STATUS" = "running" ] && [ "\$WEB_STATUS" = "running" ]; then
+                echo "Both containers are running"
+                break
+              fi
+              if [ "\$API_STATUS" = "exited" ] || [ "\$API_STATUS" = "dead" ]; then
+                echo "ERROR: api container crashed (status: \$API_STATUS)" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              if [ "\$WEB_STATUS" = "exited" ] || [ "\$WEB_STATUS" = "dead" ]; then
+                echo "ERROR: web container crashed (status: \$WEB_STATUS)" >&2
+                docker logs palmital-web-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              if [ "\$i" -eq 24 ]; then
+                echo "ERROR: containers did not reach running state within 120s" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
+                docker logs palmital-web-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              sleep 5
+            done
 
             # Wait for API health
             echo "Waiting for API to be healthy..."
             for i in \$(seq 1 30); do
-              if wget -qO- http://localhost:3001/health 2>/dev/null | grep -q '"status":"ok"'; then
+              API_STATUS=\$(docker inspect --format='{{.State.Status}}' palmital-api-1 2>/dev/null || echo "not_found")
+              if [ "\$API_STATUS" != "running" ]; then
+                echo "ERROR: API container stopped unexpectedly (status: \$API_STATUS)" >&2
+                docker logs palmital-api-1 --tail=80 >&2 || true
+                exit 1
+              fi
+              if docker exec palmital-api-1 curl -sf http://localhost:3001/health 2>/dev/null | grep -q '"status"'; then
                 echo "API is healthy after \${i}0s"
                 break
               fi
               if [ "\$i" -eq 30 ]; then
                 echo "API did not become healthy in 300s" >&2
-                docker compose -f docker-compose.production.yml --env-file .env logs api --tail=50
+                docker logs palmital-api-1 --tail=80 >&2
                 exit 1
               fi
               sleep 10
             done
 
             # Verify release version
-            DEPLOYED_VERSION=\$(docker compose -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
+            DEPLOYED_VERSION=\$(docker exec palmital-api-1 cat /app/.release-version 2>/dev/null || echo "")
             if [ "\$DEPLOYED_VERSION" != "\$RELEASE" ]; then
               echo "Release version mismatch: expected=\$RELEASE got=\$DEPLOYED_VERSION" >&2
               exit 1
             fi
             echo "Release version verified: \$DEPLOYED_VERSION"
+
+            # Verify port 7000 is actually serving requests (catches web crash-loops)
+            echo "Verifying port 7000 is accessible..."
+            for i in \$(seq 1 12); do
+              HTTP_7000=\$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:7000/health 2>/dev/null || true)
+              if [ "\$HTTP_7000" = "200" ]; then
+                echo "Port 7000 verified: HTTP \$HTTP_7000"
+                break
+              fi
+              echo "  [\$i/12] port 7000: HTTP \$HTTP_7000"
+              if [ "\$i" -eq 12 ]; then
+                echo "ERROR: Port 7000 not accessible after 60s (HTTP \$HTTP_7000)" >&2
+                echo "--- web container state ---" >&2
+                docker inspect --format='Status={{.State.Status}} Restarts={{.RestartCount}}' palmital-web-1 >&2 || true
+                echo "--- web logs ---" >&2
+                docker logs palmital-web-1 --tail=60 >&2 || true
+                echo "--- port bindings ---" >&2
+                ss -tlnp 2>/dev/null | grep -E '7000|3000' || true
+                exit 1
+              fi
+              sleep 5
+            done
 
             # Clean up old releases (keep last 3)
             ls -dt "\$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
@@ -253,15 +345,26 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sleep 5
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 15 \
-            http://${{ env.VPS_HOST }}:${{ env.DEPLOY_PORT }}/health || echo "000")
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "Health check failed: HTTP $HTTP_STATUS" >&2
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
+            echo "Running post-deploy health check..."
+            for i in $(seq 1 24); do
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 http://localhost:7000/health 2>/dev/null || true)
+              if [ "$HTTP_STATUS" = "200" ]; then
+                echo "Health check passed: HTTP $HTTP_STATUS"
+                exit 0
+              fi
+              echo "Attempt $i/24: HTTP $HTTP_STATUS, retrying in 5s..."
+              sleep 5
+            done
+            echo "Health check failed after 120s" >&2
+            echo "--- All container states ---" >&2
+            docker ps -a --filter "name=palmital" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" >&2 || true
+            echo "--- API logs ---" >&2
+            docker logs palmital-api-1 --tail=40 >&2 || true
+            echo "--- Web logs ---" >&2
+            docker logs palmital-web-1 --tail=40 >&2 || true
             exit 1
-          fi
-          echo "Health check passed: HTTP $HTTP_STATUS"
+          ENDSSH
 
       - name: Notify success
         run: |
