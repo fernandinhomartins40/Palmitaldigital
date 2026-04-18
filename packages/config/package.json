@@ -4,5 +4,6 @@
   "private": true,
   "exports": {
     "./tsconfig/*": "./tsconfig/*.json"
-  }
+  },
+  "files": ["tsconfig"]
 }

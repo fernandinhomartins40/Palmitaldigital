@@ -23,7 +23,10 @@ export function ClassifiedDetailPage() {
   });
 
   const startChatMutation = useMutation({
-    mutationFn: () => api.post('/chat/conversations', { recipientId: item.authorId }),
+    mutationFn: () => {
+      if (!item) throw new Error('Item not loaded');
+      return api.post('/chat/conversations', { recipientId: item.authorId });
+    },
     onSuccess: (res) => navigate(`/chat/${res.data.id}`),
     onError: () => addToast('Erro ao iniciar conversa', 'error'),
   });

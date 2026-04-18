@@ -84,10 +84,8 @@ export class ChatService {
       },
     });
 
-    return {
-      messages: messages.reverse(),
-      nextCursor: messages.length === limit ? messages[0]?.id : null,
-    };
+    const nextCursor = messages.length === limit ? messages[0]?.id : null;
+    return { messages: messages.reverse(), nextCursor };
   }
 
   async saveMessage(conversationId: string, senderId: string, content: string) {

@@ -25,6 +25,7 @@ export function ChatPage() {
     },
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled: !!conversationId,
   });
 
   const messages = data?.pages.flatMap((p) => p.messages) ?? [];

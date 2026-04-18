@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { Spinner } from '@palmital/ui';
 
 interface InfiniteListProps<T> {
   items: T[];
-  renderItem: (item: T) => React.ReactNode;
+  renderItem: (item: T) => ReactNode;
   hasNextPage: boolean;
   fetchNextPage: () => void;
   isFetchingNextPage: boolean;
@@ -24,7 +24,10 @@ export function InfiniteList<T extends { id: string }>({
     const el = sentinelRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage(); },
+      ([entry]) => {
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage)
+          fetchNextPage();
+      },
       { threshold: 0.1 },
     );
     observer.observe(el);

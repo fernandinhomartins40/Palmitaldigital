@@ -6,23 +6,25 @@ COPY packages ./packages
 COPY apps/api ./apps/api
 
 FROM base AS development
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm install
 RUN pnpm --filter api exec prisma generate
 EXPOSE 3001
 CMD ["pnpm", "--filter", "api", "dev"]
 
 FROM base AS build
-RUN pnpm install --frozen-lockfile || pnpm install
+RUN pnpm install
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
 
+FROM base AS predeploy
+RUN pnpm install
+RUN pnpm --filter api --prod deploy /deploy
+
 FROM node:20-alpine AS production
-RUN npm install -g pnpm@9
 WORKDIR /app
 COPY --from=build /app/apps/api/dist ./dist
-COPY --from=build /app/apps/api/package.json .
 COPY --from=build /app/apps/api/prisma ./prisma
-COPY --from=build /app/node_modules/.pnpm ./node_modules/.pnpm
-RUN pnpm install --prod
+COPY --from=predeploy /deploy/node_modules ./node_modules
+COPY --from=predeploy /deploy/package.json ./package.json
 EXPOSE 3001
 CMD ["node", "dist/main"]
