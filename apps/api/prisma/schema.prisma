@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  BUSINESS_OWNER
+  ADMIN
+}
+
+enum PostType {
+  SOCIAL
+  CLASSIFIED
+  BUSINESS
+}
+
+enum ClassifiedStatus {
+  ACTIVE
+  SOLD
+  PAUSED
+  EXPIRED
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?  @unique
+  passwordHash String
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile          Profile?
+  company          Company?
+  posts            Post[]
+  classifieds      Classified[]
+  sentMessages     Message[]                @relation("SentMessages")
+  conversations    ConversationParticipant[]
+  mediaUploads     Media[]
+  refreshTokens    RefreshToken[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  displayName String
+  bio         String?
+  avatarUrl   String?
+  city        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  coverUrl    String?
+  phone       String?
+  address     String?
+  city        String?
+  category    String?
+  isVerified  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id])
+  posts    Post[]
+  products Product[]
+
+  @@index([slug])
+  @@index([city])
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  authorId    String
+  companyId   String?
+  type        PostType @default(SOCIAL)
+  content     String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author     User        @relation(fields: [authorId], references: [id])
+  company    Company?    @relation(fields: [companyId], references: [id])
+  classified Classified?
+  media      Media[]
+
+  @@index([authorId])
+  @@index([type])
+  @@index([createdAt(sort: Desc)])
+  @@index([isPublished, createdAt(sort: Desc)])
+}
+
+model Classified {
+  id          String           @id @default(cuid())
+  postId      String           @unique
+  authorId    String
+  title       String
+  description String
+  price       Decimal?         @db.Decimal(10, 2)
+  isFree      Boolean          @default(false)
+  status      ClassifiedStatus @default(ACTIVE)
+  categoryId  String?
+  city        String?
+  expiresAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([authorId])
+  @@index([status])
+  @@index([categoryId])
+  @@index([city])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  companyId   String
+  name        String
+  description String?
+  price       Decimal? @db.Decimal(10, 2)
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@index([companyId])
+}
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  slug     String  @unique
+  iconName String?
+  parentId String?
+
+  parent      Category?    @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[]   @relation("SubCategories")
+  classifieds Classified[]
+
+  @@index([slug])
+}
+
+model Media {
+  id         String    @id @default(cuid())
+  postId     String?
+  uploaderId String
+  url        String
+  type       MediaType @default(IMAGE)
+  mimeType   String?
+  sizeBytes  Int?
+  width      Int?
+  height     Int?
+  createdAt  DateTime  @default(now())
+
+  post     Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
+  uploader User  @relation(fields: [uploaderId], references: [id])
+
+  @@index([postId])
+  @@index([uploaderId])
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([updatedAt(sort: Desc)])
+}
+
+model ConversationParticipant {
+  id             String    @id @default(cuid())
+  conversationId String
+  userId         String
+  joinedAt       DateTime  @default(now())
+  lastReadAt     DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String        @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  status         MessageStatus @default(SENT)
+  createdAt      DateTime      @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
