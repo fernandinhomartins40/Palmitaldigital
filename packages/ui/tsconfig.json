@@ -1,9 +1,18 @@
 {
-  "extends": "../../packages/config/tsconfig/react.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
     "outDir": "dist",
-    "rootDir": "src",
-    "noEmit": false
+    "rootDir": "src"
   },
   "include": ["src"]
 }
