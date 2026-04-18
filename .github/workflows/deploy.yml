@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VPS_HOST: rebequi.com.br
+  VPS_HOST: 72.60.10.112
   VPS_USER: root
   APP_ROOT: /opt/palmital
   RELEASE_DIR: /opt/palmital/current
