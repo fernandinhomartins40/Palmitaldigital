@@ -220,6 +220,28 @@ jobs:
             fi
             echo "Release version verified: \$DEPLOYED_VERSION"
 
+            # Verify port 7000 is actually serving requests (catches web crash-loops)
+            echo "Verifying port 7000 is accessible..."
+            for i in \$(seq 1 12); do
+              HTTP_7000=\$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:7000/health 2>/dev/null || true)
+              if [ "\$HTTP_7000" = "200" ]; then
+                echo "Port 7000 verified: HTTP \$HTTP_7000"
+                break
+              fi
+              echo "  [\$i/12] port 7000: HTTP \$HTTP_7000"
+              if [ "\$i" -eq 12 ]; then
+                echo "ERROR: Port 7000 not accessible after 60s (HTTP \$HTTP_7000)" >&2
+                echo "--- web container state ---" >&2
+                docker inspect --format='Status={{.State.Status}} Restarts={{.RestartCount}}' palmital-web-1 >&2 || true
+                echo "--- web logs ---" >&2
+                docker logs palmital-web-1 --tail=60 >&2 || true
+                echo "--- port bindings ---" >&2
+                ss -tlnp 2>/dev/null | grep -E '7000|3000' || true
+                exit 1
+              fi
+              sleep 5
+            done
+
             # Clean up old releases (keep last 3)
             ls -dt "\$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
           ENDSSH
