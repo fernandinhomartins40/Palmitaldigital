@@ -67,20 +67,18 @@ jobs:
               JWT_SECRET=$(openssl rand -hex 32)
               JWT_REFRESH_SECRET=$(openssl rand -hex 32)
               SEED_ADMIN_PASSWORD=$(openssl rand -hex 12)
-              cat > "$ENV_FILE" << EOF
-          POSTGRES_USER=palmital
-          POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-          POSTGRES_DB=palmital
-          DATABASE_URL=postgresql://palmital:${POSTGRES_PASSWORD}@postgres:5432/palmital
-          JWT_SECRET=${JWT_SECRET}
-          JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
-          JWT_EXPIRES_IN=15m
-          JWT_REFRESH_EXPIRES_IN=30d
-          NODE_ENV=production
-          PORT=3001
-          FRONTEND_URL=https://palmitaldigital.com.br
-          SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
-          EOF
+              printf 'POSTGRES_USER=palmital\n' > "$ENV_FILE"
+              printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD" >> "$ENV_FILE"
+              printf 'POSTGRES_DB=palmital\n' >> "$ENV_FILE"
+              printf 'DATABASE_URL=postgresql://palmital:%s@postgres:5432/palmital\n' "$POSTGRES_PASSWORD" >> "$ENV_FILE"
+              printf 'JWT_SECRET=%s\n' "$JWT_SECRET" >> "$ENV_FILE"
+              printf 'JWT_REFRESH_SECRET=%s\n' "$JWT_REFRESH_SECRET" >> "$ENV_FILE"
+              printf 'JWT_EXPIRES_IN=15m\n' >> "$ENV_FILE"
+              printf 'JWT_REFRESH_EXPIRES_IN=30d\n' >> "$ENV_FILE"
+              printf 'NODE_ENV=production\n' >> "$ENV_FILE"
+              printf 'PORT=3001\n' >> "$ENV_FILE"
+              printf 'FRONTEND_URL=https://palmitaldigital.com.br\n' >> "$ENV_FILE"
+              printf 'SEED_ADMIN_PASSWORD=%s\n' "$SEED_ADMIN_PASSWORD" >> "$ENV_FILE"
               chmod 600 "$ENV_FILE"
               echo ".env created successfully"
             else
@@ -127,10 +125,10 @@ jobs:
             cd "\$CURRENT_DIR"
             docker compose -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
-            # Wait for API health
+            # Wait for API health (check through web/nginx on port 7000 — port 3001 not exposed to host)
             echo "Waiting for API to be healthy..."
             for i in \$(seq 1 30); do
-              if wget -qO- http://localhost:3001/health 2>/dev/null | grep -q '"status":"ok"'; then
+              if wget -qO- http://localhost:7000/api/health 2>/dev/null | grep -q '"status":"ok"'; then
                 echo "API is healthy after \${i}0s"
                 break
               fi
