@@ -13,7 +13,6 @@ env:
   VPS_HOST: 72.60.10.112
   VPS_USER: root
   APP_ROOT: /opt/palmital
-  RELEASE_DIR: /opt/palmital/current
   DEPLOY_PORT: "7000"
   PRIMARY_DOMAIN: palmitaldigital.com.br
   SECONDARY_DOMAIN: www.palmitaldigital.com.br
@@ -54,25 +53,42 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/
 
+      - name: Write .env on VPS
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+            "mkdir -p ${{ env.APP_ROOT }} && cat > ${{ env.APP_ROOT }}/.env << 'ENVEOF'
+          POSTGRES_USER=palmital
+          POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+          POSTGRES_DB=palmital
+          DATABASE_URL=postgresql://palmital:${POSTGRES_PASSWORD}@postgres:5432/palmital
+          JWT_SECRET=${JWT_SECRET}
+          JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+          JWT_EXPIRES_IN=15m
+          JWT_REFRESH_EXPIRES_IN=30d
+          NODE_ENV=production
+          PORT=3001
+          FRONTEND_URL=https://palmitaldigital.com.br
+          SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
+          ENVEOF"
+
       - name: Deploy on VPS
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
-          RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << ENDSSH
             set -euo pipefail
 
             RELEASE="${{ steps.release.outputs.version }}"
             APP_ROOT="${{ env.APP_ROOT }}"
-            RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
-            CURRENT_DIR="$APP_ROOT/current"
-            ENV_FILE="$APP_ROOT/.env"
-
-            # Ensure env file exists
-            if [ ! -f "$ENV_FILE" ]; then
-              echo "ERROR: $ENV_FILE not found. Create it manually on the VPS." >&2
-              exit 1
-            fi
+            RELEASE_DIR="\$APP_ROOT/releases/\$RELEASE"
+            CURRENT_DIR="\$APP_ROOT/current"
+            ENV_FILE="\$APP_ROOT/.env"
 
             # Create required Docker volumes
             docker volume create palmital-postgres-data 2>/dev/null || true
@@ -80,35 +96,34 @@ jobs:
             docker volume create palmital-logs 2>/dev/null || true
 
             # Copy env file into release
-            cp "$ENV_FILE" "$RELEASE_DIR/.env"
-            echo "RELEASE_VERSION=$RELEASE" >> "$RELEASE_DIR/.env"
+            cp "\$ENV_FILE" "\$RELEASE_DIR/.env"
+            echo "RELEASE_VERSION=\$RELEASE" >> "\$RELEASE_DIR/.env"
 
             # Build images
-            cd "$RELEASE_DIR"
+            cd "\$RELEASE_DIR"
             docker compose -f docker-compose.production.yml --env-file .env build \
-              --build-arg RELEASE_VERSION="$RELEASE" \
+              --build-arg RELEASE_VERSION="\$RELEASE" \
               --no-cache
 
             # Run migrations
             docker compose -f docker-compose.production.yml --env-file .env run --rm migrator
 
             # Swap current symlink atomically
-            ln -sfn "$RELEASE_DIR" "$APP_ROOT/current_new"
-            mv -Tf "$APP_ROOT/current_new" "$CURRENT_DIR"
+            ln -sfn "\$RELEASE_DIR" "\$APP_ROOT/current_new"
+            mv -Tf "\$APP_ROOT/current_new" "\$CURRENT_DIR"
 
             # Restart services
-            cd "$CURRENT_DIR"
+            cd "\$CURRENT_DIR"
             docker compose -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
 
             # Wait for API health
             echo "Waiting for API to be healthy..."
-            for i in $(seq 1 30); do
-              STATUS=$(docker compose -f docker-compose.production.yml --env-file .env ps api --format json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('Health','unknown'))" 2>/dev/null || echo "unknown")
-              if [ "$STATUS" = "healthy" ]; then
-                echo "API is healthy after ${i}0s"
+            for i in \$(seq 1 30); do
+              if wget -qO- http://localhost:3001/health 2>/dev/null | grep -q '"status":"ok"'; then
+                echo "API is healthy after \${i}0s"
                 break
               fi
-              if [ "$i" -eq 30 ]; then
+              if [ "\$i" -eq 30 ]; then
                 echo "API did not become healthy in 300s" >&2
                 docker compose -f docker-compose.production.yml --env-file .env logs api --tail=50
                 exit 1
@@ -117,25 +132,25 @@ jobs:
             done
 
             # Verify release version
-            DEPLOYED_VERSION=$(docker compose -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
-            if [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
-              echo "Release version mismatch: expected=$RELEASE got=$DEPLOYED_VERSION" >&2
+            DEPLOYED_VERSION=\$(docker compose -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
+            if [ "\$DEPLOYED_VERSION" != "\$RELEASE" ]; then
+              echo "Release version mismatch: expected=\$RELEASE got=\$DEPLOYED_VERSION" >&2
               exit 1
             fi
-            echo "Release version verified: $DEPLOYED_VERSION"
+            echo "Release version verified: \$DEPLOYED_VERSION"
 
             # Clean up old releases (keep last 3)
-            ls -dt "$APP_ROOT/releases"/*/ | tail -n +4 | xargs rm -rf 2>/dev/null || true
+            ls -dt "\$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
           ENDSSH
 
       - name: Configure Nginx (HTTP)
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << 'ENDSSH'
             set -euo pipefail
-            NGINX_CONF="/etc/nginx/sites-available/palmital"
-            cat > "$NGINX_CONF" << 'NGINX'
+            mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+            cat > /etc/nginx/sites-available/palmital << 'NGINX'
           server {
               listen 80;
               server_name palmitaldigital.com.br www.palmitaldigital.com.br;
@@ -157,7 +172,7 @@ jobs:
               }
           }
           NGINX
-            ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/palmital
+            ln -sf /etc/nginx/sites-available/palmital /etc/nginx/sites-enabled/palmital
             nginx -t && systemctl reload nginx
           ENDSSH
 
@@ -165,7 +180,7 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << ENDSSH
             set -euo pipefail
             mkdir -p /var/www/certbot
             if [ ! -f "/etc/letsencrypt/live/${{ env.PRIMARY_DOMAIN }}/fullchain.pem" ]; then
@@ -175,7 +190,7 @@ jobs:
                 -d ${{ env.SECONDARY_DOMAIN }} \
                 --email ${{ env.SSL_EMAIL }} \
                 --agree-tos \
-                --non-interactive
+                --non-interactive || true
             else
               certbot renew --quiet --no-self-upgrade 2>/dev/null || true
             fi
@@ -185,10 +200,9 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash << ENDSSH
             set -euo pipefail
-            CERT_PATH="/etc/letsencrypt/live/${{ env.PRIMARY_DOMAIN }}"
-            if [ ! -f "$CERT_PATH/fullchain.pem" ]; then
+            if [ ! -f "/etc/letsencrypt/live/${{ env.PRIMARY_DOMAIN }}/fullchain.pem" ]; then
               echo "SSL cert not found, keeping HTTP-only config"
               exit 0
             fi
@@ -196,7 +210,7 @@ jobs:
           server {
               listen 80;
               server_name palmitaldigital.com.br www.palmitaldigital.com.br;
-              return 301 https://www.palmitaldigital.com.br$request_uri;
+              return 301 https://www.palmitaldigital.com.br\$request_uri;
           }
 
           server {
@@ -211,12 +225,12 @@ jobs:
               location / {
                   proxy_pass http://127.0.0.1:7000;
                   proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Upgrade \$http_upgrade;
                   proxy_set_header Connection "upgrade";
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_set_header Host \$host;
+                  proxy_set_header X-Real-IP \$remote_addr;
+                  proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto \$scheme;
                   proxy_read_timeout 86400;
               }
           }
