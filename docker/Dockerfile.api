@@ -22,7 +22,12 @@ FROM base AS predeploy
 RUN pnpm install
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api --prod deploy /deploy
-RUN cp -r /app/node_modules/.prisma /deploy/node_modules/.prisma
+# pnpm stores .prisma/client in the virtual store; find it regardless of exact path
+RUN PRISMA_CLIENT=$(find /app -path "*/.prisma/client" -type d 2>/dev/null | head -1) && \
+    [ -n "$PRISMA_CLIENT" ] || { echo "ERROR: .prisma/client not found after prisma generate" >&2; exit 1; } && \
+    mkdir -p /deploy/node_modules/.prisma && \
+    cp -r "$PRISMA_CLIENT" /deploy/node_modules/.prisma/client && \
+    echo "Prisma client copied from: $PRISMA_CLIENT"
 
 FROM node:20-alpine AS production
 RUN apk add --no-cache curl
