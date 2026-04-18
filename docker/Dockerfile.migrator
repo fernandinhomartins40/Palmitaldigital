@@ -1,0 +1,11 @@
+FROM node:20-alpine AS base
+RUN npm install -g pnpm@9
+WORKDIR /app
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY packages ./packages
+COPY apps/api ./apps/api
+
+RUN pnpm install
+RUN pnpm --filter api exec prisma generate
+
+CMD ["pnpm", "--filter", "api", "exec", "prisma", "migrate", "deploy"]

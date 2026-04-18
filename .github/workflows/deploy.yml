@@ -1,0 +1,244 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+env:
+  VPS_HOST: rebequi.com.br
+  VPS_USER: root
+  APP_ROOT: /opt/palmital
+  RELEASE_DIR: /opt/palmital/current
+  DEPLOY_PORT: "7000"
+  PRIMARY_DOMAIN: palmitaldigital.com.br
+  SECONDARY_DOMAIN: www.palmitaldigital.com.br
+  SSL_EMAIL: admin@palmitaldigital.com.br
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    environment:
+      name: production
+      url: https://www.palmitaldigital.com.br
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set release version
+        id: release
+        run: echo "version=$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Upload source to VPS
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+            "mkdir -p ${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}"
+          sshpass -e rsync -az --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='apps/api/node_modules' \
+            --exclude='apps/web/node_modules' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/
+
+      - name: Deploy on VPS
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+            set -euo pipefail
+
+            RELEASE="${{ steps.release.outputs.version }}"
+            APP_ROOT="${{ env.APP_ROOT }}"
+            RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
+            CURRENT_DIR="$APP_ROOT/current"
+            ENV_FILE="$APP_ROOT/.env"
+
+            # Ensure env file exists
+            if [ ! -f "$ENV_FILE" ]; then
+              echo "ERROR: $ENV_FILE not found. Create it manually on the VPS." >&2
+              exit 1
+            fi
+
+            # Create required Docker volumes
+            docker volume create palmital-postgres-data 2>/dev/null || true
+            docker volume create palmital-uploads 2>/dev/null || true
+            docker volume create palmital-logs 2>/dev/null || true
+
+            # Copy env file into release
+            cp "$ENV_FILE" "$RELEASE_DIR/.env"
+            echo "RELEASE_VERSION=$RELEASE" >> "$RELEASE_DIR/.env"
+
+            # Build images
+            cd "$RELEASE_DIR"
+            docker compose -f docker-compose.production.yml --env-file .env build \
+              --build-arg RELEASE_VERSION="$RELEASE" \
+              --no-cache
+
+            # Run migrations
+            docker compose -f docker-compose.production.yml --env-file .env run --rm migrator
+
+            # Swap current symlink atomically
+            ln -sfn "$RELEASE_DIR" "$APP_ROOT/current_new"
+            mv -Tf "$APP_ROOT/current_new" "$CURRENT_DIR"
+
+            # Restart services
+            cd "$CURRENT_DIR"
+            docker compose -f docker-compose.production.yml --env-file .env up -d --remove-orphans postgres api web
+
+            # Wait for API health
+            echo "Waiting for API to be healthy..."
+            for i in $(seq 1 30); do
+              STATUS=$(docker compose -f docker-compose.production.yml --env-file .env ps api --format json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('Health','unknown'))" 2>/dev/null || echo "unknown")
+              if [ "$STATUS" = "healthy" ]; then
+                echo "API is healthy after ${i}0s"
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "API did not become healthy in 300s" >&2
+                docker compose -f docker-compose.production.yml --env-file .env logs api --tail=50
+                exit 1
+              fi
+              sleep 10
+            done
+
+            # Verify release version
+            DEPLOYED_VERSION=$(docker compose -f docker-compose.production.yml --env-file .env exec -T api cat /app/.release-version 2>/dev/null || echo "")
+            if [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
+              echo "Release version mismatch: expected=$RELEASE got=$DEPLOYED_VERSION" >&2
+              exit 1
+            fi
+            echo "Release version verified: $DEPLOYED_VERSION"
+
+            # Clean up old releases (keep last 3)
+            ls -dt "$APP_ROOT/releases"/*/ | tail -n +4 | xargs rm -rf 2>/dev/null || true
+          ENDSSH
+
+      - name: Configure Nginx (HTTP)
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+            set -euo pipefail
+            NGINX_CONF="/etc/nginx/sites-available/palmital"
+            cat > "$NGINX_CONF" << 'NGINX'
+          server {
+              listen 80;
+              server_name palmitaldigital.com.br www.palmitaldigital.com.br;
+
+              location /.well-known/acme-challenge/ {
+                  root /var/www/certbot;
+              }
+
+              location / {
+                  proxy_pass http://127.0.0.1:7000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_read_timeout 86400;
+              }
+          }
+          NGINX
+            ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/palmital
+            nginx -t && systemctl reload nginx
+          ENDSSH
+
+      - name: Obtain SSL certificate
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+            set -euo pipefail
+            mkdir -p /var/www/certbot
+            if [ ! -f "/etc/letsencrypt/live/${{ env.PRIMARY_DOMAIN }}/fullchain.pem" ]; then
+              certbot certonly --webroot \
+                -w /var/www/certbot \
+                -d ${{ env.PRIMARY_DOMAIN }} \
+                -d ${{ env.SECONDARY_DOMAIN }} \
+                --email ${{ env.SSL_EMAIL }} \
+                --agree-tos \
+                --non-interactive
+            else
+              certbot renew --quiet --no-self-upgrade 2>/dev/null || true
+            fi
+          ENDSSH
+
+      - name: Configure Nginx (HTTPS)
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} bash -s << 'ENDSSH'
+            set -euo pipefail
+            CERT_PATH="/etc/letsencrypt/live/${{ env.PRIMARY_DOMAIN }}"
+            if [ ! -f "$CERT_PATH/fullchain.pem" ]; then
+              echo "SSL cert not found, keeping HTTP-only config"
+              exit 0
+            fi
+            cat > /etc/nginx/sites-available/palmital << 'NGINX'
+          server {
+              listen 80;
+              server_name palmitaldigital.com.br www.palmitaldigital.com.br;
+              return 301 https://www.palmitaldigital.com.br$request_uri;
+          }
+
+          server {
+              listen 443 ssl http2;
+              server_name palmitaldigital.com.br www.palmitaldigital.com.br;
+
+              ssl_certificate /etc/letsencrypt/live/palmitaldigital.com.br/fullchain.pem;
+              ssl_certificate_key /etc/letsencrypt/live/palmitaldigital.com.br/privkey.pem;
+              ssl_protocols TLSv1.2 TLSv1.3;
+              ssl_ciphers HIGH:!aNULL:!MD5;
+
+              location / {
+                  proxy_pass http://127.0.0.1:7000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection "upgrade";
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_read_timeout 86400;
+              }
+          }
+          NGINX
+            nginx -t && systemctl reload nginx
+          ENDSSH
+
+      - name: Post-deploy health check
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sleep 5
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            --max-time 15 \
+            http://${{ env.VPS_HOST }}:${{ env.DEPLOY_PORT }}/health || echo "000")
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Health check failed: HTTP $HTTP_STATUS" >&2
+            exit 1
+          fi
+          echo "Health check passed: HTTP $HTTP_STATUS"
+
+      - name: Notify success
+        run: |
+          echo "Deployment ${{ steps.release.outputs.version }} completed successfully"
+          echo "URL: https://www.palmitaldigital.com.br"

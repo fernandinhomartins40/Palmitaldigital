@@ -11,6 +11,7 @@ import { MediaModule } from './modules/media/media.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { HealthModule } from './modules/health/health.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
@@ -27,6 +28,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
     ChatModule,
     CategoriesModule,
     CompaniesModule,
+    HealthModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

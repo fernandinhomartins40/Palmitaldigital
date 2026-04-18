@@ -13,8 +13,10 @@ CMD ["pnpm", "--filter", "web", "dev", "--host"]
 FROM base AS build
 ARG VITE_API_URL=/api/v1
 ARG VITE_WS_URL=
+ARG RELEASE_VERSION=dev
 RUN pnpm install --frozen-lockfile || pnpm install
 RUN pnpm --filter web build
+RUN echo "$RELEASE_VERSION" > /app/apps/web/dist/release.txt
 
 FROM nginx:alpine AS production
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html

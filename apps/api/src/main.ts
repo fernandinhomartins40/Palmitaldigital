@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { RequestMethod } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { globalValidationPipe } from './common/pipes/validation.pipe';
 import { join } from 'path';
@@ -13,7 +14,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useWebSocketAdapter(new IoAdapter(app));
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+    exclude: [{ path: 'health', method: RequestMethod.GET }],
+  });
   app.useGlobalPipes(globalValidationPipe);
 
   app.enableCors({
