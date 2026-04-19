@@ -38,6 +38,6 @@ COPY --from=build /app/.release-version ./.release-version
 COPY --from=predeploy /deploy/node_modules ./node_modules
 COPY --from=predeploy /deploy/package.json ./package.json
 # Run prisma generate in the final image so the query engine is built for this exact environment
-RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma
 EXPOSE 3001
 CMD ["node", "dist/main"]
