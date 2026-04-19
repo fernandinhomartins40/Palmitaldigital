@@ -16,6 +16,7 @@ ARG RELEASE_VERSION=dev
 RUN pnpm install
 RUN pnpm --filter @palmital/utils build
 RUN pnpm --filter @palmital/types build
+# Generate prisma client to /app/generated/prisma (custom output path in schema.prisma)
 RUN pnpm --filter api exec prisma generate
 RUN pnpm --filter api build
 RUN echo "$RELEASE_VERSION" > /app/.release-version
@@ -36,7 +37,8 @@ COPY --from=build /app/apps/api/prisma ./prisma
 COPY --from=build /app/.release-version ./.release-version
 COPY --from=predeploy /deploy/node_modules ./node_modules
 COPY --from=predeploy /deploy/package.json ./package.json
-# prisma is now a prod dependency so ./node_modules/.bin/prisma exists
-RUN ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma
+# Copy the generated prisma client from the build stage (custom output = apps/api/generated/prisma)
+# This avoids any pnpm virtual store path issues — fixed, predictable path
+COPY --from=build /app/apps/api/generated/prisma ./generated/prisma
 EXPOSE 3001
 CMD ["node", "dist/main"]
