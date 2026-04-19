@@ -29,7 +29,6 @@ COPY --from=build /app/packages/utils/dist /deploy/node_modules/.pnpm/@palmital+
 COPY --from=build /app/packages/types/dist /deploy/node_modules/.pnpm/@palmital+types@file+packages+types/node_modules/@palmital/types/dist
 
 FROM node:20-alpine AS production
-RUN npm install -g pnpm@9
 RUN apk add --no-cache curl
 WORKDIR /app
 COPY --from=build /app/apps/api/dist ./dist
@@ -37,7 +36,7 @@ COPY --from=build /app/apps/api/prisma ./prisma
 COPY --from=build /app/.release-version ./.release-version
 COPY --from=predeploy /deploy/node_modules ./node_modules
 COPY --from=predeploy /deploy/package.json ./package.json
-# Run prisma generate in the final image so the query engine is built for this exact environment
+# prisma is now a prod dependency so ./node_modules/.bin/prisma exists
 RUN ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma
 EXPOSE 3001
 CMD ["node", "dist/main"]
