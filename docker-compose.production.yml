@@ -11,11 +11,15 @@ services:
     networks:
       - palmital-internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U palmital -h 127.0.0.1"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -h 127.0.0.1 || exit 1",
+        ]
       interval: 5s
       timeout: 5s
-      retries: 15
-      start_period: 60s
+      retries: 20
+      start_period: 20s
 
   migrator:
     build:
@@ -44,7 +48,7 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
-      FRONTEND_URL: ${FRONTEND_URL:-https://palmitaldigital.com.br}
+      FRONTEND_URL: ${FRONTEND_URL:-https://www.palmitaldigital.com.br}
       PORT: 3001
       NODE_ENV: production
     volumes:
@@ -56,11 +60,15 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:3001/health | grep -q 'ok' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:3001/health | grep -q '\"status\":\"ok\"' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
 
   web:
     build:
@@ -73,12 +81,22 @@ services:
         RELEASE_VERSION: ${RELEASE_VERSION:-dev}
     restart: unless-stopped
     ports:
-      - "7000:3000"
+      - "${DEPLOY_PORT:-7000}:3000"
     networks:
       - palmital-internal
     depends_on:
       api:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:3000/health | grep -q '\"status\":\"ok\"' || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
 volumes:
   palmital-postgres-data:

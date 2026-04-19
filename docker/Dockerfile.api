@@ -6,14 +6,14 @@ COPY packages ./packages
 COPY apps/api ./apps/api
 
 FROM base AS development
-RUN pnpm install
+RUN pnpm install --frozen-lockfile || pnpm install
 RUN pnpm --filter api exec prisma generate
 EXPOSE 3001
 CMD ["pnpm", "--filter", "api", "dev"]
 
 FROM base AS build
 ARG RELEASE_VERSION=dev
-RUN pnpm install
+RUN pnpm install --frozen-lockfile || pnpm install
 RUN pnpm --filter @palmital/utils build
 RUN pnpm --filter @palmital/types build
 # Generate prisma client to /app/generated/prisma (custom output path in schema.prisma)
@@ -22,12 +22,20 @@ RUN pnpm --filter api build
 RUN echo "$RELEASE_VERSION" > /app/.release-version
 
 FROM base AS predeploy
-RUN pnpm install
+RUN pnpm install --frozen-lockfile || pnpm install
 RUN pnpm --filter @palmital/utils build
 RUN pnpm --filter @palmital/types build
 RUN pnpm --filter api --prod deploy /deploy
-COPY --from=build /app/packages/utils/dist /deploy/node_modules/.pnpm/@palmital+utils@file+packages+utils/node_modules/@palmital/utils/dist
-COPY --from=build /app/packages/types/dist /deploy/node_modules/.pnpm/@palmital+types@file+packages+types/node_modules/@palmital/types/dist
+COPY --from=build /app/packages/utils/dist /tmp/palmital/utils-dist
+COPY --from=build /app/packages/types/dist /tmp/palmital/types-dist
+RUN set -eux; \
+    utils_dir="$(find /deploy/node_modules/.pnpm -path '*/node_modules/@palmital/utils' -type d | head -n 1)"; \
+    types_dir="$(find /deploy/node_modules/.pnpm -path '*/node_modules/@palmital/types' -type d | head -n 1)"; \
+    test -n "$utils_dir"; \
+    test -n "$types_dir"; \
+    mkdir -p "$utils_dir/dist" "$types_dir/dist"; \
+    cp -R /tmp/palmital/utils-dist/. "$utils_dir/dist/"; \
+    cp -R /tmp/palmital/types-dist/. "$types_dir/dist/"
 
 FROM node:20-alpine AS production
 RUN apk add --no-cache curl
