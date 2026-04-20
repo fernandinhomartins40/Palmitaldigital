@@ -169,11 +169,12 @@ jobs:
             ensure_random_hex "JWT_REFRESH_SECRET" 32
             ensure_env "JWT_EXPIRES_IN" "15m"
             ensure_env "JWT_REFRESH_EXPIRES_IN" "30d"
-            ensure_env "NODE_ENV" "production"
-            ensure_env "PORT" "3001"
-            ensure_env "DEPLOY_PORT" "$DEPLOY_PORT"
-            ensure_env "FRONTEND_URL" "$CANONICAL_URL"
             ensure_random_alnum "SEED_ADMIN_PASSWORD" 20
+
+            upsert_env "NODE_ENV" "production"
+            upsert_env "PORT" "3001"
+            upsert_env "DEPLOY_PORT" "$DEPLOY_PORT"
+            upsert_env "FRONTEND_URL" "$CANONICAL_URL"
 
             POSTGRES_USER_VALUE="$(get_env "POSTGRES_USER" | tr -d '\r')"
             POSTGRES_PASSWORD_VALUE="$(get_env "POSTGRES_PASSWORD" | tr -d '\r')"
@@ -229,6 +230,18 @@ jobs:
               local service="$1"
               echo "--- logs: $service ---" >&2
               compose logs --no-color --tail=100 "$service" >&2 || true
+            }
+
+            promote_release() {
+              ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
+
+              CURRENT_TARGET="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
+              if [ "$CURRENT_TARGET" != "$RELEASE_DIR" ]; then
+                echo "Failed to promote release: current=$CURRENT_TARGET expected=$RELEASE_DIR" >&2
+                exit 1
+              fi
+
+              echo "Current release promoted to $CURRENT_TARGET"
             }
 
             wait_for_service_state() {
@@ -303,11 +316,6 @@ jobs:
             echo "Running migrations..."
             compose run --rm migrator
 
-            ln -sfn "$RELEASE_DIR" "$APP_ROOT/current_new"
-            mv -Tf "$APP_ROOT/current_new" "$CURRENT_DIR"
-            COMPOSE_FILE="$CURRENT_DIR/docker-compose.production.yml"
-            ENV_FILE="$CURRENT_DIR/.env"
-
             echo "Starting application services..."
             compose up -d --remove-orphans postgres api web
 
@@ -343,6 +351,8 @@ jobs:
               sleep 5
             done
 
+            promote_release
+
             ls -dt "$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
           ENDSSH
 
@@ -355,28 +365,28 @@ jobs:
             set -euo pipefail
 
             mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
-            cat > /etc/nginx/sites-available/palmital <<NGINX
-            server {
-                listen 80;
-                server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};
-
-                location /.well-known/acme-challenge/ {
-                    root /var/www/certbot;
-                }
-
-                location / {
-                    proxy_pass http://127.0.0.1:${DEPLOY_PORT};
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection "upgrade";
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto \$scheme;
-                    proxy_read_timeout 86400;
-                }
-            }
-            NGINX
+            {
+              printf '%s\n' 'server {'
+              printf '%s\n' '    listen 80;'
+              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' ''
+              printf '%s\n' '    location /.well-known/acme-challenge/ {'
+              printf '%s\n' '        root /var/www/certbot;'
+              printf '%s\n' '    }'
+              printf '%s\n' ''
+              printf '%s\n' '    location / {'
+              printf '%s\n' "        proxy_pass http://127.0.0.1:${DEPLOY_PORT};"
+              printf '%s\n' '        proxy_http_version 1.1;'
+              printf '%s\n' '        proxy_set_header Upgrade $http_upgrade;'
+              printf '%s\n' '        proxy_set_header Connection "upgrade";'
+              printf '%s\n' '        proxy_set_header Host $host;'
+              printf '%s\n' '        proxy_set_header X-Real-IP $remote_addr;'
+              printf '%s\n' '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'
+              printf '%s\n' '        proxy_set_header X-Forwarded-Proto $scheme;'
+              printf '%s\n' '        proxy_read_timeout 86400;'
+              printf '%s\n' '    }'
+              printf '%s\n' '}'
+            } > /etc/nginx/sites-available/palmital
 
             ln -sf /etc/nginx/sites-available/palmital /etc/nginx/sites-enabled/palmital
             nginx -t
@@ -423,35 +433,35 @@ jobs:
               exit 0
             fi
 
-            cat > /etc/nginx/sites-available/palmital <<NGINX
-            server {
-                listen 80;
-                server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};
-                return 301 ${CANONICAL_URL}\$request_uri;
-            }
-
-            server {
-                listen 443 ssl http2;
-                server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};
-
-                ssl_certificate /etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem;
-                ssl_certificate_key /etc/letsencrypt/live/${PRIMARY_DOMAIN}/privkey.pem;
-                ssl_protocols TLSv1.2 TLSv1.3;
-                ssl_ciphers HIGH:!aNULL:!MD5;
-
-                location / {
-                    proxy_pass http://127.0.0.1:${DEPLOY_PORT};
-                    proxy_http_version 1.1;
-                    proxy_set_header Upgrade \$http_upgrade;
-                    proxy_set_header Connection "upgrade";
-                    proxy_set_header Host \$host;
-                    proxy_set_header X-Real-IP \$remote_addr;
-                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                    proxy_set_header X-Forwarded-Proto \$scheme;
-                    proxy_read_timeout 86400;
-                }
-            }
-            NGINX
+            {
+              printf '%s\n' 'server {'
+              printf '%s\n' '    listen 80;'
+              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' "    return 301 ${CANONICAL_URL}\$request_uri;"
+              printf '%s\n' '}'
+              printf '%s\n' ''
+              printf '%s\n' 'server {'
+              printf '%s\n' '    listen 443 ssl http2;'
+              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' ''
+              printf '%s\n' "    ssl_certificate /etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem;"
+              printf '%s\n' "    ssl_certificate_key /etc/letsencrypt/live/${PRIMARY_DOMAIN}/privkey.pem;"
+              printf '%s\n' '    ssl_protocols TLSv1.2 TLSv1.3;'
+              printf '%s\n' '    ssl_ciphers HIGH:!aNULL:!MD5;'
+              printf '%s\n' ''
+              printf '%s\n' '    location / {'
+              printf '%s\n' "        proxy_pass http://127.0.0.1:${DEPLOY_PORT};"
+              printf '%s\n' '        proxy_http_version 1.1;'
+              printf '%s\n' '        proxy_set_header Upgrade $http_upgrade;'
+              printf '%s\n' '        proxy_set_header Connection "upgrade";'
+              printf '%s\n' '        proxy_set_header Host $host;'
+              printf '%s\n' '        proxy_set_header X-Real-IP $remote_addr;'
+              printf '%s\n' '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'
+              printf '%s\n' '        proxy_set_header X-Forwarded-Proto $scheme;'
+              printf '%s\n' '        proxy_read_timeout 86400;'
+              printf '%s\n' '    }'
+              printf '%s\n' '}'
+            } > /etc/nginx/sites-available/palmital
 
             nginx -t
             systemctl reload nginx
