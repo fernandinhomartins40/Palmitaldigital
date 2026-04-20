@@ -4,8 +4,10 @@ WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
 COPY packages ./packages
 COPY apps/api ./apps/api
+COPY docker/migrator-entrypoint.sh /usr/local/bin/migrator-entrypoint.sh
 
 RUN pnpm install --frozen-lockfile || pnpm install
 RUN pnpm --filter api exec prisma generate
+RUN chmod +x /usr/local/bin/migrator-entrypoint.sh
 
-CMD ["pnpm", "--filter", "api", "exec", "prisma", "migrate", "deploy"]
+CMD ["/usr/local/bin/migrator-entrypoint.sh"]

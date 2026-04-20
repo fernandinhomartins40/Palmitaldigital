@@ -170,6 +170,7 @@ jobs:
             ensure_env "JWT_EXPIRES_IN" "15m"
             ensure_env "JWT_REFRESH_EXPIRES_IN" "30d"
             ensure_random_alnum "SEED_ADMIN_PASSWORD" 20
+            ensure_env "SEED_TEST_PASSWORD" "Teste123456"
 
             upsert_env "NODE_ENV" "production"
             upsert_env "PORT" "3001"
