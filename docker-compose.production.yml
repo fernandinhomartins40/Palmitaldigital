@@ -27,6 +27,8 @@ services:
       dockerfile: docker/Dockerfile.migrator
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-palmital}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-palmital}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123456}
+      SEED_TEST_PASSWORD: ${SEED_TEST_PASSWORD:-Teste123456}
     networks:
       - palmital-internal
     depends_on:
