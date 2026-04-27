@@ -92,7 +92,7 @@ export function RegisterPage() {
       setAuth(data.accessToken, data.refreshToken, data.user);
       connectSocket();
       addToast('Conta criada com sucesso! Bem-vindo(a) 🎉', 'success');
-      navigate('/');
+      navigate('/feed');
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Erro ao criar conta. Tente novamente.';
       const display = Array.isArray(msg) ? msg.join(', ') : msg;

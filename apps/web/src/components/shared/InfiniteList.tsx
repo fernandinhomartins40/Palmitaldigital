@@ -25,8 +25,9 @@ export function InfiniteList<T extends { id: string }>({
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage)
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
+        }
       },
       { threshold: 0.1 },
     );
@@ -39,8 +40,12 @@ export function InfiniteList<T extends { id: string }>({
   }
 
   return (
-    <div className="space-y-3">
-      {items.map(renderItem)}
+    <div className="space-y-4">
+      {items.map((item) => (
+        <div key={item.id} className="w-full">
+          {renderItem(item)}
+        </div>
+      ))}
       <div ref={sentinelRef} className="h-1" />
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">

@@ -17,15 +17,13 @@ export function FeedPage() {
   }
 
   return (
-    <div className="space-y-1">
-      <InfiniteList
-        items={posts}
-        renderItem={(post) => <FeedCard key={post.id} post={post as any} />}
-        hasNextPage={!!hasNextPage}
-        fetchNextPage={fetchNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        emptyMessage="Nenhuma publicação ainda. Seja o primeiro!"
-      />
-    </div>
+    <InfiniteList
+      items={posts}
+      renderItem={(post) => <FeedCard post={post as any} />}
+      hasNextPage={!!hasNextPage}
+      fetchNextPage={fetchNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      emptyMessage="Nenhuma publicação ainda. Seja o primeiro!"
+    />
   );
 }

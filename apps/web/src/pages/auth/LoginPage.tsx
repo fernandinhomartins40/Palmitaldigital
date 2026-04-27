@@ -33,7 +33,7 @@ export function LoginPage() {
       setAuth(data.accessToken, data.refreshToken, data.user);
       connectSocket();
       addToast('Bem-vindo de volta! 🎉', 'success');
-      navigate('/');
+      navigate('/feed');
     } catch (err: any) {
       const msg = err.response?.data?.message || 'E-mail ou senha incorretos.';
       setError(Array.isArray(msg) ? msg.join(', ') : msg);

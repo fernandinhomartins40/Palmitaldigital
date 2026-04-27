@@ -29,7 +29,7 @@ export function CreatePostPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['feed'] });
       addToast('Publicado com sucesso!', 'success');
-      navigate('/');
+      navigate('/feed');
     },
     onError: (err: any) => {
       addToast(err.response?.data?.message || 'Erro ao publicar', 'error');

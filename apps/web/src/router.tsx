@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Spinner } from '@palmital/ui';
 import { AppLayout } from './components/layout/AppLayout';
@@ -33,7 +33,8 @@ function Page({ children }: { children: React.ReactNode }) {
 }
 
 export const router = createBrowserRouter([
-  { path: '/landing', element: <LandingPage /> },
+  { path: '/', element: <LandingPage /> },
+  { path: '/landing', element: <Navigate to="/" replace /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   {
@@ -43,7 +44,7 @@ export const router = createBrowserRouter([
       </AuthGuard>
     ),
     children: [
-      { index: true, element: <Page><FeedPage /></Page> },
+      { path: '/feed', element: <Page><FeedPage /></Page> },
       { path: '/classifieds', element: <Page><ClassifiedsPage /></Page> },
       { path: '/classifieds/:id', element: <Page><ClassifiedDetailPage /></Page> },
       { path: '/companies', element: <Page><CompaniesPage /></Page> },
