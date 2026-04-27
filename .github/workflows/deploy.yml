@@ -263,6 +263,11 @@ jobs:
                 exit 1
               fi
 
+              if [ ! -f "$CURRENT_DIR/.env" ]; then
+                cp "$ROOT_ENV_FILE" "$CURRENT_DIR/.env"
+                printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$CURRENT_DIR/.env"
+              fi
+
               echo "Current release promoted to $CURRENT_TARGET"
             }
 
@@ -500,8 +505,13 @@ jobs:
             set -euo pipefail
 
             CURRENT_DIR="$APP_ROOT/current"
+            ROOT_ENV_FILE="$APP_ROOT/.env"
             COMPOSE_FILE="$CURRENT_DIR/docker-compose.production.yml"
             ENV_FILE="$CURRENT_DIR/.env"
+
+            if [ ! -f "$ENV_FILE" ]; then
+              ENV_FILE="$ROOT_ENV_FILE"
+            fi
 
             compose() {
               docker compose -p palmital -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"
