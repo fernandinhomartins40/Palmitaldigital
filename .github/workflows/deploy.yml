@@ -213,6 +213,7 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash -s" <<'ENDSSH'
             set -euo pipefail
+            trap 'echo "Deploy failed at line $LINENO: $BASH_COMMAND" >&2' ERR
 
             RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
             CURRENT_DIR="$APP_ROOT/current"
@@ -262,6 +263,15 @@ jobs:
               local service="$1"
               echo "--- logs: $service ---" >&2
               compose logs --no-color --tail=100 "$service" >&2 || true
+            }
+
+            remove_service_container() {
+              local service="$1"
+              local id
+              id="$(service_id "$1")"
+              if [ -n "$id" ]; then
+                docker rm -f "$id" >/dev/null 2>&1 || true
+              fi
             }
 
             promote_release() {
@@ -354,6 +364,8 @@ jobs:
             compose run --rm migrator
 
             echo "Starting application services..."
+            remove_service_container api
+            remove_service_container web
             compose up -d --remove-orphans --force-recreate --no-build api web
 
             wait_for_service_state api running 24 5
@@ -524,6 +536,7 @@ jobs:
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash -s" <<'ENDSSH'
             set -euo pipefail
+            trap 'echo "Post-deploy health check failed at line $LINENO: $BASH_COMMAND" >&2' ERR
 
             API_CONTAINER="palmital-api-1"
             WEB_CONTAINER="palmital-web-1"
