@@ -14,5 +14,9 @@ else
   pnpm --filter api exec prisma db push --skip-generate
 fi
 
-echo "Running Prisma seed..."
-pnpm --filter api exec prisma db seed
+if [ "${RUN_SEED:-false}" = "true" ]; then
+  echo "Running Prisma seed..."
+  pnpm --filter api exec prisma db seed
+else
+  echo "Skipping Prisma seed (RUN_SEED is not true)."
+fi

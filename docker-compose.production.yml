@@ -29,12 +29,14 @@ services:
       start_period: 20s
 
   migrator:
+    image: palmital-migrator:${RELEASE_VERSION:-dev}
     build:
       context: .
       dockerfile: docker/Dockerfile.migrator
     logging: *default-logging
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-palmital}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-palmital}
+      RUN_SEED: ${RUN_SEED:-false}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123456}
       SEED_TEST_PASSWORD: ${SEED_TEST_PASSWORD:-Teste123456}
     networks:
@@ -45,6 +47,7 @@ services:
     restart: on-failure
 
   api:
+    image: palmital-api:${RELEASE_VERSION:-dev}
     build:
       context: .
       dockerfile: docker/Dockerfile.api
@@ -82,6 +85,7 @@ services:
       start_period: 45s
 
   web:
+    image: palmital-web:${RELEASE_VERSION:-dev}
     build:
       context: .
       dockerfile: docker/Dockerfile.web

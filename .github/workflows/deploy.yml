@@ -248,6 +248,16 @@ jobs:
               docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$id" 2>/dev/null || echo "not_found"
             }
 
+            service_image() {
+              local id
+              id="$(service_id "$1")"
+              if [ -z "$id" ]; then
+                echo ""
+                return
+              fi
+              docker inspect --format '{{.Config.Image}}' "$id" 2>/dev/null || echo ""
+            }
+
             dump_service_logs() {
               local service="$1"
               echo "--- logs: $service ---" >&2
@@ -333,7 +343,7 @@ jobs:
             printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$ENV_FILE"
 
             cd "$RELEASE_DIR"
-            compose build --pull
+            compose build --pull migrator api web
 
             echo "Starting postgres..."
             compose up -d postgres
@@ -344,7 +354,7 @@ jobs:
             compose run --rm migrator
 
             echo "Starting application services..."
-            compose up -d --remove-orphans postgres api web
+            compose up -d --remove-orphans --force-recreate --no-build api web
 
             wait_for_service_state api running 24 5
             wait_for_service_health api 36 5
@@ -352,9 +362,20 @@ jobs:
             wait_for_service_health web 30 5
 
             API_ID="$(service_id api)"
+            API_IMAGE="$(service_image api)"
             DEPLOYED_VERSION="$(docker exec "$API_ID" cat /app/.release-version 2>/dev/null || true)"
-            if [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
-              echo "Release version mismatch: expected=$RELEASE got=$DEPLOYED_VERSION" >&2
+            if [ "$API_IMAGE" != "palmital-api:$RELEASE" ] || [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
+              echo "API release mismatch: expected_image=palmital-api:$RELEASE got_image=$API_IMAGE expected_version=$RELEASE got_version=$DEPLOYED_VERSION" >&2
+              dump_service_logs api
+              exit 1
+            fi
+
+            WEB_ID="$(service_id web)"
+            WEB_IMAGE="$(service_image web)"
+            WEB_DEPLOYED_VERSION="$(docker exec "$WEB_ID" cat /usr/share/nginx/html/release.txt 2>/dev/null || true)"
+            if [ "$WEB_IMAGE" != "palmital-web:$RELEASE" ] || [ "$WEB_DEPLOYED_VERSION" != "$RELEASE" ]; then
+              echo "Web release mismatch: expected_image=palmital-web:$RELEASE got_image=$WEB_IMAGE expected_version=$RELEASE got_version=$WEB_DEPLOYED_VERSION" >&2
+              dump_service_logs web
               exit 1
             fi
 
@@ -381,7 +402,7 @@ jobs:
             promote_release
 
             ls -dt "$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
-            docker image prune -f >/dev/null 2>&1 || true
+            docker image prune -af >/dev/null 2>&1 || true
             docker builder prune -af --filter 'until=24h' >/dev/null 2>&1 || true
           ENDSSH
 
@@ -515,6 +536,10 @@ jobs:
               docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
             }
 
+            container_image() {
+              docker inspect --format '{{.Config.Image}}' "$1" 2>/dev/null || echo ""
+            }
+
             dump_logs() {
               local container_name="$1"
               echo "--- logs: $container_name ---" >&2
@@ -535,10 +560,20 @@ jobs:
               if [ "$API_STATE" = "running" ] && [ "$API_HEALTH" = "healthy" ] && \
                  [ "$WEB_STATE" = "running" ] && [ "$WEB_HEALTH" = "healthy" ] && \
                  [ "$WEB_HTTP" = "200" ]; then
+                API_IMAGE="$(container_image "$API_CONTAINER")"
                 DEPLOYED_VERSION="$(docker exec "$API_CONTAINER" cat /app/.release-version 2>/dev/null || true)"
-                if [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
-                  echo "Release version mismatch during post-deploy: expected=$RELEASE got=$DEPLOYED_VERSION" >&2
+                WEB_IMAGE="$(container_image "$WEB_CONTAINER")"
+                WEB_DEPLOYED_VERSION="$(docker exec "$WEB_CONTAINER" cat /usr/share/nginx/html/release.txt 2>/dev/null || true)"
+
+                if [ "$API_IMAGE" != "palmital-api:$RELEASE" ] || [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
+                  echo "API release mismatch during post-deploy: expected_image=palmital-api:$RELEASE got_image=$API_IMAGE expected_version=$RELEASE got_version=$DEPLOYED_VERSION" >&2
                   dump_logs "$API_CONTAINER"
+                  exit 1
+                fi
+
+                if [ "$WEB_IMAGE" != "palmital-web:$RELEASE" ] || [ "$WEB_DEPLOYED_VERSION" != "$RELEASE" ]; then
+                  echo "Web release mismatch during post-deploy: expected_image=palmital-web:$RELEASE got_image=$WEB_IMAGE expected_version=$RELEASE got_version=$WEB_DEPLOYED_VERSION" >&2
+                  dump_logs "$WEB_CONTAINER"
                   exit 1
                 fi
 
