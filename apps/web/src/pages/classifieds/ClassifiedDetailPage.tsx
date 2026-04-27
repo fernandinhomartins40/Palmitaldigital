@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Button, Spinner } from '@palmital/ui';
 import { formatCurrency, formatDate } from '@palmital/utils';
 import { api } from '../../services/api';
@@ -75,13 +75,15 @@ export function ClassifiedDetailPage() {
           <span>Publicado em {formatDate(item.createdAt)}</span>
         </div>
 
-        <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3">
-          <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="md" />
-          <div>
-            <p className="font-semibold text-gray-900">{profile?.displayName}</p>
-            <p className="text-xs text-gray-500">Vendedor</p>
+        <Link to={`/profile/${item.authorId}`} className="block">
+          <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 transition-colors hover:border-blue-100 hover:bg-blue-50/40">
+            <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="md" />
+            <div>
+              <p className="font-semibold text-gray-900">{profile?.displayName}</p>
+              <p className="text-xs text-gray-500">Ver perfil do vendedor</p>
+            </div>
           </div>
-        </div>
+        </Link>
 
         {!isOwner && item.status === 'ACTIVE' && (
           <Button fullWidth onClick={() => startChatMutation.mutate()} isLoading={startChatMutation.isPending}>

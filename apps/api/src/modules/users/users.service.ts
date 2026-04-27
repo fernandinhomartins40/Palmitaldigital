@@ -25,6 +25,12 @@ export class UsersService {
         createdAt: true,
         profile: true,
         company: { select: { id: true, name: true, slug: true, logoUrl: true } },
+        _count: {
+          select: {
+            posts: true,
+            classifieds: true,
+          },
+        },
       },
     });
     if (!user) throw new NotFoundException('User not found');
@@ -48,9 +54,14 @@ export class UsersService {
   }
 
   async updateAvatar(userId: string, avatarUrl: string) {
-    return this.prisma.profile.update({
+    return this.prisma.profile.upsert({
       where: { userId },
-      data: { avatarUrl },
+      create: {
+        userId,
+        displayName: 'Usuário',
+        avatarUrl,
+      },
+      update: { avatarUrl },
     });
   }
 }

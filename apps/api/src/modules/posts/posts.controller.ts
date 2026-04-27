@@ -18,6 +18,11 @@ export class PostsController {
     return this.postsService.getFeed(query);
   }
 
+  @Get('user/:userId')
+  getUserPosts(@Param('userId') userId: string, @Query() query: FeedQueryDto) {
+    return this.postsService.getUserPosts(userId, query);
+  }
+
   @Get(':id')
   getPost(@Param('id') id: string) {
     return this.postsService.getPost(id);

@@ -80,6 +80,32 @@ export class PostsService {
     return { posts, nextCursor };
   }
 
+  async getUserPosts(userId: string, query: FeedQueryDto) {
+    const limit = query.limit ?? 20;
+    let cursorFilter = {};
+
+    if (query.cursor) {
+      const cursorPost = await this.prisma.post.findUnique({ where: { id: query.cursor } });
+      if (cursorPost) {
+        cursorFilter = { createdAt: { lt: cursorPost.createdAt } };
+      }
+    }
+
+    const posts = await this.prisma.post.findMany({
+      where: {
+        authorId: userId,
+        isPublished: true,
+        ...cursorFilter,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      include: this.postInclude,
+    });
+
+    const nextCursor = posts.length === limit ? posts[posts.length - 1].id : null;
+    return { posts, nextCursor };
+  }
+
   async getPost(id: string) {
     const post = await this.prisma.post.findUnique({
       where: { id },

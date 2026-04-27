@@ -16,6 +16,7 @@ const CompanyProfilePage = lazy(() => import('./pages/companies/CompanyProfilePa
 const ConversationsPage = lazy(() => import('./pages/chat/ConversationsPage').then((m) => ({ default: m.ConversationsPage })));
 const ChatPage = lazy(() => import('./pages/chat/ChatPage').then((m) => ({ default: m.ChatPage })));
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const UserProfilePage = lazy(() => import('./pages/profile/UserProfilePage').then((m) => ({ default: m.UserProfilePage })));
 const CreatePostPage = lazy(() => import('./pages/create/CreatePostPage').then((m) => ({ default: m.CreatePostPage })));
 
 const Loader = () => (
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
       { path: '/chat', element: <Page><ConversationsPage /></Page> },
       { path: '/chat/:conversationId', element: <Page><ChatPage /></Page> },
       { path: '/profile', element: <Page><ProfilePage /></Page> },
+      { path: '/profile/:id', element: <Page><UserProfilePage /></Page> },
       { path: '/create', element: <Page><CreatePostPage /></Page> },
     ],
   },
