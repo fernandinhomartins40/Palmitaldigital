@@ -501,16 +501,31 @@ jobs:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash -s" <<'ENDSSH'
+            "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
             CURRENT_DIR="$APP_ROOT/current"
             ROOT_ENV_FILE="$APP_ROOT/.env"
+            RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
+
+            if [ ! -f "$CURRENT_DIR/docker-compose.production.yml" ]; then
+              if [ ! -f "$RELEASE_DIR/docker-compose.production.yml" ]; then
+                echo "Release compose file not found: $RELEASE_DIR/docker-compose.production.yml" >&2
+                exit 1
+              fi
+
+              ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
+            fi
+
             COMPOSE_FILE="$CURRENT_DIR/docker-compose.production.yml"
             ENV_FILE="$CURRENT_DIR/.env"
 
             if [ ! -f "$ENV_FILE" ]; then
-              ENV_FILE="$ROOT_ENV_FILE"
+              if [ -f "$RELEASE_DIR/.env" ]; then
+                ENV_FILE="$RELEASE_DIR/.env"
+              else
+                ENV_FILE="$ROOT_ENV_FILE"
+              fi
             fi
 
             compose() {
