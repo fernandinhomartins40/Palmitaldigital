@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VPS_HOST: 72.60.10.112
+  VPS_HOST: 72.60.10.108
   VPS_USER: root
   APP_ROOT: /opt/palmital
   DEPLOY_PORT: "7000"
@@ -74,20 +74,41 @@ jobs:
             fi
 
             export DEBIAN_FRONTEND=noninteractive
-            apt-get update
-            apt-get install -y --no-install-recommends \
-              ca-certificates \
-              certbot \
-              curl \
-              nginx \
-              openssl \
-              tar
+            APT_UPDATED=0
+
+            apt_update_once() {
+              if [ "$APT_UPDATED" -eq 0 ]; then
+                apt-get update
+                APT_UPDATED=1
+              fi
+            }
+
+            ensure_apt_packages() {
+              local missing=0
+              local package_name
+
+              for package_name in "$@"; do
+                if ! dpkg-query -W -f='${Status}' "$package_name" 2>/dev/null | grep -q 'install ok installed'; then
+                  missing=1
+                  break
+                fi
+              done
+
+              if [ "$missing" -eq 1 ]; then
+                apt_update_once
+                apt-get install -y --no-install-recommends "$@"
+              fi
+            }
+
+            ensure_apt_packages ca-certificates certbot curl nginx openssl tar
 
             if ! command -v docker >/dev/null 2>&1; then
+              apt_update_once
               apt-get install -y --no-install-recommends docker.io
             fi
 
             if ! docker compose version >/dev/null 2>&1; then
+              apt_update_once
               apt-get install -y --no-install-recommends docker-compose-v2 || \
               apt-get install -y --no-install-recommends docker-compose-plugin
             fi
@@ -307,7 +328,7 @@ jobs:
             printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$ENV_FILE"
 
             cd "$RELEASE_DIR"
-            compose build --no-cache
+            compose build --pull
 
             echo "Starting postgres..."
             compose up -d postgres
@@ -355,6 +376,8 @@ jobs:
             promote_release
 
             ls -dt "$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
+            docker image prune -f >/dev/null 2>&1 || true
+            docker builder prune -af --filter 'until=24h' >/dev/null 2>&1 || true
           ENDSSH
 
       - name: Configure Nginx (HTTP)

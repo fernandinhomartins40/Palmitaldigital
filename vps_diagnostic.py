@@ -3,7 +3,7 @@ import paramiko
 import sys
 import os
 
-HOST = "72.60.10.112"
+HOST = "72.60.10.108"
 PORT = 22
 USERNAME = "root"
 

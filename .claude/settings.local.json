@@ -13,7 +13,7 @@
       "Bash(gh secret list)",
       "Bash(gh auth status)",
       "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" remote -v)",
-      "Bash(curl -v --max-time 10 http://72.60.10.112/)",
+      "Bash(curl -v --max-time 10 http://72.60.10.108/)",
       "Bash(xargs ls -la)",
       "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" log --oneline -40)",
       "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" show HEAD --stat)",

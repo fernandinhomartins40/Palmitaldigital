@@ -1,7 +1,14 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
     image: postgres:15-alpine
     restart: unless-stopped
+    logging: *default-logging
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-palmital}
       POSTGRES_USER: ${POSTGRES_USER:-palmital}
@@ -16,15 +23,16 @@ services:
           "CMD-SHELL",
           "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\" -h 127.0.0.1 || exit 1",
         ]
-      interval: 5s
+      interval: 30s
       timeout: 5s
-      retries: 20
+      retries: 5
       start_period: 20s
 
   migrator:
     build:
       context: .
       dockerfile: docker/Dockerfile.migrator
+    logging: *default-logging
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-palmital}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-palmital}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-admin123456}
@@ -44,6 +52,7 @@ services:
       args:
         RELEASE_VERSION: ${RELEASE_VERSION:-dev}
     restart: unless-stopped
+    logging: *default-logging
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-palmital}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-palmital}
       JWT_SECRET: ${JWT_SECRET}
@@ -67,9 +76,9 @@ services:
           "CMD-SHELL",
           "curl -fsS http://127.0.0.1:3001/health | grep -q '\"status\":\"ok\"' || exit 1",
         ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 12
+      retries: 5
       start_period: 45s
 
   web:
@@ -82,6 +91,7 @@ services:
         VITE_WS_URL: ""
         RELEASE_VERSION: ${RELEASE_VERSION:-dev}
     restart: unless-stopped
+    logging: *default-logging
     ports:
       - "${DEPLOY_PORT:-7000}:3000"
     networks:
@@ -95,9 +105,9 @@ services:
           "CMD-SHELL",
           "curl -fsS http://127.0.0.1:3000/health | grep -q '\"status\":\"ok\"' || exit 1",
         ]
-      interval: 10s
+      interval: 30s
       timeout: 5s
-      retries: 12
+      retries: 5
       start_period: 10s
 
 volumes:
