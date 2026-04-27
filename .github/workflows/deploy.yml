@@ -504,89 +504,55 @@ jobs:
             "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
-            CURRENT_DIR="$APP_ROOT/current"
-            ROOT_ENV_FILE="$APP_ROOT/.env"
-            RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
+            API_CONTAINER="palmital-api-1"
+            WEB_CONTAINER="palmital-web-1"
 
-            if [ ! -f "$CURRENT_DIR/docker-compose.production.yml" ]; then
-              if [ ! -f "$RELEASE_DIR/docker-compose.production.yml" ]; then
-                echo "Release compose file not found: $RELEASE_DIR/docker-compose.production.yml" >&2
-                exit 1
-              fi
-
-              ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
-            fi
-
-            COMPOSE_FILE="$CURRENT_DIR/docker-compose.production.yml"
-            ENV_FILE="$CURRENT_DIR/.env"
-
-            if [ ! -f "$ENV_FILE" ]; then
-              if [ -f "$RELEASE_DIR/.env" ]; then
-                ENV_FILE="$RELEASE_DIR/.env"
-              else
-                ENV_FILE="$ROOT_ENV_FILE"
-              fi
-            fi
-
-            compose() {
-              docker compose -p palmital -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"
+            container_state() {
+              docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || echo "not_found"
             }
 
-            service_id() {
-              compose ps -q "$1"
-            }
-
-            service_state() {
-              local id
-              id="$(service_id "$1")"
-              if [ -z "$id" ]; then
-                echo "not_found"
-                return
-              fi
-              docker inspect --format '{{.State.Status}}' "$id" 2>/dev/null || echo "not_found"
-            }
-
-            service_health() {
-              local id
-              id="$(service_id "$1")"
-              if [ -z "$id" ]; then
-                echo "not_found"
-                return
-              fi
-              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$id" 2>/dev/null || echo "not_found"
+            container_health() {
+              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
             }
 
             dump_logs() {
-              local service="$1"
-              echo "--- logs: $service ---" >&2
-              compose logs --no-color --tail=80 "$service" >&2 || true
+              local container_name="$1"
+              echo "--- logs: $container_name ---" >&2
+              docker logs --tail=80 "$container_name" >&2 || true
             }
 
             echo "Running post-deploy health check..."
-            compose ps || true
+            docker ps -a --filter "name=^palmital-" || true
 
             for i in $(seq 1 30); do
-              API_STATE="$(service_state api)"
-              API_HEALTH="$(service_health api)"
-              WEB_STATE="$(service_state web)"
-              WEB_HEALTH="$(service_health web)"
+              API_STATE="$(container_state "$API_CONTAINER")"
+              API_HEALTH="$(container_health "$API_CONTAINER")"
+              WEB_STATE="$(container_state "$WEB_CONTAINER")"
+              WEB_HEALTH="$(container_health "$WEB_CONTAINER")"
               WEB_HTTP="$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "http://127.0.0.1:${DEPLOY_PORT}/health" 2>/dev/null || true)"
               WEB_HTTP="${WEB_HTTP:-000}"
 
               if [ "$API_STATE" = "running" ] && [ "$API_HEALTH" = "healthy" ] && \
                  [ "$WEB_STATE" = "running" ] && [ "$WEB_HEALTH" = "healthy" ] && \
                  [ "$WEB_HTTP" = "200" ]; then
+                DEPLOYED_VERSION="$(docker exec "$API_CONTAINER" cat /app/.release-version 2>/dev/null || true)"
+                if [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
+                  echo "Release version mismatch during post-deploy: expected=$RELEASE got=$DEPLOYED_VERSION" >&2
+                  dump_logs "$API_CONTAINER"
+                  exit 1
+                fi
+
                 echo "Health check passed: api=${API_HEALTH} web=${WEB_HEALTH} http=${WEB_HTTP}"
                 exit 0
               fi
 
               if [ "$API_STATE" = "exited" ] || [ "$API_STATE" = "dead" ] || [ "$API_STATE" = "not_found" ]; then
-                dump_logs api
+                dump_logs "$API_CONTAINER"
                 exit 1
               fi
 
               if [ "$WEB_STATE" = "exited" ] || [ "$WEB_STATE" = "dead" ] || [ "$WEB_STATE" = "not_found" ]; then
-                dump_logs web
+                dump_logs "$WEB_CONTAINER"
                 exit 1
               fi
 
@@ -595,9 +561,9 @@ jobs:
             done
 
             echo "Health check failed after 150s" >&2
-            compose ps >&2 || true
-            dump_logs api
-            dump_logs web
+            docker ps -a --filter "name=^palmital-" >&2 || true
+            dump_logs "$API_CONTAINER"
+            dump_logs "$WEB_CONTAINER"
             exit 1
           ENDSSH
 
