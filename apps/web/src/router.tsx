@@ -6,6 +6,7 @@ import { AuthGuard } from './components/layout/AuthGuard';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
+import { LandingPage } from './pages/LandingPage';
 
 const FeedPage = lazy(() => import('./pages/feed/FeedPage').then((m) => ({ default: m.FeedPage })));
 const ClassifiedsPage = lazy(() => import('./pages/classifieds/ClassifiedsPage').then((m) => ({ default: m.ClassifiedsPage })));
@@ -32,6 +33,7 @@ function Page({ children }: { children: React.ReactNode }) {
 }
 
 export const router = createBrowserRouter([
+  { path: '/landing', element: <LandingPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
   {

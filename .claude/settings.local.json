@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Projetos Cursor/Palmitaldigital/**)",
+      "Bash(gh repo edit --default-branch main)",
+      "Bash(python -c \"import paramiko; print\\(''ok''\\)\")",
+      "Bash(python3:*)",
+      "Bash(npm run type-check)",
+      "Bash(pnpm install --filter api)",
+      "Bash(pip install paramiko)",
+      "Bash(printenv)",
+      "Bash(gh secret list --repo fernandinhomartins40/Palmitaldigital)",
+      "Bash(gh secret list)",
+      "Bash(gh auth status)",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" remote -v)",
+      "Bash(curl -v --max-time 10 http://72.60.10.112/)",
+      "Bash(xargs ls -la)",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" log --oneline -40)",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" show HEAD --stat)",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" show \"7a6ffbf\")",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" show \"5c7f794\")",
+      "Bash(git -C \"/c/Projetos Cursor/Palmitaldigital\" show \"f10fb31\")",
+      "Bash(gh run list --limit 5 --json databaseId,status,conclusion,displayTitle,createdAt)",
+      "Bash(where gh)",
+      "Bash(python -c \"import paramiko; print\\(''paramiko available''\\)\")",
+      "Bash(python vps_diagnostic.py)",
+      "Bash(pnpm --filter api exec prisma generate)",
+      "Bash(pnpm --filter api build)",
+      "Bash(\"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\.gitignore\")",
+      "Bash(git rm --cached -r \"apps/api/generated/\")"
+    ]
+  }
+}
