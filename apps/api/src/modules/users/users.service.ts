@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { SearchUsersQueryDto } from './dto/search-users-query.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,39 @@ export class UsersService {
     });
     if (!user) throw new NotFoundException('User not found');
     return user;
+  }
+
+  async searchUsers(currentUserId: string, query: SearchUsersQueryDto) {
+    const term = query.q?.trim();
+    if (!term) return [];
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        id: { not: currentUserId },
+        OR: [
+          { email: { contains: term, mode: 'insensitive' } },
+          { profile: { is: { displayName: { contains: term, mode: 'insensitive' } } } },
+        ],
+      },
+      select: {
+        id: true,
+        email: true,
+        profile: {
+          select: {
+            displayName: true,
+            avatarUrl: true,
+            city: true,
+          },
+        },
+      },
+      take: query.limit ?? 12,
+    });
+
+    return users.sort((a, b) => {
+      const aName = (a.profile?.displayName || a.email).toLocaleLowerCase();
+      const bName = (b.profile?.displayName || b.email).toLocaleLowerCase();
+      return aName.localeCompare(bName, 'pt-BR');
+    });
   }
 
   async updateProfile(userId: string, dto: UpdateProfileDto) {

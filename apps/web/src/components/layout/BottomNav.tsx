@@ -1,25 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, PlusCircle, Tag, User } from 'lucide-react';
-
-const navItems = [
-  { to: '/feed', icon: Home, label: 'Feed' },
-  { to: '/classifieds', icon: Tag, label: 'Classificados' },
-  { to: '/create', icon: PlusCircle, label: 'Publicar', primary: true },
-  { to: '/chat', icon: MessageCircle, label: 'Chat' },
-  { to: '/profile', icon: User, label: 'Perfil' },
-];
+import { isNavItemActive, mobileNavItems } from './navigation';
 
 export function BottomNav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="safe-bottom fixed bottom-0 left-0 right-0 z-40 border-t border-gray-100 bg-white/95 shadow-[0_-1px_6px_rgba(0,0,0,0.06)] backdrop-blur-sm">
+    <nav className="safe-bottom fixed bottom-0 left-0 right-0 z-40 border-t border-gray-100 bg-white/95 shadow-[0_-1px_6px_rgba(0,0,0,0.06)] backdrop-blur-sm lg:hidden">
       <div className="mx-auto flex h-16 max-w-lg items-center">
-        {navItems.map(({ to, icon: Icon, label, primary }) => {
-          const isActive =
-            to === '/profile'
-              ? pathname === '/profile' || pathname.startsWith('/profile/')
-              : pathname === to;
+        {mobileNavItems.map(({ to, icon: Icon, label, primary }) => {
+          const isActive = isNavItemActive(pathname, to);
 
           return (
             <Link

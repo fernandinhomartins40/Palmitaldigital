@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { extname, join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { UsersService } from './users.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { SearchUsersQueryDto } from './dto/search-users-query.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -48,6 +50,11 @@ export class UsersController {
   async uploadAvatar(@CurrentUser() user: any, @UploadedFile() file: Express.Multer.File) {
     const url = `/uploads/avatars/${file.filename}`;
     return this.usersService.updateAvatar(user.id, url);
+  }
+
+  @Get('search')
+  searchUsers(@CurrentUser() user: any, @Query() query: SearchUsersQueryDto) {
+    return this.usersService.searchUsers(user.id, query);
   }
 
   @Public()

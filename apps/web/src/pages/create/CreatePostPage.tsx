@@ -63,83 +63,87 @@ export function CreatePostPage() {
 
   return (
     <div className="px-4 pb-6">
-      <div className="flex border-b mb-4">
-        {(['social', 'classified'] as TabType[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-              tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
-            }`}
-          >
-            {t === 'social' ? 'Publicação' : 'Classificado'}
-          </button>
-        ))}
-      </div>
+      <div className="rounded-[28px] border border-white/80 bg-white/90 p-4 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm md:p-6">
+        <div className="mb-4 flex border-b">
+          {(['social', 'classified'] as TabType[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex-1 border-b-2 py-3 text-sm font-medium transition-colors ${
+                tab === t ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
+              }`}
+            >
+              {t === 'social' ? 'Publicação' : 'Classificado'}
+            </button>
+          ))}
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder={tab === 'social' ? 'O que está acontecendo em Palmital?' : 'Descrição do anúncio (opcional)'}
-          rows={4}
-          maxLength={2000}
-          className="w-full rounded-xl border border-gray-300 p-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={tab === 'social' ? 'O que está acontecendo em Palmital?' : 'Descrição do anúncio (opcional)'}
+            rows={4}
+            maxLength={2000}
+            className="w-full resize-none rounded-xl border border-gray-300 p-3 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
 
-        {tab === 'classified' && (
-          <div className="space-y-3">
-            <Input
-              label="Título do anúncio *"
-              value={classified.title}
-              onChange={(e) => setClassified((c) => ({ ...c, title: e.target.value }))}
-              required
-              maxLength={200}
-            />
-            <Input
-              label="Descrição *"
-              value={classified.description}
-              onChange={(e) => setClassified((c) => ({ ...c, description: e.target.value }))}
-              required
-            />
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isFree"
-                checked={classified.isFree}
-                onChange={(e) => setClassified((c) => ({ ...c, isFree: e.target.checked }))}
-                className="rounded"
-              />
-              <label htmlFor="isFree" className="text-sm text-gray-700">É grátis</label>
-            </div>
-            {!classified.isFree && (
+          {tab === 'classified' && (
+            <div className="grid gap-3 md:grid-cols-2">
               <Input
-                label="Preço (R$)"
-                type="number"
-                min="0"
-                step="0.01"
-                value={classified.price}
-                onChange={(e) => setClassified((c) => ({ ...c, price: e.target.value }))}
+                label="Título do anúncio *"
+                value={classified.title}
+                onChange={(e) => setClassified((c) => ({ ...c, title: e.target.value }))}
+                required
+                maxLength={200}
               />
-            )}
-            <Input
-              label="Cidade"
-              value={classified.city}
-              onChange={(e) => setClassified((c) => ({ ...c, city: e.target.value }))}
-              placeholder="Palmital"
-            />
-          </div>
-        )}
+              <Input
+                label="Cidade"
+                value={classified.city}
+                onChange={(e) => setClassified((c) => ({ ...c, city: e.target.value }))}
+                placeholder="Palmital"
+              />
+              <div className="md:col-span-2">
+                <Input
+                  label="Descrição *"
+                  value={classified.description}
+                  onChange={(e) => setClassified((c) => ({ ...c, description: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 md:col-span-2">
+                <input
+                  type="checkbox"
+                  id="isFree"
+                  checked={classified.isFree}
+                  onChange={(e) => setClassified((c) => ({ ...c, isFree: e.target.checked }))}
+                  className="rounded"
+                />
+                <label htmlFor="isFree" className="text-sm text-gray-700">É grátis</label>
+              </div>
+              {!classified.isFree && (
+                <Input
+                  label="Preço (R$)"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={classified.price}
+                  onChange={(e) => setClassified((c) => ({ ...c, price: e.target.value }))}
+                />
+              )}
+            </div>
+          )}
 
-        <ImageUploader
-          onUpload={(id) => setMediaIds((ids) => [...ids, id])}
-          maxFiles={4}
-        />
+          <ImageUploader
+            onUpload={(id) => setMediaIds((ids) => [...ids, id])}
+            maxFiles={4}
+          />
 
-        <Button type="submit" fullWidth isLoading={mutation.isPending}>
-          Publicar
-        </Button>
-      </form>
+          <Button type="submit" fullWidth isLoading={mutation.isPending}>
+            Publicar
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

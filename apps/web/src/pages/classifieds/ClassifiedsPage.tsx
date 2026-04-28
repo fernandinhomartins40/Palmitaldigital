@@ -35,8 +35,8 @@ export function ClassifiedsPage() {
 
   return (
     <div className="px-4 pb-6">
-      <div className="mb-4 space-y-2">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="mb-4 space-y-3 lg:flex lg:items-start lg:gap-4 lg:space-y-0">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide lg:flex-1 lg:flex-wrap lg:overflow-visible lg:pb-0">
           <button
             onClick={() => setCategoryId('')}
             className={`flex-shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${!categoryId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
@@ -57,7 +57,7 @@ export function ClassifiedsPage() {
           value={city}
           onChange={(e) => setCity(e.target.value)}
           placeholder="Filtrar por cidade..."
-          className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+          className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 lg:max-w-xs"
         />
       </div>
 

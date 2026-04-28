@@ -35,7 +35,7 @@ export function CompaniesPage() {
           <p className="mt-3">Nenhuma empresa encontrada</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {companies.map((company) => (
             <Link key={company.id} to={`/companies/${company.slug}`}>
               <Card className="flex flex-col items-center p-4 text-center hover:shadow-md transition-shadow">
