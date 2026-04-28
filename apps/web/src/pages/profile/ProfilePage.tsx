@@ -165,15 +165,16 @@ export function ProfilePage() {
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <Button
               variant="secondary"
+              size="sm"
               fullWidth
-              className="min-h-[52px] rounded-2xl"
+              className="rounded-xl py-3"
               onClick={() => setEditing((value) => !value)}
             >
               {editing ? 'Fechar edição' : 'Gerenciar perfil'}
             </Button>
             {user?.id && (
               <Link to={`/profile/${user.id}?preview=public`} className="block flex-1">
-                <Button fullWidth className="min-h-[52px] rounded-2xl px-5 whitespace-nowrap">
+                <Button fullWidth size="sm" className="rounded-xl px-4 py-3 whitespace-nowrap">
                   <ExternalLink size={16} />
                   <span className="ml-2">Ver versão pública</span>
                 </Button>
