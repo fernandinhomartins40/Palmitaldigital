@@ -112,17 +112,17 @@ export function ProfilePage() {
   const displayName = p?.displayName ?? user?.profile?.displayName ?? user?.email ?? 'Usuário';
 
   return (
-    <div className="space-y-5 px-4 pb-6">
-      <Card className="overflow-hidden p-0">
-        <div className="h-24 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500" />
-        <div className="px-4 pb-5">
-          <div className="-mt-10 flex items-end gap-4">
-            <div className="relative rounded-3xl border-4 border-white bg-white shadow-sm">
-              <Avatar src={p?.avatarUrl} name={displayName} size="lg" />
+    <div className="space-y-5 px-4 pb-6 pt-4">
+      <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
+        <div className="relative h-28 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500">
+          <div className="absolute inset-y-0 right-0 w-28 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute -bottom-10 left-4">
+            <div className="relative rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
+              <Avatar src={p?.avatarUrl} name={displayName} size="lg" className="h-16 w-16 text-2xl" />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1 -right-1 rounded-full bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
+                className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
                 disabled={avatarMutation.isPending}
                 aria-label="Alterar avatar"
               >
@@ -136,33 +136,44 @@ export function ProfilePage() {
                 onChange={handleAvatarChange}
               />
             </div>
+          </div>
+        </div>
 
-            <div className="flex-1 pb-1">
-              <h1 className="text-xl font-bold text-gray-900">{displayName}</h1>
-              <p className="text-sm text-gray-500">{profile?.email}</p>
-            </div>
+        <div className="px-4 pb-5 pt-12">
+          <div className="space-y-1">
+            <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900">{displayName}</h1>
+            <p className="break-all text-sm text-gray-500">{profile?.email}</p>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Cidade</p>
               <p className="mt-1 text-sm font-semibold text-gray-900">{p?.city || 'Não informada'}</p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Telefone</p>
               <p className="mt-1 text-sm font-semibold text-gray-900">{profile?.phone || 'Não informado'}</p>
             </div>
           </div>
 
-          {p?.bio && <p className="mt-4 text-sm leading-relaxed text-gray-700">{p.bio}</p>}
+          {p?.bio && (
+            <p className="mt-4 rounded-2xl bg-blue-50/60 px-3 py-3 text-sm leading-relaxed text-gray-700">
+              {p.bio}
+            </p>
+          )}
 
-          <div className="mt-4 flex gap-3">
-            <Button variant="secondary" fullWidth onClick={() => setEditing((value) => !value)}>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="secondary"
+              fullWidth
+              className="min-h-[52px] rounded-2xl"
+              onClick={() => setEditing((value) => !value)}
+            >
               {editing ? 'Fechar edição' : 'Gerenciar perfil'}
             </Button>
             {user?.id && (
-              <Link to={`/profile/${user.id}?preview=public`} className="flex-1">
-                <Button fullWidth>
+              <Link to={`/profile/${user.id}?preview=public`} className="block flex-1">
+                <Button fullWidth className="min-h-[52px] rounded-2xl px-5 whitespace-nowrap">
                   <ExternalLink size={16} />
                   <span className="ml-2">Ver versão pública</span>
                 </Button>
