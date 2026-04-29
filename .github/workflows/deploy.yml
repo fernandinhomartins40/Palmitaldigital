@@ -7,7 +7,7 @@ on:
 
 concurrency:
   group: deploy-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   VPS_HOST: 72.60.10.108
@@ -100,7 +100,7 @@ jobs:
               fi
             }
 
-            ensure_apt_packages ca-certificates certbot curl nginx openssl tar
+            ensure_apt_packages ca-certificates certbot curl nginx openssl tar util-linux
 
             if ! command -v docker >/dev/null 2>&1; then
               apt_update_once
@@ -211,184 +211,7 @@ jobs:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
-            trap 'echo "Deploy failed at line $LINENO: $BASH_COMMAND" >&2' ERR
-
-            RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
-            CURRENT_DIR="$APP_ROOT/current"
-            ROOT_ENV_FILE="$APP_ROOT/.env"
-            COMPOSE_FILE="$RELEASE_DIR/docker-compose.production.yml"
-            ENV_FILE="$RELEASE_DIR/.env"
-            POSTGRES_CONTAINER="palmital-postgres-1"
-            API_CONTAINER="palmital-api-1"
-            WEB_CONTAINER="palmital-web-1"
-
-            compose() {
-              docker compose -p palmital -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"
-            }
-
-            container_state() {
-              docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || echo "not_found"
-            }
-
-            container_health() {
-              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
-            }
-
-            container_image() {
-              docker inspect --format '{{.Config.Image}}' "$1" 2>/dev/null || echo ""
-            }
-
-            dump_service_logs() {
-              local container_name="$1"
-              echo "--- logs: $container_name ---" >&2
-              docker logs --tail=100 "$container_name" >&2 || true
-            }
-
-            promote_release() {
-              ln -sfn "$RELEASE_DIR" "$CURRENT_DIR"
-
-              CURRENT_TARGET="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
-              if [ "$CURRENT_TARGET" != "$RELEASE_DIR" ]; then
-                echo "Failed to promote release: current=$CURRENT_TARGET expected=$RELEASE_DIR" >&2
-                exit 1
-              fi
-
-              if [ ! -f "$CURRENT_DIR/.env" ]; then
-                cp "$ROOT_ENV_FILE" "$CURRENT_DIR/.env"
-                printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$CURRENT_DIR/.env"
-              fi
-
-              echo "Current release promoted to $CURRENT_TARGET"
-            }
-
-            wait_for_container_state() {
-              local container_name="$1"
-              local desired_state="$2"
-              local attempts="$3"
-              local delay_seconds="$4"
-              local i
-              local state
-
-              for i in $(seq 1 "$attempts"); do
-                state="$(container_state "$container_name")"
-                echo "  $container_name[$i/$attempts]: state=$state"
-                if [ "$state" = "$desired_state" ]; then
-                  return 0
-                fi
-                if [ "$state" = "exited" ] || [ "$state" = "dead" ]; then
-                  dump_service_logs "$container_name"
-                  return 1
-                fi
-                sleep "$delay_seconds"
-              done
-
-              dump_service_logs "$container_name"
-              return 1
-            }
-
-            wait_for_container_health() {
-              local container_name="$1"
-              local attempts="$2"
-              local delay_seconds="$3"
-              local i
-              local state
-              local health
-
-              for i in $(seq 1 "$attempts"); do
-                state="$(container_state "$container_name")"
-                health="$(container_health "$container_name")"
-                echo "  $container_name[$i/$attempts]: state=$state health=$health"
-
-                if [ "$state" = "exited" ] || [ "$state" = "dead" ]; then
-                  dump_service_logs "$container_name"
-                  return 1
-                fi
-
-                if [ "$health" = "healthy" ] || [ "$health" = "no_healthcheck" ]; then
-                  return 0
-                fi
-
-                sleep "$delay_seconds"
-              done
-
-              dump_service_logs "$container_name"
-              return 1
-            }
-
-            docker volume create palmital-postgres-data >/dev/null
-            docker volume create palmital-uploads >/dev/null
-            docker volume create palmital-logs >/dev/null
-            docker volume inspect palmital-postgres-data palmital-uploads palmital-logs >/dev/null
-            echo "Persistent volumes ready: postgres=palmital-postgres-data uploads=palmital-uploads logs=palmital-logs"
-
-            cp "$ROOT_ENV_FILE" "$ENV_FILE"
-            printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$ENV_FILE"
-
-            cd "$RELEASE_DIR"
-            compose build --pull migrator api web
-
-            echo "Starting postgres..."
-            compose up -d postgres
-            wait_for_container_state "$POSTGRES_CONTAINER" running 24 5
-            wait_for_container_health "$POSTGRES_CONTAINER" 36 5
-
-            echo "Running migrations..."
-            compose run --rm migrator
-
-            echo "Starting application services..."
-            compose rm -sf api web || true
-            docker rm -f "$API_CONTAINER" "$WEB_CONTAINER" >/dev/null 2>&1 || true
-            compose up -d --remove-orphans --no-build api web
-
-            wait_for_container_state "$API_CONTAINER" running 24 5
-            wait_for_container_health "$API_CONTAINER" 36 5
-            wait_for_container_state "$WEB_CONTAINER" running 24 5
-            wait_for_container_health "$WEB_CONTAINER" 30 5
-
-            API_IMAGE="$(container_image "$API_CONTAINER")"
-            DEPLOYED_VERSION="$(docker exec "$API_CONTAINER" cat /app/.release-version 2>/dev/null || true)"
-            if [ "$API_IMAGE" != "palmital-api:$RELEASE" ] || [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
-              echo "API release mismatch: expected_image=palmital-api:$RELEASE got_image=$API_IMAGE expected_version=$RELEASE got_version=$DEPLOYED_VERSION" >&2
-              dump_service_logs "$API_CONTAINER"
-              exit 1
-            fi
-
-            WEB_IMAGE="$(container_image "$WEB_CONTAINER")"
-            WEB_DEPLOYED_VERSION="$(docker exec "$WEB_CONTAINER" cat /usr/share/nginx/html/release.txt 2>/dev/null || true)"
-            if [ "$WEB_IMAGE" != "palmital-web:$RELEASE" ] || [ "$WEB_DEPLOYED_VERSION" != "$RELEASE" ]; then
-              echo "Web release mismatch: expected_image=palmital-web:$RELEASE got_image=$WEB_IMAGE expected_version=$RELEASE got_version=$WEB_DEPLOYED_VERSION" >&2
-              dump_service_logs "$WEB_CONTAINER"
-              exit 1
-            fi
-
-            echo "Verifying external port health..."
-            for i in $(seq 1 18); do
-              if curl -fsS --max-time 5 "http://127.0.0.1:${DEPLOY_PORT}/health" | grep -q '"status":"ok"'; then
-                echo "Port ${DEPLOY_PORT} verified"
-                break
-              fi
-
-              echo "  port[$i/18]: waiting for http://127.0.0.1:${DEPLOY_PORT}/health"
-
-              if [ "$i" -eq 18 ]; then
-                dump_service_logs "$API_CONTAINER"
-                dump_service_logs "$WEB_CONTAINER"
-                echo "--- port bindings ---" >&2
-                ss -tlnp 2>/dev/null | grep -E "${DEPLOY_PORT}|3000|3001" >&2 || true
-                exit 1
-              fi
-
-              sleep 5
-            done
-
-            promote_release
-
-            ls -dt "$APP_ROOT/releases"/*/ 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
-            docker image prune -af >/dev/null 2>&1 || true
-            docker builder prune -af --filter 'until=24h' >/dev/null 2>&1 || true
-          ENDSSH
+            "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh'"
 
       - name: Configure Nginx (HTTP)
         env:
@@ -506,71 +329,7 @@ jobs:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
           sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
-            trap 'echo "Post-deploy health check failed at line $LINENO: $BASH_COMMAND" >&2' ERR
-
-            API_CONTAINER="palmital-api-1"
-            WEB_CONTAINER="palmital-web-1"
-
-            container_state() {
-              docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || echo "not_found"
-            }
-
-            container_health() {
-              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
-            }
-
-            container_image() {
-              docker inspect --format '{{.Config.Image}}' "$1" 2>/dev/null || echo ""
-            }
-
-            dump_logs() {
-              local container_name="$1"
-              echo "--- logs: $container_name ---" >&2
-              docker logs --tail=80 "$container_name" >&2 || true
-            }
-
-            echo "Running post-deploy health check..."
-            docker ps -a --filter "name=^palmital-" || true
-
-            for i in $(seq 1 30); do
-              API_STATE="$(container_state "$API_CONTAINER")"
-              API_HEALTH="$(container_health "$API_CONTAINER")"
-              WEB_STATE="$(container_state "$WEB_CONTAINER")"
-              WEB_HEALTH="$(container_health "$WEB_CONTAINER")"
-              WEB_HTTP="$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "http://127.0.0.1:${DEPLOY_PORT}/health" 2>/dev/null || true)"
-              WEB_HTTP="${WEB_HTTP:-000}"
-
-              if [ "$API_STATE" = "running" ] && [ "$API_HEALTH" = "healthy" ] && \
-                 [ "$WEB_STATE" = "running" ] && [ "$WEB_HEALTH" = "healthy" ] && \
-                 [ "$WEB_HTTP" = "200" ]; then
-                API_IMAGE="$(container_image "$API_CONTAINER")"
-                WEB_IMAGE="$(container_image "$WEB_CONTAINER")"
-                echo "Health check passed: api=${API_HEALTH} web=${WEB_HEALTH} http=${WEB_HTTP} api_image=${API_IMAGE} web_image=${WEB_IMAGE}"
-                exit 0
-              fi
-
-              if [ "$API_STATE" = "exited" ] || [ "$API_STATE" = "dead" ] || [ "$API_STATE" = "not_found" ]; then
-                dump_logs "$API_CONTAINER"
-                exit 1
-              fi
-
-              if [ "$WEB_STATE" = "exited" ] || [ "$WEB_STATE" = "dead" ] || [ "$WEB_STATE" = "not_found" ]; then
-                dump_logs "$WEB_CONTAINER"
-                exit 1
-              fi
-
-              echo "Attempt $i/30: api_state=$API_STATE api_health=$API_HEALTH web_state=$WEB_STATE web_health=$WEB_HEALTH web_http=$WEB_HTTP"
-              sleep 5
-            done
-
-            echo "Health check failed after 150s" >&2
-            docker ps -a --filter "name=^palmital-" >&2 || true
-            dump_logs "$API_CONTAINER"
-            dump_logs "$WEB_CONTAINER"
-            exit 1
-          ENDSSH
+            "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-health-check.sh'"
 
       - name: Notify success
         run: |
