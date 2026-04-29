@@ -1,44 +1,134 @@
-import { useRef, useState } from 'react';
-import { useUpload } from '../../hooks/useUpload';
+import { useEffect, useRef, useState } from 'react';
 import { Spinner } from '@palmital/ui';
 import { Image, X } from 'lucide-react';
+import { useUpload } from '../../hooks/useUpload';
+import { api } from '../../services/api';
+import { useUIStore } from '../../store/uiStore';
 
 interface ImageUploaderProps {
   onUpload: (mediaId: string, url: string) => void;
+  onRemove?: (mediaId: string) => void;
   maxFiles?: number;
 }
 
-export function ImageUploader({ onUpload, maxFiles = 4 }: ImageUploaderProps) {
+interface UploadPreview {
+  localId: string;
+  mediaId?: string;
+  url: string;
+  kind: 'image' | 'video';
+  status: 'uploading' | 'uploaded' | 'error';
+}
+
+export function ImageUploader({ onUpload, onRemove, maxFiles = 4 }: ImageUploaderProps) {
   const { upload, isUploading } = useUpload();
+  const addToast = useUIStore((s) => s.addToast);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [previews, setPreviews] = useState<{ id: string; url: string }[]>([]);
+  const previewUrlsRef = useRef<string[]>([]);
+  const [previews, setPreviews] = useState<UploadPreview[]>([]);
+
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      previewUrlsRef.current = [];
+    };
+  }, []);
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    for (const file of files.slice(0, maxFiles - previews.length)) {
-      const result = await upload(file);
-      const preview = URL.createObjectURL(file);
-      setPreviews((p) => [...p, { id: result.id, url: preview }]);
-      onUpload(result.id, result.url);
+    const availableSlots = Math.max(0, maxFiles - previews.length);
+
+    for (const file of files.slice(0, availableSlots)) {
+      const localId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const previewUrl = URL.createObjectURL(file);
+      const kind = file.type.startsWith('video/') ? 'video' : 'image';
+      previewUrlsRef.current.push(previewUrl);
+
+      setPreviews((current) => [
+        ...current,
+        { localId, url: previewUrl, kind, status: 'uploading' },
+      ]);
+
+      try {
+        const result = await upload(file);
+        setPreviews((current) =>
+          current.map((preview) =>
+            preview.localId === localId
+              ? { ...preview, mediaId: result.id, status: 'uploaded' }
+              : preview,
+          ),
+        );
+        onUpload(result.id, result.url);
+      } catch (error: any) {
+        setPreviews((current) =>
+          current.map((preview) =>
+            preview.localId === localId ? { ...preview, status: 'error' } : preview,
+          ),
+        );
+        addToast(error.response?.data?.message || 'Erro ao enviar arquivo', 'error');
+      }
     }
-    if (inputRef.current) inputRef.current.value = '';
+
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   }
 
-  function removePreview(id: string) {
-    setPreviews((p) => p.filter((item) => item.id !== id));
+  async function removePreview(preview: UploadPreview) {
+    setPreviews((current) => current.filter((item) => item.localId !== preview.localId));
+    URL.revokeObjectURL(preview.url);
+    previewUrlsRef.current = previewUrlsRef.current.filter((url) => url !== preview.url);
+
+    if (!preview.mediaId) {
+      return;
+    }
+
+    onRemove?.(preview.mediaId);
+
+    try {
+      await api.delete(`/media/${preview.mediaId}`);
+    } catch {
+      addToast('Nao foi possivel remover a midia do servidor', 'error');
+    }
   }
 
   return (
     <div>
       {previews.length > 0 && (
-        <div className="mb-2 flex flex-wrap gap-2">
-          {previews.map((p) => (
-            <div key={p.id} className="relative h-20 w-20">
-              <img src={p.url} alt="" className="h-full w-full rounded-lg object-cover" />
+        <div className="mb-3 flex flex-wrap gap-2">
+          {previews.map((preview) => (
+            <div key={preview.localId} className="relative h-20 w-20 overflow-hidden rounded-lg bg-gray-100">
+              {preview.kind === 'video' ? (
+                <video
+                  src={preview.url}
+                  className="h-full w-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img src={preview.url} alt="" className="h-full w-full object-cover" />
+              )}
+
+              <div className="absolute inset-x-0 bottom-0 bg-black/55 px-1 py-0.5 text-center text-[10px] font-medium text-white">
+                {preview.status === 'uploading'
+                  ? 'Enviando'
+                  : preview.status === 'error'
+                    ? 'Falhou'
+                    : preview.kind === 'video'
+                      ? 'Video'
+                      : 'Imagem'}
+              </div>
+
+              {preview.status === 'uploading' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                  <Spinner size="sm" />
+                </div>
+              )}
+
               <button
                 type="button"
-                onClick={() => removePreview(p.id)}
-                className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white"
+                onClick={() => removePreview(preview)}
+                className="absolute right-1 top-1 rounded-full bg-red-500 p-0.5 text-white"
               >
                 <X size={12} />
               </button>
@@ -46,6 +136,7 @@ export function ImageUploader({ onUpload, maxFiles = 4 }: ImageUploaderProps) {
           ))}
         </div>
       )}
+
       {previews.length < maxFiles && (
         <button
           type="button"
@@ -54,10 +145,22 @@ export function ImageUploader({ onUpload, maxFiles = 4 }: ImageUploaderProps) {
           disabled={isUploading}
         >
           {isUploading ? <Spinner size="sm" /> : <Image size={18} />}
-          <span>Adicionar foto</span>
+          <span>Adicionar foto ou video</span>
         </button>
       )}
-      <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleChange} />
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,video/mp4"
+        multiple
+        className="hidden"
+        onChange={handleChange}
+      />
+
+      <p className="mt-2 text-xs text-gray-400">
+        Suporta JPG, PNG, WEBP e video MP4.
+      </p>
     </div>
   );
 }

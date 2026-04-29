@@ -181,7 +181,11 @@ export function CreatePostPage() {
             </div>
           )}
 
-          <ImageUploader onUpload={(id) => setMediaIds((ids) => [...ids, id])} maxFiles={4} />
+          <ImageUploader
+            onUpload={(id) => setMediaIds((ids) => [...ids, id])}
+            onRemove={(id) => setMediaIds((ids) => ids.filter((mediaId) => mediaId !== id))}
+            maxFiles={4}
+          />
 
           <Button type="submit" fullWidth isLoading={mutation.isPending}>
             Publicar
