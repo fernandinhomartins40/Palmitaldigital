@@ -35,6 +35,10 @@ export class CreatePostDto {
   mediaIds?: string[];
 
   @IsOptional()
+  @IsString()
+  companyId?: string;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreateClassifiedInlineDto)
   classified?: CreateClassifiedInlineDto;

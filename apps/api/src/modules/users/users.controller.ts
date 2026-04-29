@@ -10,9 +10,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { memoryStorage } from 'multer';
 import { UsersService } from './users.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SearchUsersQueryDto } from './dto/search-users-query.dto';
@@ -36,10 +34,7 @@ export class UsersController {
   @Post('me/avatar')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: join(process.cwd(), 'uploads', 'avatars'),
-        filename: (_, file, cb) => cb(null, `${uuidv4()}${extname(file.originalname)}`),
-      }),
+      storage: memoryStorage(),
       limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (_, file, cb) => {
         const allowed = ['image/jpeg', 'image/png', 'image/webp'];
@@ -48,8 +43,7 @@ export class UsersController {
     }),
   )
   async uploadAvatar(@CurrentUser() user: any, @UploadedFile() file: Express.Multer.File) {
-    const url = `/uploads/avatars/${file.filename}`;
-    return this.usersService.updateAvatar(user.id, url);
+    return this.usersService.updateAvatar(user.id, file);
   }
 
   @Get('search')

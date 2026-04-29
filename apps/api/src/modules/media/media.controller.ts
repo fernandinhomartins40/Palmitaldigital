@@ -7,9 +7,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { memoryStorage } from 'multer';
 import { MediaService } from './media.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -20,10 +18,7 @@ export class MediaController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: join(process.cwd(), 'uploads', 'media'),
-        filename: (_, file, cb) => cb(null, `${uuidv4()}${extname(file.originalname)}`),
-      }),
+      storage: memoryStorage(),
       limits: { fileSize: 10 * 1024 * 1024 },
       fileFilter: (_, file, cb) => {
         const allowed = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];

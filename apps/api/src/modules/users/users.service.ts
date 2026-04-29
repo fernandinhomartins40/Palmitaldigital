@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { UploadStorageService } from '../../common/storage/upload-storage.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SearchUsersQueryDto } from './dto/search-users-query.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private uploadStorage: UploadStorageService,
+  ) {}
 
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -13,6 +17,7 @@ export class UsersService {
       include: { profile: true, company: true },
     });
     if (!user) throw new NotFoundException('User not found');
+
     const { passwordHash, ...safe } = user;
     return safe;
   }
@@ -35,6 +40,7 @@ export class UsersService {
       },
     });
     if (!user) throw new NotFoundException('User not found');
+
     return user;
   }
 
@@ -80,22 +86,40 @@ export class UsersService {
 
     const profile = await this.prisma.profile.upsert({
       where: { userId },
-      create: { userId, displayName: profileData.displayName || 'Usuário', ...profileData },
+      create: { userId, displayName: profileData.displayName || 'Usuario', ...profileData },
       update: profileData,
     });
 
     return profile;
   }
 
-  async updateAvatar(userId: string, avatarUrl: string) {
-    return this.prisma.profile.upsert({
+  async updateAvatar(userId: string, file: Express.Multer.File) {
+    const currentProfile = await this.prisma.profile.findUnique({
       where: { userId },
-      create: {
-        userId,
-        displayName: 'Usuário',
-        avatarUrl,
-      },
-      update: { avatarUrl },
+      select: { avatarUrl: true, displayName: true },
     });
+
+    const storedAvatar = await this.uploadStorage.storeAvatar(file);
+
+    try {
+      const profile = await this.prisma.profile.upsert({
+        where: { userId },
+        create: {
+          userId,
+          displayName: currentProfile?.displayName ?? 'Usuario',
+          avatarUrl: storedAvatar.url,
+        },
+        update: { avatarUrl: storedAvatar.url },
+      });
+
+      if (currentProfile?.avatarUrl && currentProfile.avatarUrl !== storedAvatar.url) {
+        await this.uploadStorage.removeByUrl(currentProfile.avatarUrl);
+      }
+
+      return profile;
+    } catch (error) {
+      await this.uploadStorage.removeByUrl(storedAvatar.url);
+      throw error;
+    }
   }
 }

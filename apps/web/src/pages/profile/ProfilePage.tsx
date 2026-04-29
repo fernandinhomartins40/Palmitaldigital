@@ -109,86 +109,96 @@ export function ProfilePage() {
   }
 
   const p = profile?.profile;
-  const displayName = p?.displayName ?? user?.profile?.displayName ?? user?.email ?? 'Usuário';
+  const displayName = p?.displayName ?? user?.profile?.displayName ?? user?.email ?? 'Usuario';
 
   return (
-    <div className="space-y-5 px-4 pb-6 pt-4">
+    <div className="space-y-6 px-4 pb-8 pt-4 lg:px-0">
       <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
-        <div className="relative h-28 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500">
-          <div className="absolute inset-y-0 right-0 w-28 rounded-full bg-white/10 blur-2xl" />
-          <div className="absolute -bottom-10 left-4">
-            <div className="relative rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
-              <Avatar src={p?.avatarUrl} name={displayName} size="lg" className="h-16 w-16 text-2xl" />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
-                disabled={avatarMutation.isPending}
-                aria-label="Alterar avatar"
-              >
-                <Camera size={14} />
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
-            </div>
-          </div>
+        <div className="relative h-28 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-40">
+          <div className="absolute inset-y-0 right-0 w-32 rounded-full bg-white/10 blur-2xl lg:w-48" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent" />
         </div>
 
-        <div className="px-4 pb-5 pt-12">
-          <div className="space-y-1">
-            <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900">{displayName}</h1>
-            <p className="break-all text-sm text-gray-500">{profile?.email}</p>
+        <div className="px-4 pb-5 pt-4 lg:px-8 lg:pb-8 lg:pt-0">
+          <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
+            <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
+              <div className="-mt-10 inline-flex lg:-mt-14">
+                <div className="relative rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
+                  <Avatar
+                    src={p?.avatarUrl}
+                    name={displayName}
+                    size="lg"
+                    className="h-16 w-16 text-2xl lg:h-24 lg:w-24 lg:text-3xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
+                    disabled={avatarMutation.isPending}
+                    aria-label="Alterar avatar"
+                  >
+                    <Camera size={14} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4 min-w-0 space-y-1 lg:mt-0 lg:pb-2">
+                <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">{displayName}</h1>
+                <p className="break-all text-sm text-gray-500 lg:text-base">{profile?.email}</p>
+                {p?.bio && (
+                  <p className="max-w-3xl pt-2 text-sm leading-relaxed text-gray-600">
+                    {p.bio}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:w-[19rem] lg:shrink-0">
+              <Button
+                variant="secondary"
+                size="sm"
+                fullWidth
+                className="rounded-xl py-3"
+                onClick={() => setEditing((value) => !value)}
+              >
+                {editing ? 'Fechar edicao' : 'Gerenciar perfil'}
+              </Button>
+              {user?.id && (
+                <Link to={`/profile/${user.id}?preview=public`} className="block">
+                  <Button fullWidth size="sm" className="rounded-xl px-4 py-3 whitespace-nowrap">
+                    <ExternalLink size={16} />
+                    <span className="ml-2">Ver versao publica</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5">
+          <div className="mt-5 grid gap-3 lg:mt-8 lg:grid-cols-2">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Cidade</p>
-              <p className="mt-1 text-sm font-semibold text-gray-900">{p?.city || 'Não informada'}</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">{p?.city || 'Nao informada'}</p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Telefone</p>
-              <p className="mt-1 text-sm font-semibold text-gray-900">{profile?.phone || 'Não informado'}</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">{profile?.phone || 'Nao informado'}</p>
             </div>
-          </div>
-
-          {p?.bio && (
-            <p className="mt-4 rounded-2xl bg-blue-50/60 px-3 py-3 text-sm leading-relaxed text-gray-700">
-              {p.bio}
-            </p>
-          )}
-
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button
-              variant="secondary"
-              size="sm"
-              fullWidth
-              className="rounded-xl py-3"
-              onClick={() => setEditing((value) => !value)}
-            >
-              {editing ? 'Fechar edição' : 'Gerenciar perfil'}
-            </Button>
-            {user?.id && (
-              <Link to={`/profile/${user.id}?preview=public`} className="block flex-1">
-                <Button fullWidth size="sm" className="rounded-xl px-4 py-3 whitespace-nowrap">
-                  <ExternalLink size={16} />
-                  <span className="ml-2">Ver versão pública</span>
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
       </Card>
 
       {editing ? (
-        <Card className="space-y-4 p-4">
+        <Card className="space-y-4 p-4 lg:p-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Editar perfil</h2>
-            <p className="text-sm text-gray-500">Atualize como a comunidade vê você.</p>
+            <p className="text-sm text-gray-500">Atualize como a comunidade ve voce.</p>
           </div>
 
           <form
@@ -199,7 +209,7 @@ export function ProfilePage() {
             className="space-y-4"
           >
             <Input
-              label="Nome de exibição"
+              label="Nome de exibicao"
               value={form.displayName}
               onChange={(e) => setForm((state) => ({ ...state, displayName: e.target.value }))}
               required
@@ -217,21 +227,23 @@ export function ProfilePage() {
               />
             </div>
 
-            <Input
-              label="Cidade"
-              value={form.city}
-              onChange={(e) => setForm((state) => ({ ...state, city: e.target.value }))}
-              maxLength={100}
-            />
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Input
+                label="Cidade"
+                value={form.city}
+                onChange={(e) => setForm((state) => ({ ...state, city: e.target.value }))}
+                maxLength={100}
+              />
 
-            <Input
-              label="Telefone"
-              value={form.phone}
-              onChange={(e) => setForm((state) => ({ ...state, phone: e.target.value }))}
-              maxLength={30}
-            />
+              <Input
+                label="Telefone"
+                value={form.phone}
+                onChange={(e) => setForm((state) => ({ ...state, phone: e.target.value }))}
+                maxLength={30}
+              />
+            </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 variant="secondary"
                 fullWidth
@@ -241,30 +253,30 @@ export function ProfilePage() {
                 Cancelar
               </Button>
               <Button fullWidth type="submit" isLoading={updateMutation.isPending}>
-                Salvar alterações
+                Salvar alteracoes
               </Button>
             </div>
           </form>
         </Card>
       ) : (
-        <Card className="space-y-4 p-4">
+        <Card className="space-y-4 p-4 lg:p-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Minha conta</h2>
-            <p className="text-sm text-gray-500">Gerencie seus dados principais e sessão ativa.</p>
+            <p className="text-sm text-gray-500">Gerencie seus dados principais e sessao ativa.</p>
           </div>
 
-          <div className="space-y-3 text-sm text-gray-600">
+          <div className="grid gap-3 text-sm text-gray-600 lg:grid-cols-2">
             <p className="flex items-center gap-2">
               <UserCircle2 size={16} className="text-gray-400" />
               {displayName}
             </p>
             <p className="flex items-center gap-2">
               <MapPin size={16} className="text-gray-400" />
-              {p?.city || 'Cidade não informada'}
+              {p?.city || 'Cidade nao informada'}
             </p>
-            <p className="flex items-center gap-2">
+            <p className="flex items-center gap-2 lg:col-span-2">
               <Phone size={16} className="text-gray-400" />
-              {profile?.phone || 'Telefone não informado'}
+              {profile?.phone || 'Telefone nao informado'}
             </p>
           </div>
 

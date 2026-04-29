@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
@@ -9,6 +9,9 @@ import { connectSocket, disconnectSocket } from '../../services/socket';
 
 export function AppLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { pathname } = useLocation();
+  const isProfileRoute = pathname === '/profile' || pathname.startsWith('/profile/');
+  const isCompanyRoute = pathname === '/companies/manage' || pathname.startsWith('/companies/');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -29,7 +32,11 @@ export function AppLayout() {
             </aside>
 
             <section className="min-w-0">
-              <div className="mx-auto w-full max-w-[56rem]">
+              <div
+                className={`mx-auto w-full ${
+                  isProfileRoute || isCompanyRoute ? 'max-w-[68rem]' : 'max-w-[56rem]'
+                }`}
+              >
                 <Outlet />
               </div>
             </section>

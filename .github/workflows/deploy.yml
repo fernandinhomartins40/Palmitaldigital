@@ -320,6 +320,8 @@ jobs:
             docker volume create palmital-postgres-data >/dev/null
             docker volume create palmital-uploads >/dev/null
             docker volume create palmital-logs >/dev/null
+            docker volume inspect palmital-postgres-data palmital-uploads palmital-logs >/dev/null
+            echo "Persistent volumes ready: postgres=palmital-postgres-data uploads=palmital-uploads logs=palmital-logs"
 
             cp "$ROOT_ENV_FILE" "$ENV_FILE"
             printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$ENV_FILE"

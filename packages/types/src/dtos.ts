@@ -29,6 +29,7 @@ export interface CreatePostDto {
   type: PostType;
   content?: string;
   mediaIds?: string[];
+  companyId?: string;
   classified?: {
     title: string;
     description: string;
@@ -65,6 +66,11 @@ export interface CreateCompanyDto {
   address?: string;
   city?: string;
   category?: string;
+  isActive?: boolean;
+}
+
+export interface UpdateCompanyDto extends CreateCompanyDto {
+  isActive?: boolean;
 }
 
 export interface CreateProductDto {
@@ -72,6 +78,7 @@ export interface CreateProductDto {
   description?: string;
   price?: number;
   imageUrl?: string;
+  isAvailable?: boolean;
 }
 
 // Chat

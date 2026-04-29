@@ -13,6 +13,7 @@ const ClassifiedsPage = lazy(() => import('./pages/classifieds/ClassifiedsPage')
 const ClassifiedDetailPage = lazy(() => import('./pages/classifieds/ClassifiedDetailPage').then((m) => ({ default: m.ClassifiedDetailPage })));
 const CompaniesPage = lazy(() => import('./pages/companies/CompaniesPage').then((m) => ({ default: m.CompaniesPage })));
 const CompanyProfilePage = lazy(() => import('./pages/companies/CompanyProfilePage').then((m) => ({ default: m.CompanyProfilePage })));
+const CompanyManagerPage = lazy(() => import('./pages/companies/CompanyManagerPage').then((m) => ({ default: m.CompanyManagerPage })));
 const ConversationsPage = lazy(() => import('./pages/chat/ConversationsPage').then((m) => ({ default: m.ConversationsPage })));
 const ChatPage = lazy(() => import('./pages/chat/ChatPage').then((m) => ({ default: m.ChatPage })));
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
       { path: '/classifieds', element: <Page><ClassifiedsPage /></Page> },
       { path: '/classifieds/:id', element: <Page><ClassifiedDetailPage /></Page> },
       { path: '/companies', element: <Page><CompaniesPage /></Page> },
+      { path: '/companies/manage', element: <Page><CompanyManagerPage /></Page> },
       { path: '/companies/:slug', element: <Page><CompanyProfilePage /></Page> },
       { path: '/chat', element: <Page><ConversationsPage /></Page> },
       { path: '/chat/:conversationId', element: <Page><ChatPage /></Page> },

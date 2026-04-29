@@ -1,6 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
-import { MessageCircle, MapPin } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { MessageCircle, MapPin } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 
@@ -8,19 +8,23 @@ const titles: Record<string, string> = {
   '/feed': 'Feed',
   '/classifieds': 'Classificados',
   '/companies': 'Empresas',
+  '/companies/manage': 'Minha empresa',
   '/chat': 'Mensagens',
   '/profile': 'Perfil',
-  '/create': 'Nova publicação',
+  '/create': 'Nova publicacao',
 };
 
 export function TopBar() {
   const { pathname } = useLocation();
-  const title = pathname.startsWith('/profile/')
-    ? 'Perfil público'
-    : pathname.startsWith('/chat/')
-      ? 'Mensagens'
-      : titles[pathname] ?? 'Palmital Digital';
   const currentUser = useAuthStore((s) => s.user);
+  const title = titles[pathname]
+    ?? (pathname.startsWith('/profile/')
+      ? 'Perfil publico'
+      : pathname.startsWith('/companies/')
+        ? 'Perfil da empresa'
+        : pathname.startsWith('/chat/')
+          ? 'Mensagens'
+          : 'Palmital Digital');
 
   const { data: conversations } = useQuery({
     queryKey: ['conversations'],

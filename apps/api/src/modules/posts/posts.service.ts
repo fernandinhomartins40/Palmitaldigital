@@ -16,7 +16,7 @@ export class PostsService {
   private get postInclude() {
     return {
       author: { include: { profile: true } },
-      company: { select: { id: true, name: true, slug: true, logoUrl: true } },
+      company: { select: { id: true, name: true, slug: true, logoUrl: true, isVerified: true } },
       classified: { include: { category: true } },
       media: true,
     };
@@ -27,10 +27,28 @@ export class PostsService {
       throw new BadRequestException('classified data is required for CLASSIFIED type');
     }
 
+    let companyId: string | undefined;
+    if (dto.type === PostType.BUSINESS) {
+      const company = dto.companyId
+        ? await this.prisma.company.findUnique({ where: { id: dto.companyId } })
+        : await this.prisma.company.findUnique({ where: { ownerId: authorId } });
+
+      if (!company) {
+        throw new BadRequestException('business posts require an owned company');
+      }
+
+      if (company.ownerId !== authorId) {
+        throw new ForbiddenException('cannot publish for another company');
+      }
+
+      companyId = company.id;
+    }
+
     return this.prisma.$transaction(async (tx) => {
       const post = await tx.post.create({
         data: {
           authorId,
+          companyId,
           type: dto.type,
           content: dto.content,
           media: dto.mediaIds?.length
