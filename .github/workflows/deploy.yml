@@ -220,49 +220,30 @@ jobs:
             ROOT_ENV_FILE="$APP_ROOT/.env"
             COMPOSE_FILE="$RELEASE_DIR/docker-compose.production.yml"
             ENV_FILE="$RELEASE_DIR/.env"
+            POSTGRES_CONTAINER="palmital-postgres-1"
+            API_CONTAINER="palmital-api-1"
+            WEB_CONTAINER="palmital-web-1"
 
             compose() {
               docker compose -p palmital -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"
             }
 
-            service_id() {
-              compose ps -q "$1"
+            container_state() {
+              docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || echo "not_found"
             }
 
-            service_state() {
-              local id
-              id="$(service_id "$1")"
-              if [ -z "$id" ]; then
-                echo "not_found"
-                return
-              fi
-              docker inspect --format '{{.State.Status}}' "$id" 2>/dev/null || echo "not_found"
+            container_health() {
+              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
             }
 
-            service_health() {
-              local id
-              id="$(service_id "$1")"
-              if [ -z "$id" ]; then
-                echo "not_found"
-                return
-              fi
-              docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$id" 2>/dev/null || echo "not_found"
-            }
-
-            service_image() {
-              local id
-              id="$(service_id "$1")"
-              if [ -z "$id" ]; then
-                echo ""
-                return
-              fi
-              docker inspect --format '{{.Config.Image}}' "$id" 2>/dev/null || echo ""
+            container_image() {
+              docker inspect --format '{{.Config.Image}}' "$1" 2>/dev/null || echo ""
             }
 
             dump_service_logs() {
-              local service="$1"
-              echo "--- logs: $service ---" >&2
-              compose logs --no-color --tail=100 "$service" >&2 || true
+              local container_name="$1"
+              echo "--- logs: $container_name ---" >&2
+              docker logs --tail=100 "$container_name" >&2 || true
             }
 
             promote_release() {
@@ -282,8 +263,8 @@ jobs:
               echo "Current release promoted to $CURRENT_TARGET"
             }
 
-            wait_for_service_state() {
-              local service="$1"
+            wait_for_container_state() {
+              local container_name="$1"
               local desired_state="$2"
               local attempts="$3"
               local delay_seconds="$4"
@@ -291,24 +272,24 @@ jobs:
               local state
 
               for i in $(seq 1 "$attempts"); do
-                state="$(service_state "$service")"
-                echo "  $service[$i/$attempts]: state=$state"
+                state="$(container_state "$container_name")"
+                echo "  $container_name[$i/$attempts]: state=$state"
                 if [ "$state" = "$desired_state" ]; then
                   return 0
                 fi
                 if [ "$state" = "exited" ] || [ "$state" = "dead" ]; then
-                  dump_service_logs "$service"
+                  dump_service_logs "$container_name"
                   return 1
                 fi
                 sleep "$delay_seconds"
               done
 
-              dump_service_logs "$service"
+              dump_service_logs "$container_name"
               return 1
             }
 
-            wait_for_service_health() {
-              local service="$1"
+            wait_for_container_health() {
+              local container_name="$1"
               local attempts="$2"
               local delay_seconds="$3"
               local i
@@ -316,12 +297,12 @@ jobs:
               local health
 
               for i in $(seq 1 "$attempts"); do
-                state="$(service_state "$service")"
-                health="$(service_health "$service")"
-                echo "  $service[$i/$attempts]: state=$state health=$health"
+                state="$(container_state "$container_name")"
+                health="$(container_health "$container_name")"
+                echo "  $container_name[$i/$attempts]: state=$state health=$health"
 
                 if [ "$state" = "exited" ] || [ "$state" = "dead" ]; then
-                  dump_service_logs "$service"
+                  dump_service_logs "$container_name"
                   return 1
                 fi
 
@@ -332,7 +313,7 @@ jobs:
                 sleep "$delay_seconds"
               done
 
-              dump_service_logs "$service"
+              dump_service_logs "$container_name"
               return 1
             }
 
@@ -348,37 +329,35 @@ jobs:
 
             echo "Starting postgres..."
             compose up -d postgres
-            wait_for_service_state postgres running 24 5
-            wait_for_service_health postgres 36 5
+            wait_for_container_state "$POSTGRES_CONTAINER" running 24 5
+            wait_for_container_health "$POSTGRES_CONTAINER" 36 5
 
             echo "Running migrations..."
             compose run --rm migrator
 
             echo "Starting application services..."
             compose rm -sf api web || true
-            docker rm -f palmital-api-1 palmital-web-1 >/dev/null 2>&1 || true
+            docker rm -f "$API_CONTAINER" "$WEB_CONTAINER" >/dev/null 2>&1 || true
             compose up -d --remove-orphans --no-build api web
 
-            wait_for_service_state api running 24 5
-            wait_for_service_health api 36 5
-            wait_for_service_state web running 24 5
-            wait_for_service_health web 30 5
+            wait_for_container_state "$API_CONTAINER" running 24 5
+            wait_for_container_health "$API_CONTAINER" 36 5
+            wait_for_container_state "$WEB_CONTAINER" running 24 5
+            wait_for_container_health "$WEB_CONTAINER" 30 5
 
-            API_ID="$(service_id api)"
-            API_IMAGE="$(service_image api)"
-            DEPLOYED_VERSION="$(docker exec "$API_ID" cat /app/.release-version 2>/dev/null || true)"
+            API_IMAGE="$(container_image "$API_CONTAINER")"
+            DEPLOYED_VERSION="$(docker exec "$API_CONTAINER" cat /app/.release-version 2>/dev/null || true)"
             if [ "$API_IMAGE" != "palmital-api:$RELEASE" ] || [ "$DEPLOYED_VERSION" != "$RELEASE" ]; then
               echo "API release mismatch: expected_image=palmital-api:$RELEASE got_image=$API_IMAGE expected_version=$RELEASE got_version=$DEPLOYED_VERSION" >&2
-              dump_service_logs api
+              dump_service_logs "$API_CONTAINER"
               exit 1
             fi
 
-            WEB_ID="$(service_id web)"
-            WEB_IMAGE="$(service_image web)"
-            WEB_DEPLOYED_VERSION="$(docker exec "$WEB_ID" cat /usr/share/nginx/html/release.txt 2>/dev/null || true)"
+            WEB_IMAGE="$(container_image "$WEB_CONTAINER")"
+            WEB_DEPLOYED_VERSION="$(docker exec "$WEB_CONTAINER" cat /usr/share/nginx/html/release.txt 2>/dev/null || true)"
             if [ "$WEB_IMAGE" != "palmital-web:$RELEASE" ] || [ "$WEB_DEPLOYED_VERSION" != "$RELEASE" ]; then
               echo "Web release mismatch: expected_image=palmital-web:$RELEASE got_image=$WEB_IMAGE expected_version=$RELEASE got_version=$WEB_DEPLOYED_VERSION" >&2
-              dump_service_logs web
+              dump_service_logs "$WEB_CONTAINER"
               exit 1
             fi
 
@@ -392,8 +371,8 @@ jobs:
               echo "  port[$i/18]: waiting for http://127.0.0.1:${DEPLOY_PORT}/health"
 
               if [ "$i" -eq 18 ]; then
-                dump_service_logs api
-                dump_service_logs web
+                dump_service_logs "$API_CONTAINER"
+                dump_service_logs "$WEB_CONTAINER"
                 echo "--- port bindings ---" >&2
                 ss -tlnp 2>/dev/null | grep -E "${DEPLOY_PORT}|3000|3001" >&2 || true
                 exit 1
