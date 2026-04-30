@@ -18,6 +18,13 @@ enum PostType {
   SOCIAL
   CLASSIFIED
   BUSINESS
+  PROMOTION
+}
+
+enum PromotionKind {
+  PROFESSIONAL
+  COMPANY_PROFILE
+  COMPANY_PRODUCTS
 }
 
 enum ClassifiedStatus {
@@ -129,12 +136,43 @@ model Post {
   author     User        @relation(fields: [authorId], references: [id])
   company    Company?    @relation(fields: [companyId], references: [id])
   classified Classified?
+  promotion  Promotion?
   media      Media[]
 
   @@index([authorId])
   @@index([type])
   @@index([createdAt(sort: Desc)])
   @@index([isPublished, createdAt(sort: Desc)])
+}
+
+model Promotion {
+  id          String         @id @default(cuid())
+  postId       String         @unique
+  kind         PromotionKind
+  headline     String
+  subtitle     String?
+  city         String?
+  serviceArea  String?
+  highlights   String[]       @default([])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  post      Post               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  products  PromotionProduct[]
+
+  @@index([kind])
+}
+
+model PromotionProduct {
+  promotionId String
+  productId   String
+  sortOrder   Int       @default(0)
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([promotionId, productId])
+  @@index([productId])
 }
 
 model Classified {
@@ -174,6 +212,7 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   company Company @relation(fields: [companyId], references: [id])
+  promotionItems PromotionProduct[]
 
   @@index([companyId])
 }

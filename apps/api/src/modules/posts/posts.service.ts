@@ -4,22 +4,33 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PostType } from '@palmital/types';
+import { PostType, PromotionKind } from '@palmital/types';
+import { Prisma } from '../../../generated/prisma';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { FeedQueryDto } from './dto/feed-query.dto';
+
+const postInclude = Prisma.validator<Prisma.PostInclude>()({
+  author: { include: { profile: true } },
+  company: { select: { id: true, name: true, slug: true, logoUrl: true, isVerified: true } },
+  classified: { include: { category: true } },
+  promotion: {
+    include: {
+      products: {
+        orderBy: { sortOrder: 'asc' },
+        include: { product: true },
+      },
+    },
+  },
+  media: true,
+});
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
   private get postInclude() {
-    return {
-      author: { include: { profile: true } },
-      company: { select: { id: true, name: true, slug: true, logoUrl: true, isVerified: true } },
-      classified: { include: { category: true } },
-      media: true,
-    };
+    return postInclude;
   }
 
   async createPost(authorId: string, dto: CreatePostDto) {
@@ -27,8 +38,12 @@ export class PostsService {
       throw new BadRequestException('classified data is required for CLASSIFIED type');
     }
 
+    if (dto.type === PostType.PROMOTION && !dto.promotion) {
+      throw new BadRequestException('promotion data is required for PROMOTION type');
+    }
+
     let companyId: string | undefined;
-    if (dto.type === PostType.BUSINESS) {
+    if (dto.type === PostType.BUSINESS || dto.promotion?.kind === PromotionKind.COMPANY_PROFILE || dto.promotion?.kind === PromotionKind.COMPANY_PRODUCTS) {
       const company = dto.companyId
         ? await this.prisma.company.findUnique({ where: { id: dto.companyId } })
         : await this.prisma.company.findUnique({ where: { ownerId: authorId } });
@@ -42,6 +57,25 @@ export class PostsService {
       }
 
       companyId = company.id;
+
+      if (dto.promotion?.kind === PromotionKind.COMPANY_PRODUCTS) {
+        const productIds = dto.promotion.productIds ?? [];
+        if (!productIds.length) {
+          throw new BadRequestException('company products promotion requires at least one product');
+        }
+
+        const ownedProducts = await this.prisma.product.findMany({
+          where: {
+            companyId: company.id,
+            id: { in: productIds },
+          },
+          select: { id: true },
+        });
+
+        if (ownedProducts.length !== productIds.length) {
+          throw new ForbiddenException('cannot promote products from another company');
+        }
+      }
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -49,11 +83,33 @@ export class PostsService {
         data: {
           authorId,
           companyId,
-          type: dto.type,
+          type: dto.type as any,
           content: dto.content,
           media: dto.mediaIds?.length
             ? { connect: dto.mediaIds.map((id) => ({ id })) }
             : undefined,
+          promotion:
+            dto.type === PostType.PROMOTION && dto.promotion
+              ? {
+                  create: {
+                    kind: dto.promotion.kind as any,
+                    headline: dto.promotion.headline,
+                    subtitle: dto.promotion.subtitle,
+                    city: dto.promotion.city,
+                    serviceArea: dto.promotion.serviceArea,
+                    highlights: dto.promotion.highlights?.filter(Boolean) ?? [],
+                    products:
+                      dto.promotion.kind === PromotionKind.COMPANY_PRODUCTS && dto.promotion.productIds?.length
+                        ? {
+                            create: dto.promotion.productIds.map((productId, index) => ({
+                              sortOrder: index,
+                              product: { connect: { id: productId } },
+                            })),
+                          }
+                        : undefined,
+                  },
+                }
+              : undefined,
         },
       });
 

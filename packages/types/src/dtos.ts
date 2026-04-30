@@ -1,4 +1,4 @@
-import { ClassifiedStatus, PostType } from './enums';
+import { ClassifiedStatus, PostType, PromotionKind } from './enums';
 
 // Auth
 export interface RegisterDto {
@@ -43,6 +43,15 @@ export interface CreatePostDto {
     isFree?: boolean;
     categoryId?: string;
     city?: string;
+  };
+  promotion?: {
+    kind: PromotionKind;
+    headline: string;
+    subtitle?: string;
+    city?: string;
+    serviceArea?: string;
+    highlights?: string[];
+    productIds?: string[];
   };
 }
 

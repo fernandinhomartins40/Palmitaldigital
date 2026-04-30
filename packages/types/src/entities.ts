@@ -1,4 +1,4 @@
-import { ClassifiedStatus, MediaType, MessageStatus, PostType, UserRole } from './enums';
+import { ClassifiedStatus, MediaType, MessageStatus, PostType, PromotionKind, UserRole } from './enums';
 
 export interface IUser {
   id: string;
@@ -54,6 +54,7 @@ export interface IPost {
   author?: IUser;
   company?: ICompany | null;
   classified?: IClassified | null;
+  promotion?: IPromotion | null;
   media?: IMedia[];
 }
 
@@ -83,6 +84,27 @@ export interface IProduct {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IPromotion {
+  id: string;
+  postId: string;
+  kind: PromotionKind;
+  headline: string;
+  subtitle?: string | null;
+  city?: string | null;
+  serviceArea?: string | null;
+  highlights: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  products?: IPromotionProduct[];
+}
+
+export interface IPromotionProduct {
+  promotionId: string;
+  productId: string;
+  sortOrder: number;
+  product?: IProduct;
 }
 
 export interface ICategory {

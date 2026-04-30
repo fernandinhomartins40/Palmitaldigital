@@ -1,7 +1,8 @@
-import { PostType } from '@palmital/types';
+import { PostType, PromotionKind } from '@palmital/types';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  ArrayMaxSize,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -18,6 +19,43 @@ class CreateClassifiedInlineDto {
   @IsOptional() isFree?: boolean;
   @IsOptional() @IsString() categoryId?: string;
   @IsOptional() @IsString() city?: string;
+}
+
+class CreatePromotionInlineDto {
+  @IsEnum(PromotionKind)
+  kind: PromotionKind;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(80)
+  headline: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(140)
+  subtitle?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  serviceArea?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(4)
+  @IsString({ each: true })
+  highlights?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(4)
+  @IsString({ each: true })
+  productIds?: string[];
 }
 
 export class CreatePostDto {
@@ -42,4 +80,9 @@ export class CreatePostDto {
   @ValidateNested()
   @Type(() => CreateClassifiedInlineDto)
   classified?: CreateClassifiedInlineDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CreatePromotionInlineDto)
+  promotion?: CreatePromotionInlineDto;
 }

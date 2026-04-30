@@ -56,12 +56,12 @@ export function DesktopSidebar() {
 
       <Link
         to="/create"
-        className="group relative overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#2563eb_0%,#3b82f6_52%,#5b5ce2_100%)] px-5 py-5 text-white shadow-[0_18px_40px_rgba(37,99,235,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(37,99,235,0.3)]"
+        className="group relative block w-full overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#2563eb_0%,#3b82f6_52%,#5b5ce2_100%)] px-5 py-5 text-white shadow-[0_18px_40px_rgba(37,99,235,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(37,99,235,0.3)]"
       >
         <div className="absolute inset-y-0 right-0 w-32 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.3),transparent_62%)]" />
         <div className="absolute -right-5 bottom-3 h-20 w-20 rounded-full bg-white/10 blur-sm" />
 
-        <div className="relative flex items-center justify-between gap-4">
+        <div className="relative grid min-h-[164px] grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
           <div className="min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-50/95 backdrop-blur-sm">
               <Sparkles size={12} />
@@ -75,7 +75,7 @@ export function DesktopSidebar() {
             </p>
           </div>
 
-          <div className="relative shrink-0">
+          <div className="relative mt-1 shrink-0 justify-self-end">
             <div className="flex h-16 w-16 items-center justify-center rounded-[22px] border border-white/20 bg-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-sm transition-transform group-hover:scale-105">
               <ImagePlus size={28} strokeWidth={2.1} />
             </div>

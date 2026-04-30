@@ -8,6 +8,13 @@ export enum PostType {
   SOCIAL = 'SOCIAL',
   CLASSIFIED = 'CLASSIFIED',
   BUSINESS = 'BUSINESS',
+  PROMOTION = 'PROMOTION',
+}
+
+export enum PromotionKind {
+  PROFESSIONAL = 'PROFESSIONAL',
+  COMPANY_PROFILE = 'COMPANY_PROFILE',
+  COMPANY_PRODUCTS = 'COMPANY_PRODUCTS',
 }
 
 export enum ClassifiedStatus {
