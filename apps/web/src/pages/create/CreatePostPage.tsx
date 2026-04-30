@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from '@palmital/ui';
 import { PostType, PromotionKind } from '@palmital/types';
 import { BriefcaseBusiness, Megaphone, Package2, Sparkles, Store } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ImageUploader } from '../../components/shared/ImageUploader';
+import { ImageUploader, type ImageUploaderHandle } from '../../components/shared/ImageUploader';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
@@ -17,10 +17,12 @@ export function CreatePostPage() {
   const queryClient = useQueryClient();
   const addToast = useUIStore((s) => s.addToast);
   const currentUser = useAuthStore((s) => s.user);
+  const uploaderRef = useRef<ImageUploaderHandle>(null);
   const [tab, setTab] = useState<TabType>('social');
   const [content, setContent] = useState('');
   const [mediaIds, setMediaIds] = useState<string[]>([]);
   const [isMediaUploading, setIsMediaUploading] = useState(false);
+  const [isFinalizingPost, setIsFinalizingPost] = useState(false);
   const [promotionMode, setPromotionMode] = useState<PromotionMode>('professional');
   const [promotion, setPromotion] = useState({
     headline: '',
@@ -103,83 +105,109 @@ export function CreatePostPage() {
     return PromotionKind.PROFESSIONAL;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsFinalizingPost(true);
 
-    if (isMediaUploading) {
-      addToast('Aguarde o envio das midias terminar antes de publicar', 'error');
+    let finalizedMediaIds = mediaIds;
+
+    try {
+      finalizedMediaIds = uploaderRef.current
+        ? await uploaderRef.current.finalizeUploads()
+        : mediaIds;
+    } catch (error: any) {
+      addToast(error.message || 'Finalize os uploads antes de publicar', 'error');
+      setIsFinalizingPost(false);
       return;
     }
 
     if (tab === 'social' || tab === 'business') {
-      if (!content.trim() && mediaIds.length === 0) {
+      if (!content.trim() && finalizedMediaIds.length === 0) {
         addToast('Escreva algo ou adicione uma foto', 'error');
+        setIsFinalizingPost(false);
         return;
       }
 
-      mutation.mutate({
-        type: tab === 'business' ? PostType.BUSINESS : PostType.SOCIAL,
-        content,
-        mediaIds,
-        companyId: tab === 'business' ? myCompany?.id : undefined,
-      });
+      try {
+        await mutation.mutateAsync({
+          type: tab === 'business' ? PostType.BUSINESS : PostType.SOCIAL,
+          content,
+          mediaIds: finalizedMediaIds,
+          companyId: tab === 'business' ? myCompany?.id : undefined,
+        });
+      } finally {
+        setIsFinalizingPost(false);
+      }
       return;
     }
 
     if (tab === 'promotion') {
       if (!promotion.headline.trim()) {
         addToast('Defina um titulo para o impulsionamento', 'error');
+        setIsFinalizingPost(false);
         return;
       }
 
       if ((promotionMode === 'company-profile' || promotionMode === 'company-products') && !myCompany?.id) {
         addToast('Crie sua empresa antes de impulsionar esse formato', 'error');
+        setIsFinalizingPost(false);
         return;
       }
 
       if (promotionMode === 'company-products' && promotion.productIds.length === 0) {
         addToast('Selecione ao menos um produto para a vitrine impulsionada', 'error');
+        setIsFinalizingPost(false);
         return;
       }
 
-      mutation.mutate({
-        type: PostType.PROMOTION,
-        content,
-        companyId:
-          promotionMode === 'professional'
-            ? undefined
-            : myCompany?.id,
-        promotion: {
-          kind: getPromotionKind(),
-          headline: promotion.headline,
-          subtitle: promotion.subtitle || undefined,
-          city: promotion.city || undefined,
-          serviceArea: promotion.serviceArea || undefined,
-          highlights: promotion.highlights
-            .split(',')
-            .map((item) => item.trim())
-            .filter(Boolean)
-            .slice(0, 4),
-          productIds: promotionMode === 'company-products' ? promotion.productIds : undefined,
-        },
-      });
+      try {
+        await mutation.mutateAsync({
+          type: PostType.PROMOTION,
+          content,
+          mediaIds: finalizedMediaIds,
+          companyId:
+            promotionMode === 'professional'
+              ? undefined
+              : myCompany?.id,
+          promotion: {
+            kind: getPromotionKind(),
+            headline: promotion.headline,
+            subtitle: promotion.subtitle || undefined,
+            city: promotion.city || undefined,
+            serviceArea: promotion.serviceArea || undefined,
+            highlights: promotion.highlights
+              .split(',')
+              .map((item) => item.trim())
+              .filter(Boolean)
+              .slice(0, 4),
+            productIds: promotionMode === 'company-products' ? promotion.productIds : undefined,
+          },
+        });
+      } finally {
+        setIsFinalizingPost(false);
+      }
       return;
     }
 
     if (!classified.title || !classified.description) {
       addToast('Preencha titulo e descricao', 'error');
+      setIsFinalizingPost(false);
       return;
     }
 
-    mutation.mutate({
-      type: PostType.CLASSIFIED,
-      content,
-      mediaIds,
-      classified: {
-        ...classified,
-        price: classified.isFree ? undefined : classified.price ? Number(classified.price) : undefined,
-      },
-    });
+    try {
+      await mutation.mutateAsync({
+        type: PostType.CLASSIFIED,
+        content,
+        mediaIds: finalizedMediaIds,
+        classified: {
+          ...classified,
+          price: classified.isFree ? undefined : classified.price ? Number(classified.price) : undefined,
+        },
+      });
+    } finally {
+      setIsFinalizingPost(false);
+    }
   }
 
   return (
@@ -429,14 +457,20 @@ export function CreatePostPage() {
           )}
 
           <ImageUploader
+            ref={uploaderRef}
             onUpload={(id) => setMediaIds((ids) => [...ids, id])}
             onRemove={(id) => setMediaIds((ids) => ids.filter((mediaId) => mediaId !== id))}
             onUploadingChange={setIsMediaUploading}
             maxFiles={4}
           />
 
-          <Button type="submit" fullWidth isLoading={mutation.isPending} disabled={isMediaUploading}>
-            Publicar
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={mutation.isPending || isFinalizingPost}
+            disabled={mutation.isPending || isFinalizingPost}
+          >
+            {isMediaUploading && !mutation.isPending && !isFinalizingPost ? 'Aguardando uploads...' : 'Publicar'}
           </Button>
         </form>
       </div>

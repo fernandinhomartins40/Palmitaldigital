@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Spinner } from '@palmital/ui';
 import { Image, X } from 'lucide-react';
 import { useUpload } from '../../hooks/useUpload';
@@ -20,17 +20,56 @@ interface UploadPreview {
   status: 'uploading' | 'uploaded' | 'error';
 }
 
-export function ImageUploader({
-  onUpload,
-  onRemove,
-  onUploadingChange,
-  maxFiles = 4,
-}: ImageUploaderProps) {
+type UploadResult = { id: string; url: string };
+
+export interface ImageUploaderHandle {
+  finalizeUploads: () => Promise<string[]>;
+}
+
+export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>(function ImageUploader(
+  {
+    onUpload,
+    onRemove,
+    onUploadingChange,
+    maxFiles = 4,
+  },
+  ref,
+) {
   const { upload, isUploading } = useUpload();
   const addToast = useUIStore((s) => s.addToast);
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<string[]>([]);
+  const previewsRef = useRef<UploadPreview[]>([]);
+  const uploadTasksRef = useRef(new Map<string, Promise<UploadResult>>());
   const [previews, setPreviews] = useState<UploadPreview[]>([]);
+
+  function updatePreviews(
+    updater: UploadPreview[] | ((current: UploadPreview[]) => UploadPreview[]),
+  ) {
+    setPreviews((current) => {
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      previewsRef.current = next;
+      return next;
+    });
+  }
+
+  useImperativeHandle(ref, () => ({
+    async finalizeUploads() {
+      const pendingTasks = Array.from(uploadTasksRef.current.values());
+      if (pendingTasks.length) {
+        await Promise.allSettled(pendingTasks);
+      }
+
+      const failedUploads = previewsRef.current.filter((preview) => preview.status === 'error');
+      if (failedUploads.length) {
+        throw new Error('Existem arquivos que falharam no envio. Remova ou reenvie antes de publicar.');
+      }
+
+      return previewsRef.current
+        .filter((preview) => preview.status === 'uploaded' && preview.mediaId)
+        .map((preview) => preview.mediaId as string);
+    },
+  }));
 
   useEffect(() => {
     const hasPendingUploads = previews.some((preview) => preview.status === 'uploading');
@@ -46,7 +85,7 @@ export function ImageUploader({
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    const availableSlots = Math.max(0, maxFiles - previews.length);
+    const availableSlots = Math.max(0, maxFiles - previewsRef.current.length);
 
     for (const file of files.slice(0, availableSlots)) {
       const localId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -54,29 +93,37 @@ export function ImageUploader({
       const kind = file.type.startsWith('video/') ? 'video' : 'image';
       previewUrlsRef.current.push(previewUrl);
 
-      setPreviews((current) => [
+      updatePreviews((current) => [
         ...current,
         { localId, url: previewUrl, kind, status: 'uploading' },
       ]);
 
-      try {
-        const result = await upload(file);
-        setPreviews((current) =>
-          current.map((preview) =>
-            preview.localId === localId
-              ? { ...preview, mediaId: result.id, status: 'uploaded' }
-              : preview,
-          ),
-        );
-        onUpload(result.id, result.url);
-      } catch (error: any) {
-        setPreviews((current) =>
-          current.map((preview) =>
-            preview.localId === localId ? { ...preview, status: 'error' } : preview,
-          ),
-        );
-        addToast(error.response?.data?.message || 'Erro ao enviar arquivo', 'error');
-      }
+      const task = upload(file)
+        .then((result) => {
+          updatePreviews((current) =>
+            current.map((preview) =>
+              preview.localId === localId
+                ? { ...preview, mediaId: result.id, status: 'uploaded' }
+                : preview,
+            ),
+          );
+          onUpload(result.id, result.url);
+          return result;
+        })
+        .catch((error: any) => {
+          updatePreviews((current) =>
+            current.map((preview) =>
+              preview.localId === localId ? { ...preview, status: 'error' } : preview,
+            ),
+          );
+          addToast(error.response?.data?.message || 'Erro ao enviar arquivo', 'error');
+          throw error;
+        })
+        .finally(() => {
+          uploadTasksRef.current.delete(localId);
+        });
+
+      uploadTasksRef.current.set(localId, task);
     }
 
     if (inputRef.current) {
@@ -85,7 +132,7 @@ export function ImageUploader({
   }
 
   async function removePreview(preview: UploadPreview) {
-    setPreviews((current) => current.filter((item) => item.localId !== preview.localId));
+    updatePreviews((current) => current.filter((item) => item.localId !== preview.localId));
     URL.revokeObjectURL(preview.url);
     previewUrlsRef.current = previewUrlsRef.current.filter((url) => url !== preview.url);
 
@@ -175,4 +222,4 @@ export function ImageUploader({
       </p>
     </div>
   );
-}
+});
