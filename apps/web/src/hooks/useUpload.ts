@@ -13,6 +13,11 @@ export function useUpload() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       return data;
+    } catch (error: any) {
+      if (error.response?.status === 413) {
+        throw new Error('Arquivo muito grande. O limite atual de upload e 25 MB por arquivo.');
+      }
+      throw error;
     } finally {
       setIsUploading(false);
     }

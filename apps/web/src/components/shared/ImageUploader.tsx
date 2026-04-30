@@ -116,7 +116,7 @@ export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>
               preview.localId === localId ? { ...preview, status: 'error' } : preview,
             ),
           );
-          addToast(error.response?.data?.message || 'Erro ao enviar arquivo', 'error');
+          addToast(error.response?.data?.message || error.message || 'Erro ao enviar arquivo', 'error');
           throw error;
         })
         .finally(() => {
