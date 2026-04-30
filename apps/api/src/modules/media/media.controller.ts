@@ -19,7 +19,7 @@ export class MediaController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: memoryStorage(),
-      limits: { fileSize: 10 * 1024 * 1024 },
+      limits: { fileSize: 25 * 1024 * 1024 },
       fileFilter: (_, file, cb) => {
         const allowed = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
         cb(null, allowed.includes(file.mimetype));

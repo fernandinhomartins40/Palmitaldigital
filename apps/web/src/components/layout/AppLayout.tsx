@@ -9,17 +9,18 @@ import { connectSocket, disconnectSocket } from '../../services/socket';
 
 export function AppLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const { pathname } = useLocation();
   const isProfileRoute = pathname === '/profile' || pathname.startsWith('/profile/');
   const isCompanyRoute = pathname === '/companies/manage' || pathname.startsWith('/companies/');
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && accessToken) {
       connectSocket();
     } else {
       disconnectSocket();
     }
-  }, [isAuthenticated]);
+  }, [accessToken, isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.08),_transparent_32%),linear-gradient(to_bottom,_#f8fafc,_#eef2ff_55%,_#f8fafc)]">

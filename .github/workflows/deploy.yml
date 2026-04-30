@@ -226,6 +226,7 @@ jobs:
               printf '%s\n' 'server {'
               printf '%s\n' '    listen 80;'
               printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' '    client_max_body_size 32m;'
               printf '%s\n' ''
               printf '%s\n' '    location /.well-known/acme-challenge/ {'
               printf '%s\n' '        root /var/www/certbot;'
@@ -294,12 +295,14 @@ jobs:
               printf '%s\n' 'server {'
               printf '%s\n' '    listen 80;'
               printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' '    client_max_body_size 32m;'
               printf '%s\n' "    return 301 ${CANONICAL_URL}\$request_uri;"
               printf '%s\n' '}'
               printf '%s\n' ''
               printf '%s\n' 'server {'
               printf '%s\n' '    listen 443 ssl http2;'
               printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
+              printf '%s\n' '    client_max_body_size 32m;'
               printf '%s\n' ''
               printf '%s\n' "    ssl_certificate /etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem;"
               printf '%s\n' "    ssl_certificate_key /etc/letsencrypt/live/${PRIMARY_DOMAIN}/privkey.pem;"

@@ -7,6 +7,10 @@ export function connectSocket(): Socket {
   if (socket?.connected) return socket;
 
   const token = useAuthStore.getState().accessToken;
+  if (!token) {
+    throw new Error('Cannot connect socket without access token');
+  }
+
   const wsBase = import.meta.env.VITE_WS_URL || '';
 
   socket = io(`${wsBase}/chat`, {

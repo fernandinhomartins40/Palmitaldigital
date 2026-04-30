@@ -17,6 +17,8 @@ const titles: Record<string, string> = {
 export function TopBar() {
   const { pathname } = useLocation();
   const currentUser = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const accessToken = useAuthStore((s) => s.accessToken);
   const title = titles[pathname]
     ?? (pathname.startsWith('/profile/')
       ? 'Perfil publico'
@@ -33,7 +35,7 @@ export function TopBar() {
       return data as any[];
     },
     refetchInterval: 30000,
-    enabled: !!currentUser,
+    enabled: Boolean(isAuthenticated && accessToken && currentUser),
   });
 
   const unread =
@@ -66,7 +68,10 @@ export function TopBar() {
           {title !== 'Palmital Digital' && title !== 'Feed' ? title : ''}
         </div>
 
-        <Link to="/chat" className="relative rounded-xl p-2 transition-colors hover:bg-gray-100">
+        <Link
+          to={isAuthenticated ? '/chat' : '/login'}
+          className="relative rounded-xl p-2 transition-colors hover:bg-gray-100"
+        >
           <MessageCircle size={22} className="text-gray-600" />
           {unread > 0 && (
             <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-sm">
