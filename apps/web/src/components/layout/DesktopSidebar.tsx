@@ -1,5 +1,5 @@
 import { Avatar, Card } from '@palmital/ui';
-import { ChevronRight, PlusCircle } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, ImagePlus, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { desktopNavItems, isNavItemActive } from './navigation';
@@ -56,14 +56,33 @@ export function DesktopSidebar() {
 
       <Link
         to="/create"
-        className="flex items-center justify-between rounded-[28px] bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-4 py-4 text-white shadow-lg shadow-blue-200/70 transition-transform hover:-translate-y-0.5"
+        className="group relative overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#2563eb_0%,#3b82f6_52%,#5b5ce2_100%)] px-5 py-5 text-white shadow-[0_18px_40px_rgba(37,99,235,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(37,99,235,0.3)]"
       >
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100">Ação rápida</p>
-          <p className="mt-1 text-base font-semibold">Criar nova publicação</p>
-        </div>
-        <div className="rounded-2xl bg-white/15 p-3">
-          <PlusCircle size={20} />
+        <div className="absolute inset-y-0 right-0 w-32 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.3),transparent_62%)]" />
+        <div className="absolute -right-5 bottom-3 h-20 w-20 rounded-full bg-white/10 blur-sm" />
+
+        <div className="relative flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-50/95 backdrop-blur-sm">
+              <Sparkles size={12} />
+              Publicar
+            </div>
+            <p className="mt-3 text-[22px] font-semibold leading-tight tracking-[-0.02em]">
+              Compartilhe algo novo
+            </p>
+            <p className="mt-1 max-w-[14rem] text-sm leading-5 text-blue-50/88">
+              Poste foto, vídeo, oferta ou atualização para aparecer no feed.
+            </p>
+          </div>
+
+          <div className="relative shrink-0">
+            <div className="flex h-16 w-16 items-center justify-center rounded-[22px] border border-white/20 bg-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-sm transition-transform group-hover:scale-105">
+              <ImagePlus size={28} strokeWidth={2.1} />
+            </div>
+            <div className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-slate-950 text-white shadow-lg">
+              <ArrowUpRight size={14} />
+            </div>
+          </div>
         </div>
       </Link>
     </div>

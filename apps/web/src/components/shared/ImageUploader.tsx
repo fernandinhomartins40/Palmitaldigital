@@ -8,6 +8,7 @@ import { useUIStore } from '../../store/uiStore';
 interface ImageUploaderProps {
   onUpload: (mediaId: string, url: string) => void;
   onRemove?: (mediaId: string) => void;
+  onUploadingChange?: (isUploading: boolean) => void;
   maxFiles?: number;
 }
 
@@ -19,12 +20,22 @@ interface UploadPreview {
   status: 'uploading' | 'uploaded' | 'error';
 }
 
-export function ImageUploader({ onUpload, onRemove, maxFiles = 4 }: ImageUploaderProps) {
+export function ImageUploader({
+  onUpload,
+  onRemove,
+  onUploadingChange,
+  maxFiles = 4,
+}: ImageUploaderProps) {
   const { upload, isUploading } = useUpload();
   const addToast = useUIStore((s) => s.addToast);
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<string[]>([]);
   const [previews, setPreviews] = useState<UploadPreview[]>([]);
+
+  useEffect(() => {
+    const hasPendingUploads = previews.some((preview) => preview.status === 'uploading');
+    onUploadingChange?.(hasPendingUploads);
+  }, [onUploadingChange, previews]);
 
   useEffect(() => {
     return () => {
@@ -129,6 +140,7 @@ export function ImageUploader({ onUpload, onRemove, maxFiles = 4 }: ImageUploade
                 type="button"
                 onClick={() => removePreview(preview)}
                 className="absolute right-1 top-1 rounded-full bg-red-500 p-0.5 text-white"
+                disabled={preview.status === 'uploading'}
               >
                 <X size={12} />
               </button>

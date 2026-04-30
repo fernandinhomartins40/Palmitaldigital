@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Card, Input, Spinner } from '@palmital/ui';
+import { ImageCropDialog } from '../../components/shared/ImageCropDialog';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
@@ -63,6 +64,8 @@ export function CompanyManagerPage() {
   const [companyForm, setCompanyForm] = useState<CompanyFormState>(emptyCompanyForm);
   const [newProduct, setNewProduct] = useState<ProductFormState>(emptyProductForm);
   const [productDrafts, setProductDrafts] = useState<Record<string, ProductFormState>>({});
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   const { data: company, isLoading } = useQuery({
     queryKey: ['my-company'],
@@ -127,6 +130,7 @@ export function CompanyManagerPage() {
         ? {
             displayName: data.profile.displayName,
             avatarUrl: data.profile.avatarUrl,
+            coverUrl: data.profile.coverUrl,
           }
         : null,
     };
@@ -357,7 +361,7 @@ export function CompanyManagerPage() {
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 className="hidden"
-                onChange={(e) => handleFileSelection(e, (file) => uploadCoverMutation.mutate(file))}
+                onChange={(e) => handleFileSelection(e, setCoverFile)}
               />
             </div>
 
@@ -385,7 +389,7 @@ export function CompanyManagerPage() {
                         type="file"
                         accept="image/png,image/jpeg,image/webp"
                         className="hidden"
-                        onChange={(e) => handleFileSelection(e, (file) => uploadLogoMutation.mutate(file))}
+                        onChange={(e) => handleFileSelection(e, setLogoFile)}
                       />
                     </div>
                   </div>
@@ -872,6 +876,37 @@ export function CompanyManagerPage() {
           </form>
         </Card>
       )}
+
+      <ImageCropDialog
+        open={!!logoFile}
+        file={logoFile}
+        title="Ajustar logo da empresa"
+        aspect={1}
+        cropShape="round"
+        outputWidth={720}
+        outputHeight={720}
+        quality={0.82}
+        onCancel={() => setLogoFile(null)}
+        onConfirm={(file) => {
+          setLogoFile(null);
+          uploadLogoMutation.mutate(file);
+        }}
+      />
+
+      <ImageCropDialog
+        open={!!coverFile}
+        file={coverFile}
+        title="Ajustar capa da empresa"
+        aspect={16 / 9}
+        outputWidth={1600}
+        outputHeight={900}
+        quality={0.8}
+        onCancel={() => setCoverFile(null)}
+        onConfirm={(file) => {
+          setCoverFile(null);
+          uploadCoverMutation.mutate(file);
+        }}
+      />
     </div>
   );
 }

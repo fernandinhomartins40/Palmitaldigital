@@ -5,7 +5,7 @@ import { formatCurrency } from '@palmital/utils';
 import { api } from '../../services/api';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
-import { BadgeCheck, ExternalLink, MapPin, Phone, Settings2 } from 'lucide-react';
+import { BadgeCheck, ExternalLink, MapPin, Package2, Phone, Settings2, Store } from 'lucide-react';
 
 export function CompanyProfilePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -27,14 +27,21 @@ export function CompanyProfilePage() {
     onError: () => addToast('Erro ao iniciar conversa', 'error'),
   });
 
-  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
-  if (!company) return null;
+  if (isLoading) {
+    return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  }
+
+  if (!company) {
+    return null;
+  }
 
   const isOwner = currentUser?.id === company.ownerId;
+  const totalProducts = company._count?.products ?? company.products?.length ?? 0;
+  const totalPosts = company._count?.posts ?? company.posts?.length ?? 0;
 
   return (
     <div className="space-y-5 px-4 pb-6 lg:px-0">
-      <Card className="overflow-hidden p-0">
+      <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
         <div className="relative h-40 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-56">
           {company.coverUrl ? (
             <img src={company.coverUrl} alt="" className="h-full w-full object-cover" />
@@ -42,28 +49,58 @@ export function CompanyProfilePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-slate-950/10 to-transparent" />
         </div>
 
-        <div className="px-4 pb-5 lg:px-8 lg:pb-8">
-          <div className="-mt-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="rounded-3xl border-4 border-white bg-white shadow-sm">
-                <Avatar src={company.logoUrl} name={company.name} size="lg" className="h-20 w-20 text-2xl lg:h-24 lg:w-24 lg:text-3xl" />
-              </div>
-              <div className="pt-10 lg:pt-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold text-gray-900 lg:text-3xl">{company.name}</h1>
-                  {company.isVerified && <BadgeCheck size={18} className="text-blue-500" />}
+        <div className="px-4 pb-5 pt-4 lg:px-8 lg:pb-8 lg:pt-0">
+          <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
+            <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
+              <div className="-mt-10 inline-flex lg:-mt-14">
+                <div className="rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
+                  <Avatar
+                    src={company.logoUrl}
+                    name={company.name}
+                    size="lg"
+                    className="h-20 w-20 text-2xl lg:h-24 lg:w-24 lg:text-3xl"
+                  />
                 </div>
-                {company.category && <p className="text-sm text-gray-500">{company.category}</p>}
-                <div className="mt-2 space-y-1 text-sm text-gray-600">
-                  {company.city && (
-                    <p className="flex items-center gap-2">
-                      <MapPin size={14} />
-                      {company.address ? `${company.address}, ${company.city}` : company.city}
+              </div>
+
+              <div className="mt-4 min-w-0 space-y-2 lg:mt-0 lg:pb-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">
+                    {company.name}
+                  </h1>
+                  {company.isVerified ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
+                      <BadgeCheck size={14} />
+                      Verificada
+                    </span>
+                  ) : null}
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      company.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                    }`}
+                  >
+                    {company.isActive ? 'Ativa' : 'Pausada'}
+                  </span>
+                </div>
+
+                {company.category ? (
+                  <p className="text-sm text-gray-500 lg:text-base">{company.category}</p>
+                ) : null}
+
+                <div className="space-y-1 text-sm text-gray-600">
+                  {(company.address || company.city) && (
+                    <p className="flex items-start gap-2">
+                      <MapPin size={14} className="mt-0.5 shrink-0" />
+                      <span>
+                        {company.address && company.city
+                          ? `${company.address}, ${company.city}`
+                          : company.address || company.city}
+                      </span>
                     </p>
                   )}
                   {company.phone && (
                     <p className="flex items-center gap-2">
-                      <Phone size={14} />
+                      <Phone size={14} className="shrink-0" />
                       {company.phone}
                     </p>
                   )}
@@ -71,34 +108,64 @@ export function CompanyProfilePage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 lg:w-[18rem]">
+            <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:w-[19rem] lg:shrink-0">
               {isOwner ? (
                 <Link to="/companies/manage" className="block">
-                  <Button fullWidth>
+                  <Button fullWidth className="rounded-xl py-3">
                     <Settings2 size={16} />
                     <span className="ml-2">Gerenciar empresa</span>
                   </Button>
                 </Link>
               ) : (
-                <Button fullWidth onClick={() => startChatMutation.mutate()} isLoading={startChatMutation.isPending}>
+                <Button
+                  fullWidth
+                  className="rounded-xl py-3"
+                  onClick={() => startChatMutation.mutate()}
+                  isLoading={startChatMutation.isPending}
+                >
                   Enviar mensagem
                 </Button>
               )}
 
-              {company.owner?.id && (
+              {company.owner?.id ? (
                 <Link to={`/profile/${company.owner.id}`} className="block">
-                  <Button variant="secondary" fullWidth>
+                  <Button variant="secondary" fullWidth className="rounded-xl py-3">
                     <ExternalLink size={16} />
                     <span className="ml-2">Ver perfil do responsavel</span>
                   </Button>
                 </Link>
-              )}
+              ) : null}
             </div>
           </div>
 
-          {company.description && (
-            <p className="mt-5 text-sm leading-relaxed text-gray-700 lg:text-base">{company.description}</p>
-          )}
+          <div className="mt-5 grid gap-3 lg:mt-8 lg:grid-cols-3">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">
+                {company.isActive ? 'Perfil publico ativo' : 'Perfil pausado'}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Produtos</p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-gray-900 lg:text-base">
+                <Package2 size={16} className="text-gray-400" />
+                {totalProducts} item(ns)
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Publicacoes</p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-gray-900 lg:text-base">
+                <Store size={16} className="text-gray-400" />
+                {totalPosts} publicacao(oes)
+              </p>
+            </div>
+          </div>
+
+          {company.description ? (
+            <p className="mt-5 text-sm leading-relaxed text-gray-700 lg:mt-6 lg:text-base">
+              {company.description}
+            </p>
+          ) : null}
         </div>
       </Card>
 
@@ -111,12 +178,18 @@ export function CompanyProfilePage() {
                 {product.imageUrl ? (
                   <img src={product.imageUrl} alt={product.name} className="h-44 w-full object-cover" />
                 ) : (
-                  <div className="flex h-44 items-center justify-center bg-gray-100 text-xs text-gray-300">sem foto</div>
+                  <div className="flex h-44 items-center justify-center bg-gray-100 text-xs text-gray-300">
+                    sem foto
+                  </div>
                 )}
                 <div className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <p className="text-sm font-semibold text-gray-900">{product.name}</p>
-                    <span className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${product.isAvailable ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'}`}>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
+                        product.isAvailable ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
                       {product.isAvailable ? 'Disponivel' : 'Indisponivel'}
                     </span>
                   </div>
@@ -145,9 +218,7 @@ export function CompanyProfilePage() {
                 </div>
 
                 {post.content ? (
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
-                    {post.content}
-                  </p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">{post.content}</p>
                 ) : (
                   <p className="text-sm text-gray-400">Publicacao sem texto.</p>
                 )}

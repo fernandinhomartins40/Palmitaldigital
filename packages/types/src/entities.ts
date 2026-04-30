@@ -15,8 +15,10 @@ export interface IProfile {
   id: string;
   userId: string;
   displayName: string;
+  username: string;
   bio?: string | null;
   avatarUrl?: string | null;
+  coverUrl?: string | null;
   city?: string | null;
   createdAt: Date;
   updatedAt: Date;

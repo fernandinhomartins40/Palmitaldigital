@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Card, Spinner } from '@palmital/ui';
+import { Avatar, Card, Spinner } from '@palmital/ui';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { BadgeCheck, Building2, PlusCircle, Settings2 } from 'lucide-react';
@@ -48,10 +48,10 @@ export function CompaniesPage() {
           </div>
 
           <Link to="/companies/manage" className="shrink-0">
-            <Button className="min-w-[16rem] rounded-2xl bg-white text-blue-700 hover:bg-blue-50">
+            <span className="inline-flex min-w-[16rem] items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50">
               {myCompany ? <Settings2 size={16} /> : <PlusCircle size={16} />}
               <span className="ml-2">{myCompany ? 'Gerenciar minha empresa' : 'Criar perfil da empresa'}</span>
-            </Button>
+            </span>
           </Link>
         </div>
       </Card>

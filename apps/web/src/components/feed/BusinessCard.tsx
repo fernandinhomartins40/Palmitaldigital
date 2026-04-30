@@ -2,6 +2,7 @@ import { Avatar, Card } from '@palmital/ui';
 import { formatRelativeTime } from '@palmital/utils';
 import { Link } from 'react-router-dom';
 import { BadgeCheck } from 'lucide-react';
+import { PostMediaGallery } from './PostMediaGallery';
 
 export function BusinessCard({ post }: { post: any }) {
   const company = post.company;
@@ -21,14 +22,8 @@ export function BusinessCard({ post }: { post: any }) {
             <span className="text-xs text-gray-400">{formatRelativeTime(post.createdAt)}</span>
           </div>
           <span className="text-xs text-blue-600 font-medium">Empresa</span>
-          {post.content && <p className="mt-1 text-gray-800 whitespace-pre-wrap">{post.content}</p>}
-          {post.media?.length > 0 && (
-            <div className={`mt-3 grid gap-2 ${post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-              {post.media.map((m: any) => (
-                <img key={m.id} src={m.url} alt="" className="w-full rounded-xl object-cover aspect-square" />
-              ))}
-            </div>
-          )}
+          {post.content && <p className="mt-1 whitespace-pre-wrap text-gray-800">{post.content}</p>}
+          <PostMediaGallery media={post.media ?? []} />
         </div>
       </div>
     </Card>

@@ -18,6 +18,7 @@ export function CreatePostPage() {
   const [tab, setTab] = useState<TabType>('social');
   const [content, setContent] = useState('');
   const [mediaIds, setMediaIds] = useState<string[]>([]);
+  const [isMediaUploading, setIsMediaUploading] = useState(false);
   const [classified, setClassified] = useState({
     title: '',
     description: '',
@@ -61,6 +62,11 @@ export function CreatePostPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (isMediaUploading) {
+      addToast('Aguarde o envio das midias terminar antes de publicar', 'error');
+      return;
+    }
 
     if (tab === 'social' || tab === 'business') {
       if (!content.trim() && mediaIds.length === 0) {
@@ -184,10 +190,11 @@ export function CreatePostPage() {
           <ImageUploader
             onUpload={(id) => setMediaIds((ids) => [...ids, id])}
             onRemove={(id) => setMediaIds((ids) => ids.filter((mediaId) => mediaId !== id))}
+            onUploadingChange={setIsMediaUploading}
             maxFiles={4}
           />
 
-          <Button type="submit" fullWidth isLoading={mutation.isPending}>
+          <Button type="submit" fullWidth isLoading={mutation.isPending} disabled={isMediaUploading}>
             Publicar
           </Button>
         </form>

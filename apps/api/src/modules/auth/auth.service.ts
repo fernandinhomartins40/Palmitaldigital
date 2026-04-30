@@ -5,11 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { isValidUsername, normalizeUsername } from '@palmital/utils';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../prisma/prisma.service';
-import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
     if (exists) throw new ConflictException('Email already in use');
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
+    const username = await this.generateUniqueUsername(dto.username || dto.displayName);
 
     const user = await this.prisma.user.create({
       data: {
@@ -30,7 +32,10 @@ export class AuthService {
         passwordHash,
         phone: dto.phone,
         profile: {
-          create: { displayName: dto.displayName },
+          create: {
+            displayName: dto.displayName,
+            username,
+          },
         },
       },
       include: { profile: true },
@@ -95,7 +100,12 @@ export class AuthService {
         email: user.email,
         role: user.role,
         profile: user.profile
-          ? { displayName: user.profile.displayName, avatarUrl: user.profile.avatarUrl }
+          ? {
+              displayName: user.profile.displayName,
+              username: user.profile.username,
+              avatarUrl: user.profile.avatarUrl,
+              coverUrl: user.profile.coverUrl,
+            }
           : null,
       },
     };
@@ -108,5 +118,29 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  private async generateUniqueUsername(input: string) {
+    const normalized = normalizeUsername(input).slice(0, 24);
+    const base = normalized.length >= 3 ? normalized : 'usuario';
+
+    if (!isValidUsername(base)) {
+      throw new BadRequestException('Invalid username');
+    }
+
+    const existing = await this.prisma.profile.findUnique({ where: { username: base } });
+    if (!existing) {
+      return base;
+    }
+
+    for (let i = 1; i <= 100; i += 1) {
+      const candidate = `${base.slice(0, Math.max(1, 24 - String(i).length - 1))}_${i}`;
+      const candidateExists = await this.prisma.profile.findUnique({ where: { username: candidate } });
+      if (!candidateExists) {
+        return candidate;
+      }
+    }
+
+    throw new ConflictException('Username already in use');
   }
 }

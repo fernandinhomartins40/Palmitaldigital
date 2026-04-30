@@ -4,7 +4,7 @@ import { extname, join, resolve, sep } from 'path';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 
-type UploadFolder = 'avatars' | 'companies' | 'media';
+type UploadFolder = 'avatars' | 'companies' | 'media' | 'profiles';
 
 interface StoreImageOptions {
   folder: UploadFolder;
@@ -60,6 +60,15 @@ export class UploadStorageService {
   async storeCompanyCover(file: Express.Multer.File): Promise<StoredUpload> {
     return this.storeOptimizedImage(file, {
       folder: 'companies',
+      maxWidth: 1920,
+      maxHeight: 1080,
+      quality: 80,
+    });
+  }
+
+  async storeProfileCover(file: Express.Multer.File): Promise<StoredUpload> {
+    return this.storeOptimizedImage(file, {
+      folder: 'profiles',
       maxWidth: 1920,
       maxHeight: 1080,
       quality: 80,

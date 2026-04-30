@@ -5,6 +5,7 @@ export interface RegisterDto {
   email: string;
   password: string;
   displayName: string;
+  username?: string;
   phone?: string;
 }
 
@@ -20,7 +21,12 @@ export interface AuthResponseDto {
     id: string;
     email: string;
     role: string;
-    profile?: { displayName: string; avatarUrl?: string | null } | null;
+    profile?: {
+      displayName: string;
+      username: string;
+      avatarUrl?: string | null;
+      coverUrl?: string | null;
+    } | null;
   };
 }
 

@@ -53,7 +53,7 @@ export function UserProfilePage() {
   if (!profile) return null;
 
   const publicProfile = profile.profile;
-  const displayName = publicProfile?.displayName ?? 'Usuário';
+  const displayName = publicProfile?.displayName ?? 'Usuario';
   const memberSince = new Date(profile.createdAt).toLocaleDateString('pt-BR', {
     month: 'long',
     year: 'numeric',
@@ -61,27 +61,42 @@ export function UserProfilePage() {
 
   return (
     <div className="space-y-5 px-4 pb-6">
-      <Card className="overflow-hidden p-0">
-        <div className="h-24 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500" />
-        <div className="px-4 pb-5">
-          <div className="-mt-10 flex items-end gap-4">
-            <div className="rounded-3xl border-4 border-white bg-white shadow-sm">
-              <Avatar src={publicProfile?.avatarUrl} name={displayName} size="lg" />
-            </div>
-            <div className="flex-1 pb-1">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-gray-900">{displayName}</h1>
-                {profile.role === 'BUSINESS_OWNER' && (
-                  <span className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-600">
-                    Negócio local
-                  </span>
-                )}
+      <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
+        <div className="relative h-28 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-40">
+          {publicProfile?.coverUrl ? (
+            <img src={publicProfile.coverUrl} alt="" className="h-full w-full object-cover" />
+          ) : null}
+        </div>
+
+        <div className="px-4 pb-5 pt-4 lg:px-8 lg:pb-8 lg:pt-0">
+          <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
+            <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
+              <div className="-mt-10 inline-flex lg:-mt-14">
+                <div className="rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
+                  <Avatar
+                    src={publicProfile?.avatarUrl}
+                    name={displayName}
+                    size="lg"
+                    className="h-16 w-16 text-2xl lg:h-24 lg:w-24 lg:text-3xl"
+                  />
+                </div>
               </div>
-              <p className="text-sm text-gray-500">Membro desde {memberSince}</p>
+
+              <div className="mt-4 min-w-0 space-y-2 lg:mt-0 lg:pb-2">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-gray-900 lg:text-[2rem]">{displayName}</h1>
+                  {profile.role === 'BUSINESS_OWNER' && (
+                    <span className="rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-600">
+                      Negocio local
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">Membro desde {memberSince}</p>
+              </div>
             </div>
           </div>
 
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-4 lg:mt-6">
             {publicProfile?.bio && <p className="text-sm leading-relaxed text-gray-700">{publicProfile.bio}</p>}
 
             {publicProfile?.city && (
@@ -112,7 +127,7 @@ export function UserProfilePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Publicações</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Publicacoes</p>
                 <p className="mt-1 text-lg font-bold text-gray-900">{profile._count?.posts ?? posts.length}</p>
               </div>
               <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
@@ -136,7 +151,7 @@ export function UserProfilePage() {
       <section className="space-y-3">
         <div className="flex items-center gap-2 px-1">
           <Rss size={16} className="text-blue-600" />
-          <h2 className="text-base font-bold text-gray-900">Publicações deste perfil</h2>
+          <h2 className="text-base font-bold text-gray-900">Publicacoes deste perfil</h2>
         </div>
 
         {isLoadingPosts ? (
@@ -146,7 +161,7 @@ export function UserProfilePage() {
         ) : posts.length === 0 ? (
           <Card className="px-4 py-8 text-center text-gray-500">
             <UserRound size={24} className="mx-auto mb-2 text-gray-300" />
-            Este usuário ainda não publicou nada.
+            Este usuario ainda nao publicou nada.
           </Card>
         ) : (
           <InfiniteList
