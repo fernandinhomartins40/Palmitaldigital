@@ -3,6 +3,7 @@ import {
   MediaType,
   MessageStatus,
   PostType,
+  PromotionKind,
   PrismaClient,
   UserRole,
 } from '../generated/prisma';
@@ -24,9 +25,11 @@ type UserSeed = {
   email: string;
   phone: string;
   displayName: string;
+  username: string;
   city: string;
   bio: string;
   avatarSeed: string;
+  coverSeed: string;
 };
 
 type ProductSeed = {
@@ -69,6 +72,27 @@ type ClassifiedItemSeed = {
   price?: number;
   isFree?: boolean;
 };
+
+type PromotionSeed = {
+  authorEmail: string;
+  createdAt: Date;
+  content: string;
+  kind: PromotionKind;
+  headline: string;
+  subtitle?: string;
+  city?: string;
+  serviceArea?: string;
+  highlights: string[];
+} & (
+  | {
+      kind: 'PROFESSIONAL';
+    }
+  | {
+      kind: 'COMPANY_PROFILE' | 'COMPANY_PRODUCTS';
+      companySlug: string;
+      productNames?: string[];
+    }
+);
 
 type ConversationSeed = {
   participants: [string, string];
@@ -164,65 +188,101 @@ const regularUsers: UserSeed[] = [
     email: 'ana.souza@palmital.test',
     phone: '+5518997100001',
     displayName: 'Ana Souza',
+    username: 'ana_souza',
     city: 'Palmital',
     bio: 'Fotografa de eventos e sempre de olho nas novidades da cidade.',
     avatarSeed: 'Ana Souza',
+    coverSeed: 'Ana Souza cover',
   },
   {
     email: 'bruno.lima@palmital.test',
     phone: '+5518997100002',
     displayName: 'Bruno Lima',
+    username: 'bruno_lima',
     city: 'Assis',
     bio: 'Engenheiro agronomo, ciclista e comprador compulsivo de ferramentas.',
     avatarSeed: 'Bruno Lima',
+    coverSeed: 'Bruno Lima cover',
   },
   {
     email: 'carla.fernandes@palmital.test',
     phone: '+5518997100003',
     displayName: 'Carla Fernandes',
+    username: 'carla_fernandes',
     city: 'Palmital',
     bio: 'Professora, mae de dois filhos e usuaria ativa dos classificados.',
     avatarSeed: 'Carla Fernandes',
+    coverSeed: 'Carla Fernandes cover',
   },
   {
     email: 'diego.alves@palmital.test',
     phone: '+5518997100004',
     displayName: 'Diego Alves',
+    username: 'diego_alves',
     city: 'Candido Mota',
     bio: 'Mecanico e apaixonado por carros antigos e projetos DIY.',
     avatarSeed: 'Diego Alves',
+    coverSeed: 'Diego Alves cover',
   },
   {
     email: 'elisa.moraes@palmital.test',
     phone: '+5518997100005',
     displayName: 'Elisa Moraes',
+    username: 'elisa_moraes',
     city: 'Ourinhos',
     bio: 'Arquiteta que usa a plataforma para acompanhar negocios e imoveis.',
     avatarSeed: 'Elisa Moraes',
+    coverSeed: 'Elisa Moraes cover',
   },
   {
     email: 'fabio.gomes@palmital.test',
     phone: '+5518997100006',
     displayName: 'Fabio Gomes',
+    username: 'fabio_gomes',
     city: 'Palmital',
     bio: 'Servidor publico, corredor de rua e cliente fiel do comercio local.',
     avatarSeed: 'Fabio Gomes',
+    coverSeed: 'Fabio Gomes cover',
   },
   {
     email: 'gabriela.rocha@palmital.test',
     phone: '+5518997100007',
     displayName: 'Gabriela Rocha',
+    username: 'gabriela_rocha',
     city: 'Maracai',
     bio: 'Veterinaria com foco em pequenos animais e conteudo educativo.',
     avatarSeed: 'Gabriela Rocha',
+    coverSeed: 'Gabriela Rocha cover',
   },
   {
     email: 'henrique.nunes@palmital.test',
     phone: '+5518997100008',
     displayName: 'Henrique Nunes',
+    username: 'henrique_nunes',
     city: 'Salto Grande',
     bio: 'Tecnico em informatica e vendedor de eletronicos revisados.',
     avatarSeed: 'Henrique Nunes',
+    coverSeed: 'Henrique Nunes cover',
+  },
+  {
+    email: 'leonardo.ferrari@palmital.test',
+    phone: '+5518997100009',
+    displayName: 'Leonardo Ferrari',
+    username: 'leo_eletricista',
+    city: 'Palmital',
+    bio: 'Eletricista residencial com foco em padrao, chuveiro, manutencao e atendimento rapido.',
+    avatarSeed: 'Leonardo Ferrari',
+    coverSeed: 'Leonardo Ferrari cover',
+  },
+  {
+    email: 'patricia.azevedo@palmital.test',
+    phone: '+5518997100010',
+    displayName: 'Patricia Azevedo',
+    username: 'paty_pintura',
+    city: 'Ourinhos',
+    bio: 'Pintora residencial e comercial, acabamento fino e combinacao de cores.',
+    avatarSeed: 'Patricia Azevedo',
+    coverSeed: 'Patricia Azevedo cover',
   },
 ];
 
@@ -231,9 +291,11 @@ const businessUsers: BusinessUserSeed[] = [
     email: 'mariana.silva@palmital.test',
     phone: '+5518997100011',
     displayName: 'Mariana Silva',
+    username: 'mariana_silva',
     city: 'Palmital',
     bio: 'Produtora rural e proprietaria da Casa do Campo Palmital.',
     avatarSeed: 'Mariana Silva',
+    coverSeed: 'Mariana Silva cover',
     company: {
       name: 'Casa do Campo Palmital',
       slug: 'casa-do-campo-palmital',
@@ -276,9 +338,11 @@ const businessUsers: BusinessUserSeed[] = [
     email: 'ricardo.melo@palmital.test',
     phone: '+5518997100012',
     displayName: 'Ricardo Melo',
+    username: 'ricardo_melo',
     city: 'Palmital',
     bio: 'Comerciante do setor automotivo e comprador de seminovos.',
     avatarSeed: 'Ricardo Melo',
+    coverSeed: 'Ricardo Melo cover',
     company: {
       name: 'Auto Prime Palmital',
       slug: 'auto-prime-palmital',
@@ -321,9 +385,11 @@ const businessUsers: BusinessUserSeed[] = [
     email: 'juliana.ribeiro@palmital.test',
     phone: '+5518997100013',
     displayName: 'Juliana Ribeiro',
+    username: 'juliana_ribeiro',
     city: 'Candido Mota',
     bio: 'Empreendedora criativa e curadora de presentes artesanais.',
     avatarSeed: 'Juliana Ribeiro',
+    coverSeed: 'Juliana Ribeiro cover',
     company: {
       name: 'Atelier Flor de Cafe',
       slug: 'atelier-flor-de-cafe',
@@ -366,9 +432,11 @@ const businessUsers: BusinessUserSeed[] = [
     email: 'paulo.teixeira@palmital.test',
     phone: '+5518997100014',
     displayName: 'Paulo Teixeira',
+    username: 'paulo_teixeira',
     city: 'Ourinhos',
     bio: 'Tecnico em eletronica e fundador da Tech Vale Assistencia.',
     avatarSeed: 'Paulo Teixeira',
+    coverSeed: 'Paulo Teixeira cover',
     company: {
       name: 'Tech Vale Assistencia',
       slug: 'tech-vale-assistencia',
@@ -411,9 +479,11 @@ const businessUsers: BusinessUserSeed[] = [
     email: 'renata.barbosa@palmital.test',
     phone: '+5518997100015',
     displayName: 'Renata Barbosa',
+    username: 'renata_barbosa',
     city: 'Palmital',
     bio: 'Corretora e especialista em imoveis residenciais e rurais.',
     avatarSeed: 'Renata Barbosa',
+    coverSeed: 'Renata Barbosa cover',
     company: {
       name: 'Imobiliaria Centro Oeste',
       slug: 'imobiliaria-centro-oeste',
@@ -529,6 +599,31 @@ const socialPosts: PostSeed[] = [
       'Adocao responsavel continua sendo a melhor saida. Tenho contato de duas ONGs da regiao se precisarem.',
     createdAt: hoursAgo(52),
   },
+  {
+    authorEmail: 'leonardo.ferrari@palmital.test',
+    content:
+      'Fechei a agenda da semana para troca de padrao e instalacao de chuveiro. Se alguem precisar de visita tecnica, me chama.',
+    createdAt: hoursAgo(12),
+  },
+  {
+    authorEmail: 'patricia.azevedo@palmital.test',
+    content:
+      'Terminei uma pintura em tons claros que abriu bem o ambiente. Posso postar antes e depois se quiserem.',
+    createdAt: hoursAgo(21),
+    mediaSeeds: ['pintura-antes-depois-sala', 'parede-clara-acabamento'],
+  },
+  {
+    authorEmail: 'henrique.nunes@palmital.test',
+    content:
+      'Montei tres kits para home office hoje. Monitor certo e cadeira decente fazem muita diferenca.',
+    createdAt: hoursAgo(29),
+  },
+  {
+    authorEmail: 'diego.alves@palmital.test',
+    content:
+      'Quem tiver precisando revisar freio antes da viagem do feriado, tenta agendar hoje porque a oficina lota rapido.',
+    createdAt: hoursAgo(44),
+  },
 ];
 
 const businessPosts: BusinessPostSeed[] = [
@@ -600,6 +695,82 @@ const businessPosts: BusinessPostSeed[] = [
     content: 'Se voce procura terreno para construir em bairro tranquilo, chama no direct.',
     createdAt: hoursAgo(63),
     mediaSeeds: ['terrenos-centro-oeste'],
+  },
+  {
+    authorEmail: 'paulo.teixeira@palmital.test',
+    companySlug: 'tech-vale-assistencia',
+    content: 'Montamos kits de upgrade com SSD, limpeza interna e retirada agendada para empresas da regiao.',
+    createdAt: hoursAgo(26),
+  },
+  {
+    authorEmail: 'juliana.ribeiro@palmital.test',
+    companySlug: 'atelier-flor-de-cafe',
+    content: 'Hoje sairam tres kits corporativos com cartao personalizado e entrega no horario do cliente.',
+    createdAt: hoursAgo(34),
+    mediaSeeds: ['kits-corporativos-cafe', 'embalagem-presente-flores'],
+  },
+];
+
+const promotionPosts: PromotionSeed[] = [
+  {
+    kind: PromotionKind.PROFESSIONAL,
+    authorEmail: 'leonardo.ferrari@palmital.test',
+    createdAt: hoursAgo(5),
+    content: 'Atendo residencias, pequenos comercios e reparos urgentes com visita tecnica organizada.',
+    headline: 'Eletricista residencial com atendimento rapido',
+    subtitle: 'Padrao, disjuntor, chuveiro, ventilador e manutencao preventiva.',
+    city: 'Palmital',
+    serviceArea: 'Palmital, Ibirarema e Campos Novos Paulista',
+    highlights: ['orcamento rapido', 'atendimento no mesmo dia', 'instalacoes residenciais'],
+  },
+  {
+    kind: PromotionKind.PROFESSIONAL,
+    authorEmail: 'patricia.azevedo@palmital.test',
+    createdAt: hoursAgo(16),
+    content: 'Trabalho com pintura interna, massa corrida, textura leve e organizacao do ambiente no fim do servico.',
+    headline: 'Pintura residencial e comercial com acabamento fino',
+    subtitle: 'Ideal para reforma, entrega de imovel e revitalizacao de ambientes.',
+    city: 'Ourinhos',
+    serviceArea: 'Ourinhos, Palmital e Candido Mota',
+    highlights: ['acabamento limpo', 'cores orientadas', 'parcelamento combinado'],
+  },
+  {
+    kind: PromotionKind.COMPANY_PROFILE,
+    authorEmail: 'mariana.silva@palmital.test',
+    companySlug: 'casa-do-campo-palmital',
+    createdAt: hoursAgo(10),
+    content: 'A loja esta com equipe reforcada para atendimento tecnico e entrega local no mesmo dia.',
+    headline: 'Tudo para nutricao animal e rotina do campo',
+    subtitle: 'Atendimento tecnico, insumos selecionados e suporte para produtor da regiao.',
+    city: 'Palmital',
+    serviceArea: 'Palmital e propriedades vizinhas',
+    highlights: ['entrega local', 'suporte tecnico', 'linha pet e rural'],
+  },
+  {
+    kind: PromotionKind.COMPANY_PRODUCTS,
+    authorEmail: 'paulo.teixeira@palmital.test',
+    companySlug: 'tech-vale-assistencia',
+    createdAt: hoursAgo(14),
+    content: 'Selecionamos equipamentos e servicos com maior giro para facilitar o teste do novo card comercial.',
+    headline: 'Vitrine de tecnologia revisada e pronta para uso',
+    subtitle: 'Produtos e servicos com foco em estudo, trabalho e upgrade rapido.',
+    city: 'Ourinhos',
+    serviceArea: 'Ourinhos, Palmital e Santa Cruz do Rio Pardo',
+    highlights: ['garantia local', 'upgrade com instalacao', 'equipamentos revisados'],
+    productNames: ['Notebook Dell i5 16GB', 'SSD 480GB com Instalacao', 'Roteador Mesh Dual Band'],
+  },
+  {
+    kind: PromotionKind.COMPANY_PRODUCTS,
+    authorEmail: 'ricardo.melo@palmital.test',
+    companySlug: 'auto-prime-palmital',
+    createdAt: hoursAgo(24),
+    content: 'Usamos essa vitrine para destacar produtos e servicos que puxam mais conversa no feed.',
+    headline: 'Seminovos e acessorios automotivos em destaque',
+    subtitle: 'Selecao de estoque e itens que ajudam a fechar venda mais rapido.',
+    city: 'Palmital',
+    serviceArea: 'Palmital e regiao',
+    highlights: ['estoque revisado', 'avaliacao na troca', 'acessorios prontos para instalar'],
+    productNames: ['Chevrolet Onix LT 2021', 'Honda CG 160 Fan 2022', 'Multimidia 9 polegadas'],
   },
 ];
 
@@ -1044,15 +1215,19 @@ async function ensureAdmin(adminPassword: string) {
         upsert: {
           update: {
             displayName: 'Admin Palmital',
+            username: 'admin_palmital',
             city: 'Palmital',
             bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
             avatarUrl: avatarUrl('Admin Palmital'),
+            coverUrl: imageUrl('Admin Palmital cover', 1600, 900),
           },
           create: {
             displayName: 'Admin Palmital',
+            username: 'admin_palmital',
             city: 'Palmital',
             bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
             avatarUrl: avatarUrl('Admin Palmital'),
+            coverUrl: imageUrl('Admin Palmital cover', 1600, 900),
           },
         },
       },
@@ -1061,14 +1236,16 @@ async function ensureAdmin(adminPassword: string) {
       email: ADMIN_EMAIL,
       passwordHash,
       role: UserRole.ADMIN,
-      profile: {
-        create: {
-          displayName: 'Admin Palmital',
-          city: 'Palmital',
-          bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
-          avatarUrl: avatarUrl('Admin Palmital'),
+        profile: {
+          create: {
+            displayName: 'Admin Palmital',
+            username: 'admin_palmital',
+            city: 'Palmital',
+            bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
+            avatarUrl: avatarUrl('Admin Palmital'),
+            coverUrl: imageUrl('Admin Palmital cover', 1600, 900),
+          },
         },
-      },
     },
   });
 }
@@ -1077,6 +1254,7 @@ async function createUsers(testPassword: string) {
   const passwordHash = await bcrypt.hash(testPassword, 12);
   const usersByEmail = new Map<string, { id: string; email: string; role: UserRole }>();
   const companiesBySlug = new Map<string, { id: string; slug: string; ownerId: string }>();
+  const productsByCompanySlug = new Map<string, Array<{ id: string; name: string }>>();
 
   for (const user of regularUsers) {
     const created = await prisma.user.create({
@@ -1088,9 +1266,11 @@ async function createUsers(testPassword: string) {
         profile: {
           create: {
             displayName: user.displayName,
+            username: user.username,
             city: user.city,
             bio: user.bio,
             avatarUrl: avatarUrl(user.avatarSeed),
+            coverUrl: imageUrl(user.coverSeed, 1600, 900),
           },
         },
       },
@@ -1109,9 +1289,11 @@ async function createUsers(testPassword: string) {
         profile: {
           create: {
             displayName: user.displayName,
+            username: user.username,
             city: user.city,
             bio: user.bio,
             avatarUrl: avatarUrl(user.avatarSeed),
+            coverUrl: imageUrl(user.coverSeed, 1600, 900),
           },
         },
         company: {
@@ -1138,7 +1320,7 @@ async function createUsers(testPassword: string) {
           },
         },
       },
-      include: { company: true },
+      include: { company: { include: { products: true } } },
     });
 
     usersByEmail.set(created.email, { id: created.id, email: created.email, role: created.role });
@@ -1149,10 +1331,14 @@ async function createUsers(testPassword: string) {
         slug: created.company.slug,
         ownerId: created.id,
       });
+      productsByCompanySlug.set(
+        created.company.slug,
+        created.company.products.map((product) => ({ id: product.id, name: product.name })),
+      );
     }
   }
 
-  return { usersByEmail, companiesBySlug };
+  return { usersByEmail, companiesBySlug, productsByCompanySlug };
 }
 
 async function createPostWithMedia(params: {
@@ -1196,6 +1382,7 @@ async function createPostWithMedia(params: {
 async function createPostsAndClassifieds(
   usersByEmail: Map<string, { id: string }>,
   companiesBySlug: Map<string, { id: string }>,
+  productsByCompanySlug: Map<string, Array<{ id: string; name: string }>>,
   categoryIds: Record<string, string>,
 ) {
   for (const post of socialPosts) {
@@ -1262,6 +1449,60 @@ async function createPostsAndClassifieds(
         createdAt,
         updatedAt: createdAt,
       },
+      });
+  }
+
+  for (const promotion of promotionPosts) {
+    const author = usersByEmail.get(promotion.authorEmail);
+    if (!author) throw new Error(`Promotion author not found for ${promotion.authorEmail}`);
+
+    const companyId =
+      'companySlug' in promotion ? companiesBySlug.get(promotion.companySlug)?.id : undefined;
+
+    const selectedProductIds =
+      'companySlug' in promotion && promotion.productNames?.length
+        ? promotion.productNames.map((productName) => {
+            const product = productsByCompanySlug
+              .get(promotion.companySlug)
+              ?.find((item) => item.name === productName);
+
+            if (!product) {
+              throw new Error(`Product not found for promotion: ${promotion.companySlug} -> ${productName}`);
+            }
+
+            return product.id;
+          })
+        : [];
+
+    await prisma.post.create({
+      data: {
+        authorId: author.id,
+        companyId,
+        type: PostType.PROMOTION,
+        content: promotion.content,
+        createdAt: promotion.createdAt,
+        updatedAt: promotion.createdAt,
+        promotion: {
+          create: {
+            kind: promotion.kind,
+            headline: promotion.headline,
+            subtitle: promotion.subtitle,
+            city: promotion.city,
+            serviceArea: promotion.serviceArea,
+            highlights: promotion.highlights,
+            createdAt: promotion.createdAt,
+            updatedAt: promotion.createdAt,
+            products: selectedProductIds.length
+              ? {
+                  create: selectedProductIds.map((productId, index) => ({
+                    sortOrder: index,
+                    product: { connect: { id: productId } },
+                  })),
+                }
+              : undefined,
+          },
+        },
+      },
     });
   }
 }
@@ -1312,8 +1553,8 @@ async function main() {
   await cleanupSeedNamespace();
   const categoryIds = await ensureCategories();
   await ensureAdmin(adminPassword);
-  const { usersByEmail, companiesBySlug } = await createUsers(testPassword);
-  await createPostsAndClassifieds(usersByEmail, companiesBySlug, categoryIds);
+  const { usersByEmail, companiesBySlug, productsByCompanySlug } = await createUsers(testPassword);
+  await createPostsAndClassifieds(usersByEmail, companiesBySlug, productsByCompanySlug, categoryIds);
   await createConversations(usersByEmail);
 
   const classifiedEntries = classifiedCatalog.reduce(
@@ -1331,8 +1572,11 @@ async function main() {
   console.log(
     `Products: ${businessUsers.reduce((sum, user) => sum + user.company.products.length, 0)}`,
   );
-  console.log(`Feed posts: ${socialPosts.length + businessPosts.length + classifiedEntries}`);
+  console.log(
+    `Feed posts: ${socialPosts.length + businessPosts.length + promotionPosts.length + classifiedEntries}`,
+  );
   console.log(`Classifieds: ${classifiedEntries} (${activeClassifieds} active)`);
+  console.log(`Promotions: ${promotionPosts.length}`);
   console.log(`Conversations: ${buildConversationSeeds().length}`);
 
   console.table([
