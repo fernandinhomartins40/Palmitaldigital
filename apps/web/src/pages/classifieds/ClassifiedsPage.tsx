@@ -215,7 +215,7 @@ export function ClassifiedsPage() {
             </label>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="classifieds-scrollbar flex gap-2 overflow-x-auto pb-2 pr-1">
             <button
               type="button"
               onClick={() => setCategoryId('')}
