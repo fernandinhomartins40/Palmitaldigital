@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Avatar, Button, Card, Spinner } from '@palmital/ui';
 import { api } from '../../services/api';
@@ -14,6 +14,7 @@ export function UserProfilePage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const currentUser = useAuthStore((s) => s.user);
   const addToast = useUIStore((s) => s.addToast);
 
@@ -44,10 +45,24 @@ export function UserProfilePage() {
     onError: () => addToast('Erro ao iniciar conversa', 'error'),
   });
 
+  const followMutation = useMutation({
+    mutationFn: () =>
+      profile?.isFollowing ? api.delete(`/users/${id}/follow`) : api.post(`/users/${id}/follow`),
+    onSuccess: (res) => {
+      queryClient.setQueryData(['public-profile', id], res.data);
+      queryClient.invalidateQueries({ queryKey: ['stories-feed'] });
+    },
+    onError: () => addToast('Erro ao atualizar seguidores', 'error'),
+  });
+
   const posts = useMemo(() => postsData?.pages.flatMap((page) => page.posts) ?? [], [postsData]);
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   if (!profile) return null;
@@ -97,7 +112,9 @@ export function UserProfilePage() {
           </div>
 
           <div className="mt-4 space-y-4 lg:mt-6">
-            {publicProfile?.bio && <p className="text-sm leading-relaxed text-gray-700">{publicProfile.bio}</p>}
+            {publicProfile?.bio && (
+              <p className="text-sm leading-relaxed text-gray-700">{publicProfile.bio}</p>
+            )}
 
             {publicProfile?.city && (
               <p className="flex items-center gap-2 text-sm text-gray-500">
@@ -125,25 +142,60 @@ export function UserProfilePage() {
               </Link>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-4 gap-3">
               <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Publicacoes</p>
-                <p className="mt-1 text-lg font-bold text-gray-900">{profile._count?.posts ?? posts.length}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Publicacoes
+                </p>
+                <p className="mt-1 text-lg font-bold text-gray-900">
+                  {profile._count?.posts ?? posts.length}
+                </p>
               </div>
               <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Classificados</p>
-                <p className="mt-1 text-lg font-bold text-gray-900">{profile._count?.classifieds ?? 0}</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Classificados
+                </p>
+                <p className="mt-1 text-lg font-bold text-gray-900">
+                  {profile._count?.classifieds ?? 0}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Seguidores
+                </p>
+                <p className="mt-1 text-lg font-bold text-gray-900">
+                  {profile._count?.followers ?? 0}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Seguindo
+                </p>
+                <p className="mt-1 text-lg font-bold text-gray-900">
+                  {profile._count?.following ?? 0}
+                </p>
               </div>
             </div>
 
-            <Button
-              fullWidth
-              onClick={() => startChatMutation.mutate()}
-              isLoading={startChatMutation.isPending}
-            >
-              <MessageCircle size={16} />
-              <span className="ml-2">Enviar mensagem</span>
-            </Button>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Button
+                fullWidth
+                variant={profile.isFollowing ? 'secondary' : 'primary'}
+                onClick={() => followMutation.mutate()}
+                isLoading={followMutation.isPending}
+              >
+                {profile.isFollowing ? 'Deixar de seguir' : 'Seguir perfil'}
+              </Button>
+              <Button
+                fullWidth
+                variant="secondary"
+                onClick={() => startChatMutation.mutate()}
+                isLoading={startChatMutation.isPending}
+              >
+                <MessageCircle size={16} />
+                <span className="ml-2">Enviar mensagem</span>
+              </Button>
+            </div>
           </div>
         </div>
       </Card>

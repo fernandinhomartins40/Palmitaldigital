@@ -2,6 +2,7 @@ import { Avatar, Card } from '@palmital/ui';
 import { formatRelativeTime } from '@palmital/utils';
 import { MessageSquareText, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PostEngagement } from './PostEngagement';
 import { PostMediaGallery } from './PostMediaGallery';
 
 export function SocialCard({ post }: { post: any }) {
@@ -19,7 +20,12 @@ export function SocialCard({ post }: { post: any }) {
     >
       <div className="flex items-start gap-3">
         <Link to={`/profile/${post.authorId}`}>
-          <Avatar src={profile?.avatarUrl} name={name} size="md" className={hasMedia ? '' : 'ring-4 ring-slate-100'} />
+          <Avatar
+            src={profile?.avatarUrl}
+            name={name}
+            size="md"
+            className={hasMedia ? '' : 'ring-4 ring-slate-100'}
+          />
         </Link>
 
         <div className="min-w-0 flex-1">
@@ -29,7 +35,10 @@ export function SocialCard({ post }: { post: any }) {
                 {hasMedia ? <Sparkles size={12} /> : <MessageSquareText size={12} />}
                 {hasMedia ? 'Feed visual' : 'Conversa local'}
               </div>
-              <Link to={`/profile/${post.authorId}`} className="mt-2 block font-semibold text-slate-900 hover:underline">
+              <Link
+                to={`/profile/${post.authorId}`}
+                className="mt-2 block font-semibold text-slate-900 hover:underline"
+              >
                 {name}
               </Link>
             </div>
@@ -38,7 +47,9 @@ export function SocialCard({ post }: { post: any }) {
           </div>
 
           {post.content && (
-            <p className={`mt-3 whitespace-pre-wrap break-words text-slate-700 ${hasMedia ? '' : 'text-[15px] leading-7'}`}>
+            <p
+              className={`mt-3 whitespace-pre-wrap break-words text-slate-700 ${hasMedia ? '' : 'text-[15px] leading-7'}`}
+            >
               {post.content}
             </p>
           )}
@@ -50,6 +61,7 @@ export function SocialCard({ post }: { post: any }) {
           )}
 
           <PostMediaGallery media={post.media ?? []} />
+          <PostEngagement post={post} />
         </div>
       </div>
     </Card>

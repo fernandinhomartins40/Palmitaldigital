@@ -2,6 +2,7 @@ import {
   ClassifiedStatus,
   MediaType,
   MessageStatus,
+  PostReactionType,
   PostType,
   PromotionKind,
   PrismaClient,
@@ -699,13 +700,15 @@ const businessPosts: BusinessPostSeed[] = [
   {
     authorEmail: 'paulo.teixeira@palmital.test',
     companySlug: 'tech-vale-assistencia',
-    content: 'Montamos kits de upgrade com SSD, limpeza interna e retirada agendada para empresas da regiao.',
+    content:
+      'Montamos kits de upgrade com SSD, limpeza interna e retirada agendada para empresas da regiao.',
     createdAt: hoursAgo(26),
   },
   {
     authorEmail: 'juliana.ribeiro@palmital.test',
     companySlug: 'atelier-flor-de-cafe',
-    content: 'Hoje sairam tres kits corporativos com cartao personalizado e entrega no horario do cliente.',
+    content:
+      'Hoje sairam tres kits corporativos com cartao personalizado e entrega no horario do cliente.',
     createdAt: hoursAgo(34),
     mediaSeeds: ['kits-corporativos-cafe', 'embalagem-presente-flores'],
   },
@@ -716,7 +719,8 @@ const promotionPosts: PromotionSeed[] = [
     kind: PromotionKind.PROFESSIONAL,
     authorEmail: 'leonardo.ferrari@palmital.test',
     createdAt: hoursAgo(5),
-    content: 'Atendo residencias, pequenos comercios e reparos urgentes com visita tecnica organizada.',
+    content:
+      'Atendo residencias, pequenos comercios e reparos urgentes com visita tecnica organizada.',
     headline: 'Eletricista residencial com atendimento rapido',
     subtitle: 'Padrao, disjuntor, chuveiro, ventilador e manutencao preventiva.',
     city: 'Palmital',
@@ -727,7 +731,8 @@ const promotionPosts: PromotionSeed[] = [
     kind: PromotionKind.PROFESSIONAL,
     authorEmail: 'patricia.azevedo@palmital.test',
     createdAt: hoursAgo(16),
-    content: 'Trabalho com pintura interna, massa corrida, textura leve e organizacao do ambiente no fim do servico.',
+    content:
+      'Trabalho com pintura interna, massa corrida, textura leve e organizacao do ambiente no fim do servico.',
     headline: 'Pintura residencial e comercial com acabamento fino',
     subtitle: 'Ideal para reforma, entrega de imovel e revitalizacao de ambientes.',
     city: 'Ourinhos',
@@ -739,7 +744,8 @@ const promotionPosts: PromotionSeed[] = [
     authorEmail: 'mariana.silva@palmital.test',
     companySlug: 'casa-do-campo-palmital',
     createdAt: hoursAgo(10),
-    content: 'A loja esta com equipe reforcada para atendimento tecnico e entrega local no mesmo dia.',
+    content:
+      'A loja esta com equipe reforcada para atendimento tecnico e entrega local no mesmo dia.',
     headline: 'Tudo para nutricao animal e rotina do campo',
     subtitle: 'Atendimento tecnico, insumos selecionados e suporte para produtor da regiao.',
     city: 'Palmital',
@@ -751,7 +757,8 @@ const promotionPosts: PromotionSeed[] = [
     authorEmail: 'paulo.teixeira@palmital.test',
     companySlug: 'tech-vale-assistencia',
     createdAt: hoursAgo(14),
-    content: 'Selecionamos equipamentos e servicos com maior giro para facilitar o teste do novo card comercial.',
+    content:
+      'Selecionamos equipamentos e servicos com maior giro para facilitar o teste do novo card comercial.',
     headline: 'Vitrine de tecnologia revisada e pronta para uso',
     subtitle: 'Produtos e servicos com foco em estudo, trabalho e upgrade rapido.',
     city: 'Ourinhos',
@@ -761,16 +768,43 @@ const promotionPosts: PromotionSeed[] = [
   },
   {
     kind: PromotionKind.COMPANY_PRODUCTS,
+    authorEmail: 'mariana.silva@palmital.test',
+    companySlug: 'casa-do-campo-palmital',
+    createdAt: hoursAgo(19),
+    content: 'Produtos mais pedidos no balcao esta semana, com entrega local e orientacao de uso.',
+    headline: 'Produtos rurais e pet em destaque na loja',
+    subtitle: 'Selecao para testar posts com produtos diretamente no perfil publico da loja.',
+    city: 'Palmital',
+    serviceArea: 'Palmital e propriedades vizinhas',
+    highlights: ['entrega no mesmo dia', 'retirada na loja', 'orientacao tecnica'],
+    productNames: ['Racao Premium 25kg', 'Mineral Bovino 30kg', 'Pulverizador Costal 20L'],
+  },
+  {
+    kind: PromotionKind.COMPANY_PRODUCTS,
     authorEmail: 'ricardo.melo@palmital.test',
     companySlug: 'auto-prime-palmital',
     createdAt: hoursAgo(24),
-    content: 'Usamos essa vitrine para destacar produtos e servicos que puxam mais conversa no feed.',
+    content:
+      'Usamos essa vitrine para destacar produtos e servicos que puxam mais conversa no feed.',
     headline: 'Seminovos e acessorios automotivos em destaque',
     subtitle: 'Selecao de estoque e itens que ajudam a fechar venda mais rapido.',
     city: 'Palmital',
     serviceArea: 'Palmital e regiao',
     highlights: ['estoque revisado', 'avaliacao na troca', 'acessorios prontos para instalar'],
     productNames: ['Chevrolet Onix LT 2021', 'Honda CG 160 Fan 2022', 'Multimidia 9 polegadas'],
+  },
+  {
+    kind: PromotionKind.COMPANY_PRODUCTS,
+    authorEmail: 'juliana.ribeiro@palmital.test',
+    companySlug: 'atelier-flor-de-cafe',
+    createdAt: hoursAgo(38),
+    content: 'Monte um presente completo escolhendo os itens da vitrine e personalize o cartao.',
+    headline: 'Kits e presentes artesanais para testar vitrine',
+    subtitle: 'Opcoes com foto, preco e descricao para validar o card no perfil da loja.',
+    city: 'Candido Mota',
+    serviceArea: 'Candido Mota, Palmital e Assis',
+    highlights: ['pedido por encomenda', 'embalagem pronta', 'cartao personalizado'],
+    productNames: ['Cesta Cafe da Tarde', 'Kit Presente Aromas', 'Caixa Floral Afeto'],
   },
 ];
 
@@ -1236,16 +1270,16 @@ async function ensureAdmin(adminPassword: string) {
       email: ADMIN_EMAIL,
       passwordHash,
       role: UserRole.ADMIN,
-        profile: {
-          create: {
-            displayName: 'Admin Palmital',
-            username: 'admin_palmital',
-            city: 'Palmital',
-            bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
-            avatarUrl: avatarUrl('Admin Palmital'),
-            coverUrl: imageUrl('Admin Palmital cover', 1600, 900),
-          },
+      profile: {
+        create: {
+          displayName: 'Admin Palmital',
+          username: 'admin_palmital',
+          city: 'Palmital',
+          bio: 'Conta administrativa para revisar moderacao, usuarios e operacao geral.',
+          avatarUrl: avatarUrl('Admin Palmital'),
+          coverUrl: imageUrl('Admin Palmital cover', 1600, 900),
         },
+      },
     },
   });
 }
@@ -1449,7 +1483,7 @@ async function createPostsAndClassifieds(
         createdAt,
         updatedAt: createdAt,
       },
-      });
+    });
   }
 
   for (const promotion of promotionPosts) {
@@ -1467,7 +1501,9 @@ async function createPostsAndClassifieds(
               ?.find((item) => item.name === productName);
 
             if (!product) {
-              throw new Error(`Product not found for promotion: ${promotion.companySlug} -> ${productName}`);
+              throw new Error(
+                `Product not found for promotion: ${promotion.companySlug} -> ${productName}`,
+              );
             }
 
             return product.id;
@@ -1502,6 +1538,146 @@ async function createPostsAndClassifieds(
               : undefined,
           },
         },
+      },
+    });
+  }
+}
+
+async function createPostInteractions(usersByEmail: Map<string, { id: string }>) {
+  const seedUsers = [...regularUsers, ...businessUsers]
+    .map((user) => usersByEmail.get(user.email))
+    .filter(Boolean) as Array<{ id: string }>;
+
+  if (!seedUsers.length) return;
+
+  const posts = await prisma.post.findMany({
+    where: { authorId: { in: seedUsers.map((user) => user.id) } },
+    orderBy: { createdAt: 'desc' },
+    take: 18,
+    select: { id: true, authorId: true },
+  });
+
+  const reactionTypes = [
+    PostReactionType.LIKE,
+    PostReactionType.LOVE,
+    PostReactionType.CLAP,
+    PostReactionType.WOW,
+  ];
+
+  for (const [postIndex, post] of posts.entries()) {
+    const reactors = seedUsers
+      .filter((user) => user.id !== post.authorId)
+      .slice(postIndex % 3, (postIndex % 3) + 5);
+
+    for (const [reactorIndex, user] of reactors.entries()) {
+      await prisma.postReaction.create({
+        data: {
+          postId: post.id,
+          userId: user.id,
+          type: reactionTypes[(postIndex + reactorIndex) % reactionTypes.length],
+          createdAt: hoursAgo(1 + postIndex + reactorIndex),
+        },
+      });
+    }
+
+    const commenters = reactors.slice(0, 2);
+    for (const [commentIndex, user] of commenters.entries()) {
+      await prisma.postComment.create({
+        data: {
+          postId: post.id,
+          authorId: user.id,
+          content:
+            commentIndex === 0
+              ? 'Gostei da publicacao, vou acompanhar por aqui.'
+              : 'Boa dica para quem esta procurando isso na regiao.',
+          createdAt: hoursAgo(1 + postIndex + commentIndex),
+          updatedAt: hoursAgo(1 + postIndex + commentIndex),
+        },
+      });
+    }
+
+    if (postIndex % 3 === 0 && reactors[0]) {
+      await prisma.postShare.create({
+        data: {
+          postId: post.id,
+          userId: reactors[0].id,
+          target: 'seed',
+          createdAt: hoursAgo(2 + postIndex),
+        },
+      });
+    }
+  }
+}
+
+async function createFollowsAndStories(usersByEmail: Map<string, { id: string }>) {
+  const allEmails = [...regularUsers, ...businessUsers].map((user) => user.email);
+  const users = allEmails
+    .map((email) => ({ email, user: usersByEmail.get(email) }))
+    .filter((item): item is { email: string; user: { id: string } } => Boolean(item.user));
+
+  for (const [index, item] of users.entries()) {
+    const following = [users[(index + 1) % users.length], users[(index + 3) % users.length]];
+
+    for (const target of following) {
+      if (target.user.id === item.user.id) continue;
+
+      await prisma.follow.upsert({
+        where: {
+          followerId_followingId: {
+            followerId: item.user.id,
+            followingId: target.user.id,
+          },
+        },
+        update: {},
+        create: {
+          followerId: item.user.id,
+          followingId: target.user.id,
+          createdAt: hoursAgo(90 - index),
+        },
+      });
+    }
+  }
+
+  const storyAuthors = [
+    'ana.souza@palmital.test',
+    'mariana.silva@palmital.test',
+    'ricardo.melo@palmital.test',
+    'juliana.ribeiro@palmital.test',
+    'leonardo.ferrari@palmital.test',
+  ];
+
+  for (const [index, email] of storyAuthors.entries()) {
+    const author = usersByEmail.get(email);
+    if (!author) continue;
+
+    const createdAt = hoursAgo(1 + index * 3);
+    const expiresAt = new Date(createdAt);
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    const media = await prisma.media.create({
+      data: {
+        uploaderId: author.id,
+        url: imageUrl(`story-${email}-${index}`, 900, 1600),
+        type: MediaType.IMAGE,
+        mimeType: 'image/jpeg',
+        sizeBytes: 220000 + index * 8000,
+        width: 900,
+        height: 1600,
+        createdAt,
+      },
+    });
+
+    await prisma.story.create({
+      data: {
+        authorId: author.id,
+        mediaId: media.id,
+        caption:
+          index % 2 === 0
+            ? 'Atualizacao rapida do dia para quem acompanha o perfil.'
+            : 'Bastidores em formato vertical, disponivel por 24 horas.',
+        createdAt,
+        updatedAt: createdAt,
+        expiresAt,
       },
     });
   }
@@ -1554,7 +1730,14 @@ async function main() {
   const categoryIds = await ensureCategories();
   await ensureAdmin(adminPassword);
   const { usersByEmail, companiesBySlug, productsByCompanySlug } = await createUsers(testPassword);
-  await createPostsAndClassifieds(usersByEmail, companiesBySlug, productsByCompanySlug, categoryIds);
+  await createPostsAndClassifieds(
+    usersByEmail,
+    companiesBySlug,
+    productsByCompanySlug,
+    categoryIds,
+  );
+  await createPostInteractions(usersByEmail);
+  await createFollowsAndStories(usersByEmail);
   await createConversations(usersByEmail);
 
   const classifiedEntries = classifiedCatalog.reduce(
@@ -1577,6 +1760,8 @@ async function main() {
   );
   console.log(`Classifieds: ${classifiedEntries} (${activeClassifieds} active)`);
   console.log(`Promotions: ${promotionPosts.length}`);
+  console.log('Post interactions: seeded reactions, comments and shares for recent posts');
+  console.log('Follows and stories: seeded follower graph and active 9:16 stories');
   console.log(`Conversations: ${buildConversationSeeds().length}`);
 
   console.table([

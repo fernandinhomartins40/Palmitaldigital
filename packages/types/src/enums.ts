@@ -17,6 +17,13 @@ export enum PromotionKind {
   COMPANY_PRODUCTS = 'COMPANY_PRODUCTS',
 }
 
+export enum PostReactionType {
+  LIKE = 'LIKE',
+  LOVE = 'LOVE',
+  CLAP = 'CLAP',
+  WOW = 'WOW',
+}
+
 export enum ClassifiedStatus {
   ACTIVE = 'ACTIVE',
   SOLD = 'SOLD',

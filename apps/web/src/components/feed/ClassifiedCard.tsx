@@ -2,6 +2,7 @@ import { Card } from '@palmital/ui';
 import { formatCurrency, formatRelativeTime } from '@palmital/utils';
 import { ArrowUpRight, MapPin, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PostEngagement } from './PostEngagement';
 
 export function ClassifiedCard({ post }: { post: any }) {
   const classified = post.classified;
@@ -9,8 +10,8 @@ export function ClassifiedCard({ post }: { post: any }) {
   const profile = post.author?.profile;
 
   return (
-    <Link to={`/classifieds/${classified?.id}`} className="block">
-      <Card className="overflow-hidden rounded-[28px] border border-emerald-200/80 bg-[linear-gradient(180deg,#ffffff_0%,#f7fffb_100%)] p-0 shadow-[0_16px_38px_rgba(16,185,129,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(16,185,129,0.12)]">
+    <Card className="overflow-hidden rounded-[28px] border border-emerald-200/80 bg-[linear-gradient(180deg,#ffffff_0%,#f7fffb_100%)] p-0 shadow-[0_16px_38px_rgba(16,185,129,0.08)] transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_48px_rgba(16,185,129,0.12)]">
+      <Link to={`/classifieds/${classified?.id}`} className="block">
         <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50/70 px-4 py-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 shadow-sm">
             <Tag size={12} />
@@ -33,9 +34,15 @@ export function ClassifiedCard({ post }: { post: any }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate text-lg font-semibold tracking-[-0.02em] text-slate-900">{classified?.title}</p>
+                <p className="truncate text-lg font-semibold tracking-[-0.02em] text-slate-900">
+                  {classified?.title}
+                </p>
                 <p className="mt-1 text-xl font-bold text-emerald-700">
-                  {classified?.isFree ? 'Gratis' : classified?.price ? formatCurrency(Number(classified.price)) : 'Consultar'}
+                  {classified?.isFree
+                    ? 'Gratis'
+                    : classified?.price
+                      ? formatCurrency(Number(classified.price))
+                      : 'Consultar'}
                 </p>
               </div>
               <ArrowUpRight size={16} className="shrink-0 text-emerald-600" />
@@ -52,11 +59,16 @@ export function ClassifiedCard({ post }: { post: any }) {
             </div>
 
             {classified?.description && (
-              <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{classified.description}</p>
+              <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">
+                {classified.description}
+              </p>
             )}
           </div>
         </div>
-      </Card>
-    </Link>
+      </Link>
+      <div className="px-4 pb-4">
+        <PostEngagement post={post} />
+      </div>
+    </Card>
   );
 }

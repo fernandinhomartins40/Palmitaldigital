@@ -2,10 +2,22 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Button, Card, Spinner } from '@palmital/ui';
 import { formatCurrency } from '@palmital/utils';
+import { PromotionKind } from '@palmital/types';
 import { api } from '../../services/api';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
-import { BadgeCheck, ExternalLink, MapPin, Package2, Phone, Settings2, Store } from 'lucide-react';
+import { PostEngagement } from '../../components/feed/PostEngagement';
+import { PostMediaGallery } from '../../components/feed/PostMediaGallery';
+import {
+  BadgeCheck,
+  ExternalLink,
+  MapPin,
+  Package2,
+  Phone,
+  Settings2,
+  Sparkles,
+  Store,
+} from 'lucide-react';
 
 export function CompanyProfilePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,7 +40,11 @@ export function CompanyProfilePage() {
   });
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   if (!company) {
@@ -76,7 +92,9 @@ export function CompanyProfilePage() {
                   ) : null}
                   <span
                     className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                      company.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                      company.isActive
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'bg-amber-50 text-amber-600'
                     }`}
                   >
                     {company.isActive ? 'Ativa' : 'Pausada'}
@@ -153,7 +171,9 @@ export function CompanyProfilePage() {
               </p>
             </div>
             <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Publicacoes</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                Publicacoes
+              </p>
               <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-gray-900 lg:text-base">
                 <Store size={16} className="text-gray-400" />
                 {totalPosts} publicacao(oes)
@@ -176,7 +196,11 @@ export function CompanyProfilePage() {
             {company.products.map((product: any) => (
               <Card key={product.id} className="overflow-hidden rounded-[28px] p-0">
                 {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} className="h-44 w-full object-cover" />
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="h-44 w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-44 items-center justify-center bg-gray-100 text-xs text-gray-300">
                     sem foto
@@ -187,15 +211,21 @@ export function CompanyProfilePage() {
                     <p className="text-sm font-semibold text-gray-900">{product.name}</p>
                     <span
                       className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
-                        product.isAvailable ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
+                        product.isAvailable
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'bg-gray-100 text-gray-500'
                       }`}
                     >
                       {product.isAvailable ? 'Disponivel' : 'Indisponivel'}
                     </span>
                   </div>
-                  {product.description && <p className="text-sm text-gray-600">{product.description}</p>}
+                  {product.description && (
+                    <p className="text-sm text-gray-600">{product.description}</p>
+                  )}
                   {product.price != null && (
-                    <p className="text-sm font-bold text-blue-600">{formatCurrency(Number(product.price))}</p>
+                    <p className="text-sm font-bold text-blue-600">
+                      {formatCurrency(Number(product.price))}
+                    </p>
                   )}
                 </div>
               </Card>
@@ -210,31 +240,95 @@ export function CompanyProfilePage() {
           <div className="grid gap-3 xl:grid-cols-2">
             {company.posts.map((post: any) => (
               <Card key={post.id} className="space-y-4 rounded-[28px] p-4">
+                {post.promotion ? (
+                  <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                    <Sparkles size={13} />
+                    Publicacao impulsionada
+                  </div>
+                ) : null}
+
                 <div className="flex items-center justify-between gap-3">
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                     {new Date(post.createdAt).toLocaleDateString('pt-BR')}
                   </span>
-                  <span className="text-xs text-gray-400">{post.media?.length ?? 0} arquivo(s)</span>
+                  <span className="text-xs text-gray-400">
+                    {post.media?.length ?? 0} arquivo(s)
+                  </span>
                 </div>
 
+                {post.promotion?.headline ? (
+                  <div>
+                    <p className="text-base font-semibold text-gray-900">
+                      {post.promotion.headline}
+                    </p>
+                    {post.promotion.subtitle ? (
+                      <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                        {post.promotion.subtitle}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 {post.content ? (
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">{post.content}</p>
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                    {post.content}
+                  </p>
                 ) : (
                   <p className="text-sm text-gray-400">Publicacao sem texto.</p>
                 )}
 
-                {post.media?.length ? (
-                  <div className={`grid gap-2 ${post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                    {post.media.slice(0, 4).map((media: any) => (
-                      <img
-                        key={media.id}
-                        src={media.url}
-                        alt=""
-                        className="aspect-square w-full rounded-2xl object-cover"
-                      />
-                    ))}
+                <PostMediaGallery media={post.media ?? []} />
+
+                {post.promotion?.kind === PromotionKind.COMPANY_PRODUCTS &&
+                post.promotion.products?.length ? (
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {post.promotion.products.map((item: any) => {
+                      const product = item.product;
+
+                      if (!product) return null;
+
+                      return (
+                        <div
+                          key={product.id}
+                          className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50"
+                        >
+                          {product.imageUrl ? (
+                            <img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              className="h-32 w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-32 items-center justify-center text-gray-300">
+                              <Package2 size={24} />
+                            </div>
+                          )}
+                          <div className="space-y-1 p-3">
+                            <p className="line-clamp-2 text-sm font-semibold text-gray-900">
+                              {product.name}
+                            </p>
+                            {product.description ? (
+                              <p className="line-clamp-2 text-xs leading-5 text-gray-500">
+                                {product.description}
+                              </p>
+                            ) : null}
+                            {product.price != null ? (
+                              <p className="text-sm font-bold text-blue-600">
+                                {formatCurrency(Number(product.price))}
+                              </p>
+                            ) : (
+                              <p className="text-xs font-medium text-gray-500">
+                                Consulte disponibilidade
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : null}
+
+                <PostEngagement post={post} />
               </Card>
             ))}
           </div>

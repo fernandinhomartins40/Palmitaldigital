@@ -1,4 +1,4 @@
-import { ClassifiedStatus, PostType, PromotionKind } from './enums';
+import { ClassifiedStatus, PostReactionType, PostType, PromotionKind } from './enums';
 
 // Auth
 export interface RegisterDto {
@@ -58,6 +58,23 @@ export interface CreatePostDto {
 export interface FeedQueryDto {
   cursor?: string;
   limit?: number;
+}
+
+export interface ReactToPostDto {
+  type?: PostReactionType;
+}
+
+export interface CreatePostCommentDto {
+  content: string;
+}
+
+export interface SharePostDto {
+  target?: string;
+}
+
+export interface CreateStoryDto {
+  mediaId: string;
+  caption?: string;
 }
 
 // Classifieds

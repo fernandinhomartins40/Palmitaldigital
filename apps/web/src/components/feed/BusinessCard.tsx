@@ -2,6 +2,7 @@ import { Avatar, Card } from '@palmital/ui';
 import { formatRelativeTime } from '@palmital/utils';
 import { BadgeCheck, Building2, Megaphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PostEngagement } from './PostEngagement';
 import { PostMediaGallery } from './PostMediaGallery';
 
 export function BusinessCard({ post }: { post: any }) {
@@ -12,7 +13,12 @@ export function BusinessCard({ post }: { post: any }) {
       <div className="border-b border-blue-100 bg-[linear-gradient(135deg,#eff6ff_0%,#eef2ff_70%,#ffffff_100%)] px-4 py-4">
         <div className="flex items-start gap-3">
           <Link to={`/companies/${company?.slug}`}>
-            <Avatar src={company?.logoUrl} name={company?.name ?? 'Empresa'} size="md" className="ring-4 ring-white" />
+            <Avatar
+              src={company?.logoUrl}
+              name={company?.name ?? 'Empresa'}
+              size="md"
+              className="ring-4 ring-white"
+            />
           </Link>
 
           <div className="min-w-0 flex-1">
@@ -27,7 +33,9 @@ export function BusinessCard({ post }: { post: any }) {
                   className="mt-2 flex items-center gap-1 truncate font-semibold text-slate-900 hover:underline"
                 >
                   <span className="truncate">{company?.name}</span>
-                  {company?.isVerified && <BadgeCheck size={14} className="shrink-0 text-blue-500" />}
+                  {company?.isVerified && (
+                    <BadgeCheck size={14} className="shrink-0 text-blue-500" />
+                  )}
                 </Link>
               </div>
 
@@ -45,6 +53,7 @@ export function BusinessCard({ post }: { post: any }) {
       <div className="p-4">
         {post.content && <p className="whitespace-pre-wrap text-slate-700">{post.content}</p>}
         <PostMediaGallery media={post.media ?? []} />
+        <PostEngagement post={post} />
       </div>
     </Card>
   );

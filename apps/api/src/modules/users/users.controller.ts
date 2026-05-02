@@ -81,15 +81,33 @@ export class UsersController {
     return this.usersService.checkUsernameAvailability(username, currentUserId);
   }
 
-  @Public()
   @Get('handle/:username')
-  getPublicProfileByUsername(@Param('username') username: string) {
-    return this.usersService.getPublicProfileByUsername(username);
+  getPublicProfileByUsername(@CurrentUser() user: any, @Param('username') username: string) {
+    return this.usersService.getPublicProfileByUsername(username, user.id);
   }
 
-  @Public()
   @Get(':id')
-  getPublicProfile(@Param('id') id: string) {
-    return this.usersService.getPublicProfile(id);
+  getPublicProfile(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.usersService.getPublicProfile(id, user.id);
+  }
+
+  @Post(':id/follow')
+  followUser(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.usersService.followUser(user.id, id);
+  }
+
+  @Delete(':id/follow')
+  unfollowUser(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.usersService.unfollowUser(user.id, id);
+  }
+
+  @Get(':id/followers')
+  getFollowers(@Param('id') id: string) {
+    return this.usersService.getFollowers(id);
+  }
+
+  @Get(':id/following')
+  getFollowing(@Param('id') id: string) {
+    return this.usersService.getFollowing(id);
   }
 }

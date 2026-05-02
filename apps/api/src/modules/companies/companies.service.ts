@@ -1,4 +1,9 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { slugify } from '@palmital/utils';
 import { UploadStorageService } from '../../common/storage/upload-storage.service';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -49,7 +54,29 @@ export class CompaniesService {
           where: { isPublished: true },
           orderBy: { createdAt: 'desc' },
           take: 10,
-          include: { media: true },
+          include: {
+            media: true,
+            promotion: {
+              include: {
+                products: {
+                  orderBy: { sortOrder: 'asc' },
+                  include: { product: true },
+                },
+              },
+            },
+            comments: {
+              orderBy: { createdAt: 'desc' },
+              take: 3,
+              include: { author: { include: { profile: true } } },
+            },
+            _count: {
+              select: {
+                reactions: true,
+                comments: true,
+                shares: true,
+              },
+            },
+          },
         },
       },
     });
@@ -94,7 +121,29 @@ export class CompaniesService {
           where: { isPublished: true },
           orderBy: { createdAt: 'desc' },
           take: 10,
-          include: { media: true },
+          include: {
+            media: true,
+            promotion: {
+              include: {
+                products: {
+                  orderBy: { sortOrder: 'asc' },
+                  include: { product: true },
+                },
+              },
+            },
+            comments: {
+              orderBy: { createdAt: 'desc' },
+              take: 3,
+              include: { author: { include: { profile: true } } },
+            },
+            _count: {
+              select: {
+                reactions: true,
+                comments: true,
+                shares: true,
+              },
+            },
+          },
         },
       },
     });
@@ -214,7 +263,12 @@ export class CompaniesService {
     return this.updateProduct(company.slug, productId, ownerId, dto);
   }
 
-  async updateProduct(slug: string, productId: string, ownerId: string, dto: Partial<CreateProductDto>) {
+  async updateProduct(
+    slug: string,
+    productId: string,
+    ownerId: string,
+    dto: Partial<CreateProductDto>,
+  ) {
     const company = await this.prisma.company.findUnique({ where: { slug } });
     if (!company || company.ownerId !== ownerId) throw new ForbiddenException();
 

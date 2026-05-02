@@ -27,6 +27,13 @@ enum PromotionKind {
   COMPANY_PRODUCTS
 }
 
+enum PostReactionType {
+  LIKE
+  LOVE
+  CLAP
+  WOW
+}
+
 enum ClassifiedStatus {
   ACTIVE
   SOLD
@@ -55,14 +62,21 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  profile          Profile?
-  company          Company?
-  posts            Post[]
-  classifieds      Classified[]
-  sentMessages     Message[]                @relation("SentMessages")
-  conversations    ConversationParticipant[]
-  mediaUploads     Media[]
-  refreshTokens    RefreshToken[]
+  profile       Profile?
+  company       Company?
+  posts         Post[]
+  classifieds   Classified[]
+  postReactions PostReaction[]
+  postComments  PostComment[]
+  postShares    PostShare[]
+  following     Follow[]                  @relation("Following")
+  followers     Follow[]                  @relation("Followers")
+  stories       Story[]
+  storyViews    StoryView[]
+  sentMessages  Message[]                 @relation("SentMessages")
+  conversations ConversationParticipant[]
+  mediaUploads  Media[]
+  refreshTokens RefreshToken[]
 
   @@index([email])
   @@index([phone])
@@ -133,11 +147,14 @@ model Post {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  author     User        @relation(fields: [authorId], references: [id])
-  company    Company?    @relation(fields: [companyId], references: [id])
+  author     User           @relation(fields: [authorId], references: [id])
+  company    Company?       @relation(fields: [companyId], references: [id])
   classified Classified?
   promotion  Promotion?
   media      Media[]
+  reactions  PostReaction[]
+  comments   PostComment[]
+  shares     PostShare[]
 
   @@index([authorId])
   @@index([type])
@@ -145,20 +162,112 @@ model Post {
   @@index([isPublished, createdAt(sort: Desc)])
 }
 
-model Promotion {
-  id          String         @id @default(cuid())
-  postId       String         @unique
-  kind         PromotionKind
-  headline     String
-  subtitle     String?
-  city         String?
-  serviceArea  String?
-  highlights   String[]       @default([])
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+model PostReaction {
+  id        String           @id @default(cuid())
+  postId    String
+  userId    String
+  type      PostReactionType @default(LIKE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 
-  post      Post               @relation(fields: [postId], references: [id], onDelete: Cascade)
-  products  PromotionProduct[]
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@index([type])
+}
+
+model PostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt(sort: Desc)])
+  @@index([authorId])
+}
+
+model PostShare {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  target    String?
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+model Story {
+  id          String   @id @default(cuid())
+  authorId    String
+  mediaId     String
+  caption     String?
+  isPublished Boolean  @default(true)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  media  Media       @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  views  StoryView[]
+
+  @@index([authorId, expiresAt])
+  @@index([expiresAt])
+  @@index([isPublished, expiresAt])
+}
+
+model StoryView {
+  id        String   @id @default(cuid())
+  storyId   String
+  viewerId  String
+  createdAt DateTime @default(now())
+
+  story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewer User  @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, viewerId])
+  @@index([viewerId])
+}
+
+model Promotion {
+  id          String        @id @default(cuid())
+  postId      String        @unique
+  kind        PromotionKind
+  headline    String
+  subtitle    String?
+  city        String?
+  serviceArea String?
+  highlights  String[]      @default([])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  post     Post               @relation(fields: [postId], references: [id], onDelete: Cascade)
+  products PromotionProduct[]
 
   @@index([kind])
 }
@@ -166,7 +275,7 @@ model Promotion {
 model PromotionProduct {
   promotionId String
   productId   String
-  sortOrder   Int       @default(0)
+  sortOrder   Int    @default(0)
 
   promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
   product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -211,7 +320,7 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id])
+  company        Company            @relation(fields: [companyId], references: [id])
   promotionItems PromotionProduct[]
 
   @@index([companyId])
@@ -243,8 +352,9 @@ model Media {
   height     Int?
   createdAt  DateTime  @default(now())
 
-  post     Post? @relation(fields: [postId], references: [id], onDelete: SetNull)
-  uploader User  @relation(fields: [uploaderId], references: [id])
+  post     Post?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  uploader User    @relation(fields: [uploaderId], references: [id])
+  stories  Story[]
 
   @@index([postId])
   @@index([uploaderId])

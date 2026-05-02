@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { isValidUsername, normalizeUsername } from '@palmital/utils';
 import { UploadStorageService } from '../../common/storage/upload-storage.service';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -15,7 +20,17 @@ export class UsersService {
   async getMe(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { profile: true, company: true },
+      include: {
+        profile: true,
+        company: true,
+        _count: {
+          select: {
+            followers: true,
+            following: true,
+            stories: true,
+          },
+        },
+      },
     });
     if (!user) throw new NotFoundException('User not found');
 
@@ -23,7 +38,7 @@ export class UsersService {
     return safe;
   }
 
-  async getPublicProfile(userId: string) {
+  async getPublicProfile(userId: string, viewerId?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -36,16 +51,18 @@ export class UsersService {
           select: {
             posts: true,
             classifieds: true,
+            followers: true,
+            following: true,
           },
         },
       },
     });
     if (!user) throw new NotFoundException('User not found');
 
-    return user;
+    return this.withFollowStatus(user, viewerId);
   }
 
-  async getPublicProfileByUsername(username: string) {
+  async getPublicProfileByUsername(username: string, viewerId?: string) {
     const normalized = this.normalizeOrThrow(username);
     const user = await this.prisma.user.findFirst({
       where: { profile: { is: { username: normalized } } },
@@ -59,18 +76,64 @@ export class UsersService {
           select: {
             posts: true,
             classifieds: true,
+            followers: true,
+            following: true,
           },
         },
       },
     });
     if (!user) throw new NotFoundException('User not found');
 
-    return user;
+    return this.withFollowStatus(user, viewerId);
+  }
+
+  async followUser(followerId: string, followingId: string) {
+    if (followerId === followingId) {
+      throw new BadRequestException('cannot follow yourself');
+    }
+
+    await this.prisma.user.findUniqueOrThrow({ where: { id: followingId } });
+
+    await this.prisma.follow.upsert({
+      where: { followerId_followingId: { followerId, followingId } },
+      update: {},
+      create: { followerId, followingId },
+    });
+
+    return this.getPublicProfile(followingId, followerId);
+  }
+
+  async unfollowUser(followerId: string, followingId: string) {
+    await this.prisma.follow.deleteMany({ where: { followerId, followingId } });
+    return this.getPublicProfile(followingId, followerId);
+  }
+
+  async getFollowers(userId: string) {
+    await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    return this.prisma.follow.findMany({
+      where: { followingId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: { follower: { include: { profile: true } } },
+    });
+  }
+
+  async getFollowing(userId: string) {
+    await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    return this.prisma.follow.findMany({
+      where: { followerId: userId },
+      orderBy: { createdAt: 'desc' },
+      include: { following: { include: { profile: true } } },
+    });
   }
 
   async checkUsernameAvailability(username: string, currentUserId?: string) {
     const normalized = normalizeUsername(username);
-    if (!normalized || normalized.length < 3 || normalized.length > 24 || !isValidUsername(normalized)) {
+    if (
+      !normalized ||
+      normalized.length < 3 ||
+      normalized.length > 24 ||
+      !isValidUsername(normalized)
+    ) {
       return { username: normalized, available: false, valid: false };
     }
 
@@ -237,7 +300,12 @@ export class UsersService {
 
   private normalizeOrThrow(username: string) {
     const normalized = normalizeUsername(username);
-    if (!normalized || normalized.length < 3 || normalized.length > 24 || !isValidUsername(normalized)) {
+    if (
+      !normalized ||
+      normalized.length < 3 ||
+      normalized.length > 24 ||
+      !isValidUsername(normalized)
+    ) {
       throw new NotFoundException('User not found');
     }
     return normalized;
@@ -268,12 +336,27 @@ export class UsersService {
 
     for (let i = 1; i <= 100; i += 1) {
       const candidate = `${base.slice(0, Math.max(1, 24 - String(i).length - 1))}_${i}`;
-      const candidateExists = await this.prisma.profile.findUnique({ where: { username: candidate } });
+      const candidateExists = await this.prisma.profile.findUnique({
+        where: { username: candidate },
+      });
       if (!candidateExists) {
         return candidate;
       }
     }
 
     throw new ConflictException('Username already in use');
+  }
+
+  private async withFollowStatus<T extends { id: string }>(user: T, viewerId?: string) {
+    if (!viewerId || user.id === viewerId) {
+      return { ...user, isFollowing: false, isSelf: user.id === viewerId };
+    }
+
+    const follow = await this.prisma.follow.findUnique({
+      where: { followerId_followingId: { followerId: viewerId, followingId: user.id } },
+      select: { id: true },
+    });
+
+    return { ...user, isFollowing: Boolean(follow), isSelf: false };
   }
 }

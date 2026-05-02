@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Card, Input, Spinner } from '@palmital/ui';
+import { PostEngagement } from '../../components/feed/PostEngagement';
+import { PostMediaGallery } from '../../components/feed/PostMediaGallery';
 import { ImageCropDialog } from '../../components/shared/ImageCropDialog';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
@@ -195,7 +197,13 @@ export function CompanyManagerPage() {
   });
 
   const updateProductMutation = useMutation({
-    mutationFn: async ({ productId, payload }: { productId: string; payload: ProductFormState }) => {
+    mutationFn: async ({
+      productId,
+      payload,
+    }: {
+      productId: string;
+      payload: ProductFormState;
+    }) => {
       const { data } = await api.patch(`/companies/me/products/${productId}`, {
         name: payload.name,
         description: payload.description || undefined,
@@ -336,7 +344,11 @@ export function CompanyManagerPage() {
   }
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   return (
@@ -396,14 +408,18 @@ export function CompanyManagerPage() {
 
                   <div className="mt-4 min-w-0 space-y-2 lg:mt-0 lg:pb-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-[1.45rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">{company.name}</h1>
+                      <h1 className="text-[1.45rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">
+                        {company.name}
+                      </h1>
                       {company.isVerified ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
                           <BadgeCheck size={14} />
                           Verificada
                         </span>
                       ) : null}
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${company.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${company.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}
+                      >
                         {company.isActive ? 'Ativa' : 'Pausada'}
                       </span>
                     </div>
@@ -466,7 +482,9 @@ export function CompanyManagerPage() {
                   <Store size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Status</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                    Status
+                  </p>
                   <p className="text-base font-semibold text-gray-900">
                     {company.isActive ? 'Perfil publico ativo' : 'Perfil pausado'}
                   </p>
@@ -480,8 +498,12 @@ export function CompanyManagerPage() {
                   <Package2 size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Catalogo</p>
-                  <p className="text-base font-semibold text-gray-900">{totalProducts} produto(s)</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                    Catalogo
+                  </p>
+                  <p className="text-base font-semibold text-gray-900">
+                    {totalProducts} produto(s)
+                  </p>
                 </div>
               </div>
             </Card>
@@ -492,8 +514,12 @@ export function CompanyManagerPage() {
                   <Megaphone size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Conteudo</p>
-                  <p className="text-base font-semibold text-gray-900">{totalPosts} publicacao(oes)</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+                    Conteudo
+                  </p>
+                  <p className="text-base font-semibold text-gray-900">
+                    {totalPosts} publicacao(oes)
+                  </p>
                 </div>
               </div>
             </Card>
@@ -502,7 +528,9 @@ export function CompanyManagerPage() {
           <Card className="space-y-5 p-4 lg:p-6">
             <div>
               <h2 className="text-lg font-bold text-gray-900">Configuracoes da empresa</h2>
-              <p className="text-sm text-gray-500">Atualize os dados do perfil, disponibilidade e informacoes de contato.</p>
+              <p className="text-sm text-gray-500">
+                Atualize os dados do perfil, disponibilidade e informacoes de contato.
+              </p>
             </div>
 
             <form onSubmit={handleCompanySubmit} className="space-y-4">
@@ -517,7 +545,9 @@ export function CompanyManagerPage() {
                 <Input
                   label="Categoria"
                   value={companyForm.category}
-                  onChange={(e) => setCompanyForm((state) => ({ ...state, category: e.target.value }))}
+                  onChange={(e) =>
+                    setCompanyForm((state) => ({ ...state, category: e.target.value }))
+                  }
                   maxLength={100}
                 />
                 <Input
@@ -545,7 +575,9 @@ export function CompanyManagerPage() {
                 <label className="text-sm font-medium text-gray-700">Descricao</label>
                 <textarea
                   value={companyForm.description}
-                  onChange={(e) => setCompanyForm((state) => ({ ...state, description: e.target.value }))}
+                  onChange={(e) =>
+                    setCompanyForm((state) => ({ ...state, description: e.target.value }))
+                  }
                   rows={5}
                   maxLength={1000}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -556,7 +588,9 @@ export function CompanyManagerPage() {
                 <input
                   type="checkbox"
                   checked={companyForm.isActive}
-                  onChange={(e) => setCompanyForm((state) => ({ ...state, isActive: e.target.checked }))}
+                  onChange={(e) =>
+                    setCompanyForm((state) => ({ ...state, isActive: e.target.checked }))
+                  }
                 />
                 Exibir empresa e catalogo para outros usuarios
               </label>
@@ -608,18 +642,8 @@ export function CompanyManagerPage() {
                       <p className="text-sm text-gray-400">Publicacao somente com imagem/video.</p>
                     )}
 
-                    {post.media?.length ? (
-                      <div className={`grid gap-2 ${post.media.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                        {post.media.slice(0, 4).map((media: any) => (
-                          <img
-                            key={media.id}
-                            src={media.url}
-                            alt=""
-                            className="aspect-square w-full rounded-2xl object-cover"
-                          />
-                        ))}
-                      </div>
-                    ) : null}
+                    <PostMediaGallery media={post.media ?? []} />
+                    <PostEngagement post={post} />
                   </Card>
                 ))}
               </div>
@@ -630,14 +654,19 @@ export function CompanyManagerPage() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">Catalogo de produtos</h2>
-                <p className="text-sm text-gray-500">Cadastre, edite e organize o que sua empresa oferece.</p>
+                <p className="text-sm text-gray-500">
+                  Cadastre, edite e organize o que sua empresa oferece.
+                </p>
               </div>
               <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
                 {products.length} item(ns)
               </span>
             </div>
 
-            <form onSubmit={handleNewProductSubmit} className="space-y-4 rounded-3xl border border-dashed border-blue-200 bg-blue-50/40 p-4">
+            <form
+              onSubmit={handleNewProductSubmit}
+              className="space-y-4 rounded-3xl border border-dashed border-blue-200 bg-blue-50/40 p-4"
+            >
               <div className="flex items-center gap-2 text-sm font-semibold text-blue-700">
                 <PlusCircle size={16} />
                 Novo produto
@@ -662,7 +691,9 @@ export function CompanyManagerPage() {
                 <label className="text-sm font-medium text-gray-700">Descricao</label>
                 <textarea
                   value={newProduct.description}
-                  onChange={(e) => setNewProduct((state) => ({ ...state, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewProduct((state) => ({ ...state, description: e.target.value }))
+                  }
                   rows={3}
                   className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
@@ -671,7 +702,9 @@ export function CompanyManagerPage() {
                 <input
                   type="checkbox"
                   checked={newProduct.isAvailable}
-                  onChange={(e) => setNewProduct((state) => ({ ...state, isAvailable: e.target.checked }))}
+                  onChange={(e) =>
+                    setNewProduct((state) => ({ ...state, isAvailable: e.target.checked }))
+                  }
                 />
                 Produto disponivel para exibicao
               </label>
@@ -694,13 +727,19 @@ export function CompanyManagerPage() {
                       <div className="flex items-start gap-4">
                         <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gray-100">
                           {product.imageUrl ? (
-                            <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                            <img
+                              src={product.imageUrl}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                            />
                           ) : (
                             <ImagePlus size={22} className="text-gray-300" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-base font-semibold text-gray-900">{product.name}</p>
+                          <p className="truncate text-base font-semibold text-gray-900">
+                            {product.name}
+                          </p>
                           <p className="mt-1 text-sm text-gray-500">
                             {product.isAvailable ? 'Visivel no catalogo' : 'Oculto do catalogo'}
                           </p>
@@ -712,7 +751,11 @@ export function CompanyManagerPage() {
                                 type="file"
                                 accept="image/png,image/jpeg,image/webp"
                                 className="hidden"
-                                onChange={(e) => handleFileSelection(e, (file) => productImageMutation.mutate({ productId: product.id, file }))}
+                                onChange={(e) =>
+                                  handleFileSelection(e, (file) =>
+                                    productImageMutation.mutate({ productId: product.id, file }),
+                                  )
+                                }
                               />
                             </label>
                             <Button
@@ -786,7 +829,9 @@ export function CompanyManagerPage() {
                       <div className="flex flex-col gap-3 sm:flex-row">
                         <Button
                           fullWidth
-                          onClick={() => updateProductMutation.mutate({ productId: product.id, payload: draft })}
+                          onClick={() =>
+                            updateProductMutation.mutate({ productId: product.id, payload: draft })
+                          }
                           isLoading={updateProductMutation.isPending}
                         >
                           Salvar produto
@@ -818,7 +863,8 @@ export function CompanyManagerPage() {
             <div>
               <h1 className="text-xl font-bold text-gray-900">Criar perfil da sua empresa</h1>
               <p className="mt-1 text-sm text-gray-500">
-                Configure sua vitrine local com identidade visual, contato, catalogo e pagina publica.
+                Configure sua vitrine local com identidade visual, contato, catalogo e pagina
+                publica.
               </p>
             </div>
           </div>
@@ -835,7 +881,9 @@ export function CompanyManagerPage() {
               <Input
                 label="Categoria"
                 value={companyForm.category}
-                onChange={(e) => setCompanyForm((state) => ({ ...state, category: e.target.value }))}
+                onChange={(e) =>
+                  setCompanyForm((state) => ({ ...state, category: e.target.value }))
+                }
                 maxLength={100}
               />
               <Input
@@ -863,7 +911,9 @@ export function CompanyManagerPage() {
               <label className="text-sm font-medium text-gray-700">Descricao</label>
               <textarea
                 value={companyForm.description}
-                onChange={(e) => setCompanyForm((state) => ({ ...state, description: e.target.value }))}
+                onChange={(e) =>
+                  setCompanyForm((state) => ({ ...state, description: e.target.value }))
+                }
                 rows={5}
                 maxLength={1000}
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"

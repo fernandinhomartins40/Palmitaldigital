@@ -1,4 +1,12 @@
-import { ClassifiedStatus, MediaType, MessageStatus, PostType, PromotionKind, UserRole } from './enums';
+import {
+  ClassifiedStatus,
+  MediaType,
+  MessageStatus,
+  PostReactionType,
+  PostType,
+  PromotionKind,
+  UserRole,
+} from './enums';
 
 export interface IUser {
   id: string;
@@ -56,6 +64,68 @@ export interface IPost {
   classified?: IClassified | null;
   promotion?: IPromotion | null;
   media?: IMedia[];
+  stories?: IStory[];
+  comments?: IPostComment[];
+  viewerReaction?: PostReactionType | null;
+  reactionSummary?: Partial<Record<PostReactionType, number>>;
+  _count?: {
+    reactions?: number;
+    comments?: number;
+    shares?: number;
+  };
+}
+
+export interface IFollow {
+  id: string;
+  followerId: string;
+  followingId: string;
+  createdAt: Date;
+  follower?: IUser;
+  following?: IUser;
+}
+
+export interface IStory {
+  id: string;
+  authorId: string;
+  mediaId: string;
+  caption?: string | null;
+  isPublished: boolean;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: IUser;
+  media?: IMedia;
+  seenByViewer?: boolean;
+  _count?: {
+    views?: number;
+  };
+}
+
+export interface IPostReaction {
+  id: string;
+  postId: string;
+  userId: string;
+  type: PostReactionType;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IPostComment {
+  id: string;
+  postId: string;
+  authorId: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  author?: IUser;
+}
+
+export interface IPostShare {
+  id: string;
+  postId: string;
+  userId: string;
+  target?: string | null;
+  createdAt: Date;
 }
 
 export interface IClassified {

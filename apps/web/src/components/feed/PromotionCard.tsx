@@ -12,6 +12,7 @@ import {
   Store,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PostEngagement } from './PostEngagement';
 
 function HighlightList({ highlights }: { highlights?: string[] }) {
   if (!highlights?.length) {
@@ -50,14 +51,24 @@ function ProfessionalPromotionCard({ post }: { post: any }) {
       <div className="p-4">
         <div className="flex items-start gap-3">
           <Link to={`/profile/${post.authorId}`}>
-            <Avatar src={profile?.avatarUrl} name={headline} size="lg" className="h-14 w-14 ring-4 ring-amber-100" />
+            <Avatar
+              src={profile?.avatarUrl}
+              name={headline}
+              size="lg"
+              className="h-14 w-14 ring-4 ring-amber-100"
+            />
           </Link>
 
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Profissional liberal</p>
-                <Link to={`/profile/${post.authorId}`} className="mt-1 block text-xl font-semibold tracking-[-0.02em] text-slate-900 hover:underline">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                  Profissional liberal
+                </p>
+                <Link
+                  to={`/profile/${post.authorId}`}
+                  className="mt-1 block text-xl font-semibold tracking-[-0.02em] text-slate-900 hover:underline"
+                >
                   {headline}
                 </Link>
               </div>
@@ -89,6 +100,7 @@ function ProfessionalPromotionCard({ post }: { post: any }) {
               <span className="text-sm font-medium text-slate-700">Ver perfil profissional</span>
               <ArrowUpRight size={16} className="text-amber-700" />
             </div>
+            <PostEngagement post={post} />
           </div>
         </div>
       </div>
@@ -107,7 +119,12 @@ function CompanyPromotionCard({ post }: { post: any }) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link to={`/companies/${company?.slug}`}>
-              <Avatar src={company?.logoUrl} name={company?.name ?? 'Empresa'} size="lg" className="h-14 w-14 ring-4 ring-white" />
+              <Avatar
+                src={company?.logoUrl}
+                name={company?.name ?? 'Empresa'}
+                size="lg"
+                className="h-14 w-14 ring-4 ring-white"
+              />
             </Link>
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-700 shadow-sm">
@@ -122,7 +139,9 @@ function CompanyPromotionCard({ post }: { post: any }) {
                 {company?.isVerified && <BadgeCheck size={15} className="text-blue-500" />}
               </Link>
               <p className="mt-1 text-sm text-slate-500">
-                {promotion?.kind === PromotionKind.COMPANY_PRODUCTS ? 'Vitrine em destaque' : 'Perfil de loja em destaque'}
+                {promotion?.kind === PromotionKind.COMPANY_PRODUCTS
+                  ? 'Vitrine em destaque'
+                  : 'Perfil de loja em destaque'}
               </p>
             </div>
           </div>
@@ -131,9 +150,13 @@ function CompanyPromotionCard({ post }: { post: any }) {
         </div>
 
         <div className="mt-4">
-          <p className="text-xl font-semibold tracking-[-0.02em] text-slate-900">{promotion?.headline}</p>
+          <p className="text-xl font-semibold tracking-[-0.02em] text-slate-900">
+            {promotion?.headline}
+          </p>
           {(promotion?.subtitle || post.content) && (
-            <p className="mt-2 text-sm leading-6 text-slate-600">{promotion?.subtitle ?? post.content}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {promotion?.subtitle ?? post.content}
+            </p>
           )}
           <HighlightList highlights={promotion?.highlights} />
         </div>
@@ -142,10 +165,17 @@ function CompanyPromotionCard({ post }: { post: any }) {
       {promotion?.kind === PromotionKind.COMPANY_PRODUCTS && products.length > 0 ? (
         <div className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product: any) => (
-            <div key={product.id} className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50">
+            <div
+              key={product.id}
+              className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50"
+            >
               <div className="aspect-[4/3] bg-slate-100">
                 {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center text-slate-300">
                     <Package2 size={28} />
@@ -157,9 +187,15 @@ function CompanyPromotionCard({ post }: { post: any }) {
                   <p className="line-clamp-2 font-semibold text-slate-900">{product.name}</p>
                   <Store size={16} className="shrink-0 text-blue-500" />
                 </div>
-                {product.description && <p className="line-clamp-2 text-sm leading-5 text-slate-500">{product.description}</p>}
+                {product.description && (
+                  <p className="line-clamp-2 text-sm leading-5 text-slate-500">
+                    {product.description}
+                  </p>
+                )}
                 {product.price ? (
-                  <p className="text-sm font-semibold text-blue-700">{formatCurrency(Number(product.price))}</p>
+                  <p className="text-sm font-semibold text-blue-700">
+                    {formatCurrency(Number(product.price))}
+                  </p>
                 ) : (
                   <p className="text-sm font-medium text-slate-500">Consulte disponibilidade</p>
                 )}
@@ -171,7 +207,11 @@ function CompanyPromotionCard({ post }: { post: any }) {
         <div className="p-4 pt-0">
           <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-4">
             <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              {company?.category && <span className="rounded-full bg-white px-3 py-1 shadow-sm">{company.category}</span>}
+              {company?.category && (
+                <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+                  {company.category}
+                </span>
+              )}
               {company?.city && (
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin size={14} />
@@ -188,6 +228,9 @@ function CompanyPromotionCard({ post }: { post: any }) {
           </div>
         </div>
       )}
+      <div className="px-4 pb-4">
+        <PostEngagement post={post} />
+      </div>
     </Card>
   );
 }

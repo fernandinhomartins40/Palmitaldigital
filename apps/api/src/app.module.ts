@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { StoriesModule } from './modules/stories/stories.module';
 import { ClassifiedsModule } from './modules/classifieds/classifieds.module';
 import { MediaModule } from './modules/media/media.module';
 import { ChatModule } from './modules/chat/chat.module';
@@ -23,6 +24,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
     AuthModule,
     UsersModule,
     PostsModule,
+    StoriesModule,
     ClassifiedsModule,
     MediaModule,
     ChatModule,
