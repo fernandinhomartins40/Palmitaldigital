@@ -35,6 +35,16 @@ export class PostsController {
     return this.postsService.reactToPost(id, user.id, dto);
   }
 
+  @Post(':id/likes')
+  toggleLike(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.postsService.toggleLike(id, user.id);
+  }
+
+  @Delete(':id/likes')
+  removeLike(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.postsService.removeLike(id, user.id);
+  }
+
   @Delete(':id/reactions')
   removeReaction(@CurrentUser() user: any, @Param('id') id: string) {
     return this.postsService.removeReaction(id, user.id);

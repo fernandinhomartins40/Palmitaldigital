@@ -66,9 +66,11 @@ export interface IPost {
   media?: IMedia[];
   stories?: IStory[];
   comments?: IPostComment[];
+  viewerLiked?: boolean;
   viewerReaction?: PostReactionType | null;
   reactionSummary?: Partial<Record<PostReactionType, number>>;
   _count?: {
+    likes?: number;
     reactions?: number;
     comments?: number;
     shares?: number;
@@ -108,6 +110,13 @@ export interface IPostReaction {
   type: PostReactionType;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IPostLike {
+  id: string;
+  postId: string;
+  userId: string;
+  createdAt: Date;
 }
 
 export interface IPostComment {

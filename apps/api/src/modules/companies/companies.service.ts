@@ -72,6 +72,7 @@ export class CompaniesService {
             _count: {
               select: {
                 reactions: true,
+                likes: true,
                 comments: true,
                 shares: true,
               },
@@ -139,6 +140,7 @@ export class CompaniesService {
             _count: {
               select: {
                 reactions: true,
+                likes: true,
                 comments: true,
                 shares: true,
               },

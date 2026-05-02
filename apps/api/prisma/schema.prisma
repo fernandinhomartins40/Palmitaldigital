@@ -66,6 +66,7 @@ model User {
   company       Company?
   posts         Post[]
   classifieds   Classified[]
+  postLikes     PostLike[]
   postReactions PostReaction[]
   postComments  PostComment[]
   postShares    PostShare[]
@@ -152,6 +153,7 @@ model Post {
   classified Classified?
   promotion  Promotion?
   media      Media[]
+  likes      PostLike[]
   reactions  PostReaction[]
   comments   PostComment[]
   shares     PostShare[]
@@ -160,6 +162,20 @@ model Post {
   @@index([type])
   @@index([createdAt(sort: Desc)])
   @@index([isPublished, createdAt(sort: Desc)])
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
 
 model PostReaction {

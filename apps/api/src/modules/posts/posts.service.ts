@@ -31,6 +31,12 @@ export class PostsService {
         },
       },
       media: true,
+      likes: viewerId
+        ? {
+            where: { userId: viewerId },
+            take: 1,
+          }
+        : false,
       reactions: viewerId
         ? {
             where: { userId: viewerId },
@@ -45,6 +51,7 @@ export class PostsService {
       _count: {
         select: {
           reactions: true,
+          likes: true,
           comments: true,
           shares: true,
         },
@@ -52,7 +59,9 @@ export class PostsService {
     });
   }
 
-  private async decoratePostsWithInteractions<T extends { id: string; reactions?: any[] }>(
+  private async decoratePostsWithInteractions<
+    T extends { id: string; likes?: any[]; reactions?: any[] },
+  >(
     posts: T[],
   ) {
     if (!posts.length) return posts;
@@ -74,7 +83,9 @@ export class PostsService {
       return {
         ...post,
         comments: (post as any).comments ? [...(post as any).comments].reverse() : [],
+        viewerLiked: Boolean(post.likes?.length),
         viewerReaction: post.reactions?.[0]?.type ?? null,
+        likes: undefined,
         reactionSummary,
         reactions: undefined,
       };
@@ -250,7 +261,11 @@ export class PostsService {
 
   async reactToPost(postId: string, userId: string, dto: ReactToPostDto) {
     await this.ensurePostExists(postId);
-    const type = dto.type ?? PostReactionType.LIKE;
+    const type = dto.type;
+    if (!type || type === PostReactionType.LIKE) {
+      throw new BadRequestException('emoji reaction type is required');
+    }
+
     const existing = await this.prisma.postReaction.findUnique({
       where: { postId_userId: { postId, userId } },
     });
@@ -272,6 +287,26 @@ export class PostsService {
       });
     }
 
+    return this.getDecoratedPost(postId, userId);
+  }
+
+  async toggleLike(postId: string, userId: string) {
+    await this.ensurePostExists(postId);
+    const existing = await this.prisma.postLike.findUnique({
+      where: { postId_userId: { postId, userId } },
+    });
+
+    if (existing) {
+      await this.prisma.postLike.delete({ where: { id: existing.id } });
+    } else {
+      await this.prisma.postLike.create({ data: { postId, userId } });
+    }
+
+    return this.getDecoratedPost(postId, userId);
+  }
+
+  async removeLike(postId: string, userId: string) {
+    await this.prisma.postLike.deleteMany({ where: { postId, userId } });
     return this.getDecoratedPost(postId, userId);
   }
 

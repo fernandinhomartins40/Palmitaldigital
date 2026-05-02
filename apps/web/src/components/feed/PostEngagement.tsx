@@ -16,11 +16,17 @@ const reactionLabels: Record<PostReactionType, string> = {
 };
 
 const reactionEmojis: Record<PostReactionType, string> = {
-  [PostReactionType.LIKE]: '👍',
-  [PostReactionType.LOVE]: '😍',
-  [PostReactionType.CLAP]: '👏',
-  [PostReactionType.WOW]: '😮',
+  [PostReactionType.LIKE]: '\u{1F44D}',
+  [PostReactionType.LOVE]: '\u{1F60D}',
+  [PostReactionType.CLAP]: '\u{1F44F}',
+  [PostReactionType.WOW]: '\u{1F62E}',
 };
+
+const emojiReactionTypes = [
+  PostReactionType.LOVE,
+  PostReactionType.CLAP,
+  PostReactionType.WOW,
+];
 
 function compactCount(value?: number) {
   return value && value > 0 ? value : 0;
@@ -39,8 +45,12 @@ export function PostEngagement({ post }: { post: any }) {
   const addToast = useUIStore((state) => state.addToast);
 
   const counts = post._count ?? {};
+  const viewerLiked = Boolean(post.viewerLiked);
   const viewerReaction = post.viewerReaction as PostReactionType | null | undefined;
   const reactionSummary = post.reactionSummary ?? {};
+  const emojiReactionSummary = Object.entries(reactionSummary).filter(
+    ([type]) => type !== PostReactionType.LIKE,
+  );
   const initialComments = useMemo(() => post.comments ?? [], [post.comments]);
 
   const invalidatePostLists = () => {
@@ -67,6 +77,12 @@ export function PostEngagement({ post }: { post: any }) {
       invalidatePostLists();
     },
     onError: () => addToast('Erro ao registrar reacao', 'error'),
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: () => api.post(`/posts/${post.id}/likes`),
+    onSuccess: () => invalidatePostLists(),
+    onError: () => addToast('Erro ao curtir publicacao', 'error'),
   });
 
   const commentMutation = useMutation({
@@ -126,14 +142,15 @@ export function PostEngagement({ post }: { post: any }) {
     <div className="mt-4 border-t border-slate-100 pt-3">
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
         <div className="flex flex-wrap items-center gap-3">
-          <span>{compactCount(counts.reactions)} curtida(s)</span>
+          <span>{compactCount(counts.likes)} curtida(s)</span>
+          <span>{compactCount(counts.reactions)} reacao(oes)</span>
           <span>{compactCount(counts.comments)} comentario(s)</span>
           <span>{compactCount(counts.shares)} compartilhamento(s)</span>
         </div>
 
-        {Object.entries(reactionSummary).length ? (
+        {emojiReactionSummary.length ? (
           <div className="flex items-center gap-1.5">
-            {Object.entries(reactionSummary).map(([type, count]) => (
+            {emojiReactionSummary.map(([type, count]) => (
               <span
                 key={type}
                 className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-medium"
@@ -147,7 +164,21 @@ export function PostEngagement({ post }: { post: any }) {
         ) : null}
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Button
+          type="button"
+          variant={viewerLiked ? 'primary' : 'secondary'}
+          size="sm"
+          fullWidth
+          disabled={likeMutation.isPending}
+          onClick={() => likeMutation.mutate()}
+        >
+          <span className="text-base leading-none" aria-hidden="true">
+            {reactionEmojis[PostReactionType.LIKE]}
+          </span>
+          <span className="ml-1.5 truncate">Curtir</span>
+        </Button>
+
         <div className="relative">
           {floatingReaction ? (
             <span
@@ -169,16 +200,16 @@ export function PostEngagement({ post }: { post: any }) {
             onClick={() => setShowReactions((value) => !value)}
           >
             <span className="text-base leading-none" aria-hidden="true">
-              {viewerReaction ? reactionEmojis[viewerReaction] : '👍'}
+              {viewerReaction ? reactionEmojis[viewerReaction] : '\u{1F642}'}
             </span>
             <span className="ml-1.5 truncate">
-              {viewerReaction ? reactionLabels[viewerReaction] : 'Curtir'}
+              {viewerReaction ? reactionLabels[viewerReaction] : 'Reagir'}
             </span>
           </Button>
 
           {showReactions ? (
             <div className="absolute bottom-11 left-0 z-20 flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1.5 shadow-lg">
-              {Object.values(PostReactionType).map((type) => (
+              {emojiReactionTypes.map((type) => (
                 <button
                   key={type}
                   type="button"
