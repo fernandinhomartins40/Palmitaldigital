@@ -69,6 +69,8 @@ model User {
   postLikes     PostLike[]
   postReactions PostReaction[]
   postComments  PostComment[]
+  commentLikes  PostCommentLike[]
+  commentReactions PostCommentReaction[]
   postShares    PostShare[]
   following     Follow[]                  @relation("Following")
   followers     Follow[]                  @relation("Followers")
@@ -199,15 +201,52 @@ model PostComment {
   id        String   @id @default(cuid())
   postId    String
   authorId  String
+  parentId  String?
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post      Post                  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    PostComment?          @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   PostComment[]         @relation("CommentReplies")
+  likes     PostCommentLike[]
+  reactions PostCommentReaction[]
 
   @@index([postId, createdAt(sort: Desc)])
   @@index([authorId])
+  @@index([parentId])
+}
+
+model PostCommentLike {
+  id        String   @id @default(cuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  comment PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+}
+
+model PostCommentReaction {
+  id        String           @id @default(cuid())
+  commentId String
+  userId    String
+  type      PostReactionType
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  comment PostComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@index([type])
 }
 
 model PostShare {

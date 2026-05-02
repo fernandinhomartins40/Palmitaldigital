@@ -123,10 +123,36 @@ export interface IPostComment {
   id: string;
   postId: string;
   authorId: string;
+  parentId?: string | null;
   content: string;
   createdAt: Date;
   updatedAt: Date;
   author?: IUser;
+  replies?: IPostComment[];
+  viewerLiked?: boolean;
+  viewerReaction?: PostReactionType | null;
+  reactionSummary?: Partial<Record<PostReactionType, number>>;
+  _count?: {
+    likes?: number;
+    reactions?: number;
+    replies?: number;
+  };
+}
+
+export interface IPostCommentLike {
+  id: string;
+  commentId: string;
+  userId: string;
+  createdAt: Date;
+}
+
+export interface IPostCommentReaction {
+  id: string;
+  commentId: string;
+  userId: string;
+  type: PostReactionType;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IPostShare {

@@ -44,9 +44,10 @@ export class PostsService {
           }
         : false,
       comments: {
+        where: { parentId: null },
         orderBy: { createdAt: 'desc' },
         take: 3,
-        include: { author: { include: { profile: true } } },
+        include: this.buildCommentInclude(viewerId),
       },
       _count: {
         select: {
@@ -54,6 +55,81 @@ export class PostsService {
           likes: true,
           comments: true,
           shares: true,
+        },
+      },
+    });
+  }
+
+  private buildCommentInclude(viewerId?: string) {
+    return Prisma.validator<Prisma.PostCommentInclude>()({
+      author: { include: { profile: true } },
+      likes: viewerId
+        ? {
+            where: { userId: viewerId },
+            take: 1,
+          }
+        : false,
+      reactions: viewerId
+        ? {
+            where: { userId: viewerId },
+            take: 1,
+          }
+        : false,
+      replies: {
+        orderBy: { createdAt: 'asc' },
+        include: {
+          author: { include: { profile: true } },
+          likes: viewerId
+            ? {
+                where: { userId: viewerId },
+                take: 1,
+              }
+            : false,
+          reactions: viewerId
+            ? {
+                where: { userId: viewerId },
+                take: 1,
+              }
+            : false,
+          _count: {
+            select: {
+              likes: true,
+              reactions: true,
+              replies: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          likes: true,
+          reactions: true,
+          replies: true,
+        },
+      },
+    });
+  }
+
+  private buildFlatCommentInclude(viewerId?: string) {
+    return Prisma.validator<Prisma.PostCommentInclude>()({
+      author: { include: { profile: true } },
+      likes: viewerId
+        ? {
+            where: { userId: viewerId },
+            take: 1,
+          }
+        : false,
+      reactions: viewerId
+        ? {
+            where: { userId: viewerId },
+            take: 1,
+          }
+        : false,
+      _count: {
+        select: {
+          likes: true,
+          reactions: true,
+          replies: true,
         },
       },
     });
@@ -72,7 +148,7 @@ export class PostsService {
       _count: { _all: true },
     });
 
-    return posts.map((post) => {
+    return Promise.all(posts.map(async (post) => {
       const reactionSummary = reactionGroups
         .filter((group) => group.postId === post.id)
         .reduce<Record<string, number>>((summary, group) => {
@@ -82,14 +158,74 @@ export class PostsService {
 
       return {
         ...post,
-        comments: (post as any).comments ? [...(post as any).comments].reverse() : [],
+        comments: (post as any).comments
+          ? await this.decorateComments([...(post as any).comments].reverse())
+          : [],
         viewerLiked: Boolean(post.likes?.length),
         viewerReaction: post.reactions?.[0]?.type ?? null,
         likes: undefined,
         reactionSummary,
         reactions: undefined,
       };
+    }));
+  }
+
+  private async decorateComments(comments: any[]) {
+    const flattened = this.flattenComments(comments);
+    if (!flattened.length) return comments;
+
+    const reactionGroups = await this.prisma.postCommentReaction.groupBy({
+      by: ['commentId', 'type'],
+      where: { commentId: { in: flattened.map((comment) => comment.id) } },
+      _count: { _all: true },
     });
+
+    const decorate = (comment: any): any => {
+      const reactionSummary = reactionGroups
+        .filter((group) => group.commentId === comment.id)
+        .reduce<Record<string, number>>((summary, group) => {
+          summary[group.type] = group._count._all;
+          return summary;
+        }, {});
+
+      return {
+        ...comment,
+        viewerLiked: Boolean(comment.likes?.length),
+        viewerReaction: comment.reactions?.[0]?.type ?? null,
+        reactionSummary,
+        likes: undefined,
+        reactions: undefined,
+        replies: comment.replies?.map((reply: any) => decorate(reply)) ?? [],
+      };
+    };
+
+    return comments.map((comment) => decorate(comment));
+  }
+
+  private flattenComments(comments: any[]): any[] {
+    return comments.flatMap((comment) => [
+      comment,
+      ...(comment.replies?.length ? this.flattenComments(comment.replies) : []),
+    ]);
+  }
+
+  private buildCommentTree(comments: any[]) {
+    const byId = new Map<string, any>();
+    const roots: any[] = [];
+
+    for (const comment of comments) {
+      byId.set(comment.id, { ...comment, replies: [] });
+    }
+
+    for (const comment of byId.values()) {
+      if (comment.parentId && byId.has(comment.parentId)) {
+        byId.get(comment.parentId).replies.push(comment);
+      } else {
+        roots.push(comment);
+      }
+    }
+
+    return roots;
   }
 
   private async getDecoratedPost(id: string, viewerId?: string) {
@@ -327,13 +463,84 @@ export class PostsService {
     return this.getDecoratedPost(postId, authorId);
   }
 
-  async getComments(postId: string) {
+  async replyToComment(
+    postId: string,
+    parentCommentId: string,
+    authorId: string,
+    dto: CreatePostCommentDto,
+  ) {
     await this.ensurePostExists(postId);
-    return this.prisma.postComment.findMany({
+    await this.ensureCommentBelongsToPost(postId, parentCommentId);
+
+    await this.prisma.postComment.create({
+      data: {
+        postId,
+        parentId: parentCommentId,
+        authorId,
+        content: dto.content.trim(),
+      },
+    });
+
+    return this.getDecoratedPost(postId, authorId);
+  }
+
+  async getComments(postId: string, viewerId?: string) {
+    await this.ensurePostExists(postId);
+    const comments = await this.prisma.postComment.findMany({
       where: { postId },
       orderBy: { createdAt: 'asc' },
-      include: { author: { include: { profile: true } } },
+      include: this.buildFlatCommentInclude(viewerId),
     });
+
+    return this.decorateComments(this.buildCommentTree(comments));
+  }
+
+  async toggleCommentLike(postId: string, commentId: string, userId: string) {
+    await this.ensureCommentBelongsToPost(postId, commentId);
+    const existing = await this.prisma.postCommentLike.findUnique({
+      where: { commentId_userId: { commentId, userId } },
+    });
+
+    if (existing) {
+      await this.prisma.postCommentLike.delete({ where: { id: existing.id } });
+    } else {
+      await this.prisma.postCommentLike.create({ data: { commentId, userId } });
+    }
+
+    return this.getComments(postId, userId);
+  }
+
+  async reactToComment(postId: string, commentId: string, userId: string, dto: ReactToPostDto) {
+    await this.ensureCommentBelongsToPost(postId, commentId);
+    const type = dto.type;
+    if (!type || type === PostReactionType.LIKE) {
+      throw new BadRequestException('emoji reaction type is required');
+    }
+
+    const existing = await this.prisma.postCommentReaction.findUnique({
+      where: { commentId_userId: { commentId, userId } },
+    });
+
+    if (existing?.type === type) {
+      await this.prisma.postCommentReaction.delete({ where: { id: existing.id } });
+    } else if (existing) {
+      await this.prisma.postCommentReaction.update({
+        where: { id: existing.id },
+        data: { type: type as any },
+      });
+    } else {
+      await this.prisma.postCommentReaction.create({
+        data: { commentId, userId, type: type as any },
+      });
+    }
+
+    return this.getComments(postId, userId);
+  }
+
+  async removeCommentReaction(postId: string, commentId: string, userId: string) {
+    await this.ensureCommentBelongsToPost(postId, commentId);
+    await this.prisma.postCommentReaction.deleteMany({ where: { commentId, userId } });
+    return this.getComments(postId, userId);
   }
 
   async deleteComment(postId: string, commentId: string, userId: string, role: string) {
@@ -377,5 +584,14 @@ export class PostsService {
     });
     if (!post) throw new NotFoundException('Post not found');
     return post;
+  }
+
+  private async ensureCommentBelongsToPost(postId: string, commentId: string) {
+    const comment = await this.prisma.postComment.findFirst({
+      where: { id: commentId, postId },
+      select: { id: true },
+    });
+    if (!comment) throw new NotFoundException('Comment not found');
+    return comment;
   }
 }

@@ -51,8 +51,8 @@ export class PostsController {
   }
 
   @Get(':id/comments')
-  getComments(@Param('id') id: string) {
-    return this.postsService.getComments(id);
+  getComments(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.postsService.getComments(id, user.id);
   }
 
   @Post(':id/comments')
@@ -62,6 +62,44 @@ export class PostsController {
     @Body() dto: CreatePostCommentDto,
   ) {
     return this.postsService.createComment(id, user.id, dto);
+  }
+
+  @Post(':postId/comments/:commentId/replies')
+  replyToComment(
+    @CurrentUser() user: any,
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+    @Body() dto: CreatePostCommentDto,
+  ) {
+    return this.postsService.replyToComment(postId, commentId, user.id, dto);
+  }
+
+  @Post(':postId/comments/:commentId/likes')
+  toggleCommentLike(
+    @CurrentUser() user: any,
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    return this.postsService.toggleCommentLike(postId, commentId, user.id);
+  }
+
+  @Post(':postId/comments/:commentId/reactions')
+  reactToComment(
+    @CurrentUser() user: any,
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+    @Body() dto: ReactToPostDto,
+  ) {
+    return this.postsService.reactToComment(postId, commentId, user.id, dto);
+  }
+
+  @Delete(':postId/comments/:commentId/reactions')
+  removeCommentReaction(
+    @CurrentUser() user: any,
+    @Param('postId') postId: string,
+    @Param('commentId') commentId: string,
+  ) {
+    return this.postsService.removeCommentReaction(postId, commentId, user.id);
   }
 
   @Delete(':postId/comments/:commentId')
