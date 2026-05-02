@@ -3,7 +3,7 @@ import { PostReactionType } from '@palmital/types';
 import { Avatar, Button } from '@palmital/ui';
 import { formatRelativeTime } from '@palmital/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Heart, MessageCircle, Send, Share2, SmilePlus, Trash2 } from 'lucide-react';
+import { MessageCircle, Send, Share2, Trash2 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
@@ -15,6 +15,13 @@ const reactionLabels: Record<PostReactionType, string> = {
   [PostReactionType.WOW]: 'Uau',
 };
 
+const reactionEmojis: Record<PostReactionType, string> = {
+  [PostReactionType.LIKE]: '👍',
+  [PostReactionType.LOVE]: '😍',
+  [PostReactionType.CLAP]: '👏',
+  [PostReactionType.WOW]: '😮',
+};
+
 function compactCount(value?: number) {
   return value && value > 0 ? value : 0;
 }
@@ -23,6 +30,10 @@ export function PostEngagement({ post }: { post: any }) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [comment, setComment] = useState('');
   const [showReactions, setShowReactions] = useState(false);
+  const [floatingReaction, setFloatingReaction] = useState<{
+    id: number;
+    type: PostReactionType;
+  } | null>(null);
   const queryClient = useQueryClient();
   const currentUser = useAuthStore((state) => state.user);
   const addToast = useUIStore((state) => state.addToast);
@@ -86,6 +97,11 @@ export function PostEngagement({ post }: { post: any }) {
     commentMutation.mutate(content);
   };
 
+  const handleReact = (type: PostReactionType) => {
+    setFloatingReaction({ id: Date.now(), type });
+    reactMutation.mutate(type);
+  };
+
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/feed?post=${post.id}`;
     const title = post.content?.slice(0, 80) || 'Publicacao no Palmital Digital';
@@ -118,8 +134,13 @@ export function PostEngagement({ post }: { post: any }) {
         {Object.entries(reactionSummary).length ? (
           <div className="flex items-center gap-1.5">
             {Object.entries(reactionSummary).map(([type, count]) => (
-              <span key={type} className="rounded-full bg-slate-100 px-2 py-0.5 font-medium">
-                {reactionLabels[type as PostReactionType]} {count as number}
+              <span
+                key={type}
+                className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-medium"
+                title={reactionLabels[type as PostReactionType]}
+              >
+                <span aria-hidden="true">{reactionEmojis[type as PostReactionType]}</span>
+                <span>{count as number}</span>
               </span>
             ))}
           </div>
@@ -128,6 +149,17 @@ export function PostEngagement({ post }: { post: any }) {
 
       <div className="mt-3 grid grid-cols-3 gap-2">
         <div className="relative">
+          {floatingReaction ? (
+            <span
+              key={floatingReaction.id}
+              className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-1/2 animate-[reaction-float_820ms_ease-out_forwards] text-3xl drop-shadow-lg"
+              onAnimationEnd={() => setFloatingReaction(null)}
+              aria-hidden="true"
+            >
+              {reactionEmojis[floatingReaction.type]}
+            </span>
+          ) : null}
+
           <Button
             type="button"
             variant={viewerReaction ? 'primary' : 'secondary'}
@@ -136,32 +168,37 @@ export function PostEngagement({ post }: { post: any }) {
             disabled={reactMutation.isPending}
             onClick={() => setShowReactions((value) => !value)}
           >
-            <Heart size={15} />
-            <span className="ml-1.5">
+            <span className="text-base leading-none" aria-hidden="true">
+              {viewerReaction ? reactionEmojis[viewerReaction] : '👍'}
+            </span>
+            <span className="ml-1.5 truncate">
               {viewerReaction ? reactionLabels[viewerReaction] : 'Curtir'}
             </span>
           </Button>
 
           {showReactions ? (
-            <div className="absolute bottom-11 left-0 z-20 grid w-44 gap-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
+            <div className="absolute bottom-11 left-0 z-20 flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1.5 shadow-lg">
               {Object.values(PostReactionType).map((type) => (
                 <button
                   key={type}
                   type="button"
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                  onClick={() => reactMutation.mutate(type)}
+                  aria-label={reactionLabels[type]}
+                  title={reactionLabels[type]}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full text-2xl transition duration-150 hover:-translate-y-1 hover:scale-125 hover:bg-slate-50 ${
+                    viewerReaction === type ? 'bg-blue-50 ring-2 ring-blue-200' : ''
+                  }`}
+                  onClick={() => handleReact(type)}
                 >
-                  <SmilePlus size={15} className="text-blue-600" />
-                  {reactionLabels[type]}
+                  <span aria-hidden="true">{reactionEmojis[type]}</span>
                 </button>
               ))}
               {viewerReaction ? (
                 <button
                   type="button"
-                  className="rounded-xl px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+                  className="ml-1 rounded-full px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                   onClick={() => reactMutation.mutate(viewerReaction)}
                 >
-                  Remover reacao
+                  Remover
                 </button>
               ) : null}
             </div>
