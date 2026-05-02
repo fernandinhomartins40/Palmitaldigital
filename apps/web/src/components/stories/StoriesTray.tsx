@@ -1,11 +1,12 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Button, Spinner } from '@palmital/ui';
-import { ChevronLeft, ChevronRight, Plus, Send, Trash2, X } from 'lucide-react';
+import { Camera, ChevronLeft, ChevronRight, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { useUpload } from '../../hooks/useUpload';
+import { ImageCropDialog } from '../shared/ImageCropDialog';
 
 type StoryGroup = {
   author: any;
@@ -24,9 +25,12 @@ export function StoriesTray() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { upload, isUploading } = useUpload();
   const [caption, setCaption] = useState('');
+  const [cropFile, setCropFile] = useState<File | null>(null);
+  const [storyFile, setStoryFile] = useState<File | null>(null);
+  const [storyPreviewUrl, setStoryPreviewUrl] = useState<string | null>(null);
   const [selectedGroupIndex, setSelectedGroupIndex] = useState<number | null>(null);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
-  const [isCreating, setIsCreating] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { data: groups = [], isLoading } = useQuery({
     queryKey: ['stories-feed'],
@@ -37,13 +41,12 @@ export function StoriesTray() {
   });
 
   const createStoryMutation = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({ file, caption }: { file: File; caption: string }) => {
       const media = await upload(file);
       await api.post('/stories', { mediaId: media.id, caption: caption.trim() || undefined });
     },
     onSuccess: () => {
-      setCaption('');
-      setIsCreating(false);
+      closeCreateModal(true);
       queryClient.invalidateQueries({ queryKey: ['stories-feed'] });
       addToast('Historia publicada por 24 horas', 'success');
     },
@@ -74,6 +77,14 @@ export function StoriesTray() {
       viewMutation.mutate(selectedStory.id);
     }
   }, [selectedStory?.id]);
+
+  useEffect(() => {
+    return () => {
+      if (storyPreviewUrl) {
+        URL.revokeObjectURL(storyPreviewUrl);
+      }
+    };
+  }, [storyPreviewUrl]);
 
   const orderedGroups = useMemo(() => {
     if (!currentUser) return groups;
@@ -123,7 +134,48 @@ export function StoriesTray() {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
-    createStoryMutation.mutate(file);
+    if (!file.type.startsWith('image/')) {
+      addToast('Selecione uma imagem para criar a historia', 'error');
+      return;
+    }
+    setCropFile(file);
+  };
+
+  const handleCropConfirm = (file: File) => {
+    if (storyPreviewUrl) {
+      URL.revokeObjectURL(storyPreviewUrl);
+    }
+    setStoryFile(file);
+    setStoryPreviewUrl(URL.createObjectURL(file));
+    setCropFile(null);
+  };
+
+  const clearStoryFile = () => {
+    if (storyPreviewUrl) {
+      URL.revokeObjectURL(storyPreviewUrl);
+    }
+    setStoryFile(null);
+    setStoryPreviewUrl(null);
+  };
+
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const closeCreateModal = (force = false) => {
+    if (!force && (createStoryMutation.isPending || isUploading)) return;
+    setIsCreateModalOpen(false);
+    setCaption('');
+    setCropFile(null);
+    clearStoryFile();
+  };
+
+  const publishStory = () => {
+    if (!storyFile) {
+      addToast('Selecione uma imagem para publicar', 'error');
+      return;
+    }
+    createStoryMutation.mutate({ file: storyFile, caption });
   };
 
   return (
@@ -133,49 +185,17 @@ export function StoriesTray() {
         <button
           type="button"
           className="text-sm font-semibold text-blue-600"
-          onClick={() => setIsCreating((value) => !value)}
+          onClick={openCreateModal}
         >
           Criar historia
         </button>
       </div>
 
-      {isCreating ? (
-        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-3">
-          <div className="flex gap-2">
-            <input
-              value={caption}
-              onChange={(event) => setCaption(event.target.value)}
-              maxLength={280}
-              placeholder="Legenda opcional"
-              className="min-w-0 flex-1 rounded-xl border border-blue-100 px-3 py-2 text-sm outline-none focus:border-blue-400"
-            />
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              isLoading={createStoryMutation.isPending || isUploading}
-            >
-              <Send size={15} />
-            </Button>
-          </div>
-          <p className="mt-2 text-xs text-slate-500">
-            Use imagem ou video vertical 9:16. A historia expira em 24 horas.
-          </p>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/webp,video/mp4"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </div>
-      ) : null}
-
       <div className="flex gap-3 overflow-x-auto pb-2">
         <button
           type="button"
           className="flex w-20 shrink-0 flex-col items-center gap-2"
-          onClick={() => setIsCreating(true)}
+          onClick={openCreateModal}
         >
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-blue-300 bg-blue-50 text-blue-600">
             <Plus size={22} />
@@ -214,6 +234,155 @@ export function StoriesTray() {
           ))
         )}
       </div>
+
+      {isCreateModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4">
+          <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Criar historia</h2>
+                <p className="text-xs text-slate-500">A imagem fica disponivel por 24 horas.</p>
+              </div>
+              <button
+                type="button"
+                aria-label="Fechar criacao de historia"
+                className="rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                onClick={() => closeCreateModal()}
+                disabled={createStoryMutation.isPending || isUploading}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid min-h-0 flex-1 gap-0 md:grid-cols-[minmax(0,1fr)_20rem]">
+              <div className="flex min-h-[28rem] items-center justify-center bg-slate-950 p-4">
+                <div className="relative aspect-[9/16] h-full max-h-[70vh] w-full max-w-[24rem] overflow-hidden rounded-[28px] bg-slate-900 shadow-2xl">
+                  {storyPreviewUrl ? (
+                    <>
+                      <img src={storyPreviewUrl} alt="" className="h-full w-full object-cover" />
+                      {caption.trim() ? (
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-16">
+                          <p className="whitespace-pre-wrap text-sm font-medium leading-6 text-white">
+                            {caption}
+                          </p>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="flex h-full w-full flex-col items-center justify-center gap-3 px-8 text-center text-white"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
+                        <ImagePlus size={28} />
+                      </span>
+                      <span className="text-sm font-semibold">Selecionar imagem</span>
+                      <span className="text-xs leading-5 text-white/60">
+                        Escolha uma foto e ajuste o recorte vertical antes de publicar.
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4 border-t border-slate-100 p-4 md:border-l md:border-t-0">
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    src={currentUser?.profile?.avatarUrl}
+                    name={currentUser?.profile?.displayName ?? currentUser?.email ?? 'Usuario'}
+                    size="sm"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">
+                      {currentUser?.profile?.displayName ?? 'Sua historia'}
+                    </p>
+                    <p className="text-xs text-slate-500">Publicacao temporaria</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={createStoryMutation.isPending || isUploading}
+                >
+                  <Camera size={16} />
+                  {storyFile ? 'Trocar imagem' : 'Selecionar imagem'}
+                </button>
+
+                {storyFile ? (
+                  <button
+                    type="button"
+                    className="text-left text-sm font-semibold text-red-600 hover:text-red-700"
+                    onClick={clearStoryFile}
+                    disabled={createStoryMutation.isPending || isUploading}
+                  >
+                    Remover imagem
+                  </button>
+                ) : null}
+
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold text-slate-700">Legenda</span>
+                  <textarea
+                    value={caption}
+                    onChange={(event) => setCaption(event.target.value)}
+                    maxLength={280}
+                    rows={7}
+                    placeholder="Escreva uma legenda..."
+                    className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  />
+                </label>
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span>Imagem vertical 9:16</span>
+                  <span>{caption.length}/280</span>
+                </div>
+
+                <div className="mt-auto flex gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    fullWidth
+                    onClick={() => closeCreateModal()}
+                    disabled={createStoryMutation.isPending || isUploading}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    fullWidth
+                    onClick={publishStory}
+                    disabled={!storyFile}
+                    isLoading={createStoryMutation.isPending || isUploading}
+                  >
+                    Publicar
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      <ImageCropDialog
+        open={Boolean(cropFile)}
+        file={cropFile}
+        title="Ajustar imagem da historia"
+        aspect={9 / 16}
+        outputWidth={1080}
+        outputHeight={1920}
+        quality={0.86}
+        onCancel={() => setCropFile(null)}
+        onConfirm={handleCropConfirm}
+      />
 
       {selectedStory ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
