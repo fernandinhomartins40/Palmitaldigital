@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { getLoginPath } from '../utils/pwa';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api/v1',
@@ -45,7 +46,7 @@ api.interceptors.response.use(
         return api(original);
       } catch {
         useAuthStore.getState().logout();
-        window.location.href = '/login';
+        window.location.href = getLoginPath();
       } finally {
         isRefreshing = false;
       }

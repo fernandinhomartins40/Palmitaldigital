@@ -1657,12 +1657,12 @@ async function createFollowsAndStories(usersByEmail: Map<string, { id: string }>
     const media = await prisma.media.create({
       data: {
         uploaderId: author.id,
-        url: imageUrl(`story-${email}-${index}`, 900, 1600),
+        url: imageUrl(`story-${email}-${index}`, 1080, 1920),
         type: MediaType.IMAGE,
         mimeType: 'image/jpeg',
         sizeBytes: 220000 + index * 8000,
-        width: 900,
-        height: 1600,
+        width: 1080,
+        height: 1920,
         createdAt,
       },
     });

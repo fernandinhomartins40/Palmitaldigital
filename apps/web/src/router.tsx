@@ -1,4 +1,4 @@
-import { Navigate, createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Spinner } from '@palmital/ui';
 import { AppLayout } from './components/layout/AppLayout';
@@ -7,6 +7,9 @@ import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { LandingPage } from './pages/LandingPage';
+import { PwaLoginPage } from './pages/pwa/PwaLoginPage';
+import { PwaSplashPage } from './pages/pwa/PwaSplashPage';
+import { shouldUsePwaShell } from './utils/pwa';
 
 const FeedPage = lazy(() => import('./pages/feed/FeedPage').then((m) => ({ default: m.FeedPage })));
 const ClassifiedsPage = lazy(() => import('./pages/classifieds/ClassifiedsPage').then((m) => ({ default: m.ClassifiedsPage })));
@@ -34,11 +37,23 @@ function Page({ children }: { children: React.ReactNode }) {
   );
 }
 
+function PublicRoute({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+
+  if (shouldUsePwaShell(pathname)) {
+    return <Navigate to="/app" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 export const router = createBrowserRouter([
-  { path: '/', element: <LandingPage /> },
+  { path: '/', element: <PublicRoute><LandingPage /></PublicRoute> },
   { path: '/landing', element: <Navigate to="/" replace /> },
-  { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RegisterPage /> },
+  { path: '/login', element: <PublicRoute><LoginPage /></PublicRoute> },
+  { path: '/register', element: <PublicRoute><RegisterPage /></PublicRoute> },
+  { path: '/app', element: <PwaSplashPage /> },
+  { path: '/app/login', element: <PwaLoginPage /> },
   {
     element: (
       <AuthGuard>

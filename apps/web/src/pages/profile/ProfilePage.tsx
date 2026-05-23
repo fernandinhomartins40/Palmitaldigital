@@ -7,6 +7,7 @@ import { ImageCropDialog } from '../../components/shared/ImageCropDialog';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { disconnectSocket } from '../../services/socket';
+import { getLoginPath } from '../../utils/pwa';
 import { Camera, ExternalLink, LogOut, MapPin, Phone, UserCircle2 } from 'lucide-react';
 
 export function ProfilePage() {
@@ -131,7 +132,7 @@ export function ProfilePage() {
     }
     disconnectSocket();
     logout();
-    navigate('/login');
+    navigate(getLoginPath());
   }
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {

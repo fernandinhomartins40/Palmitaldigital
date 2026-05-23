@@ -51,9 +51,38 @@
     background-clip: padding-box;
   }
 
+  .sidebar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.44) transparent;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.46);
+    background-clip: padding-box;
+  }
+
   /* Subtle bounce for landing page floating cards */
   .animate-bounce-slow {
     animation: bounce-slow 3s ease-in-out infinite;
+  }
+
+  .pwa-logo-pulse {
+    animation: pwa-logo-pulse 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  }
+
+  .pwa-splash-progress {
+    animation: pwa-splash-progress 1.45s ease-out forwards;
+    transform-origin: left;
   }
 }
 
@@ -78,5 +107,24 @@
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+
+@keyframes pwa-logo-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.04);
+  }
+}
+
+@keyframes pwa-splash-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
   }
 }

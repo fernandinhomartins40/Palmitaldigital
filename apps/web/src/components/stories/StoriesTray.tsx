@@ -14,6 +14,10 @@ type StoryGroup = {
   stories: any[];
 };
 
+const STORY_IMAGE_WIDTH = 1080;
+const STORY_IMAGE_HEIGHT = 1920;
+const STORY_IMAGE_ASPECT = STORY_IMAGE_WIDTH / STORY_IMAGE_HEIGHT;
+
 function storyAuthorName(group?: StoryGroup) {
   return group?.author?.profile?.displayName ?? 'Usuario';
 }
@@ -334,7 +338,7 @@ export function StoriesTray() {
                   />
                 </label>
                 <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>Imagem vertical 9:16</span>
+                  <span>Imagem 1080 x 1920 px</span>
                   <span>{caption.length}/280</span>
                 </div>
 
@@ -376,16 +380,16 @@ export function StoriesTray() {
         open={Boolean(cropFile)}
         file={cropFile}
         title="Ajustar imagem da historia"
-        aspect={9 / 16}
-        outputWidth={1080}
-        outputHeight={1920}
+        aspect={STORY_IMAGE_ASPECT}
+        outputWidth={STORY_IMAGE_WIDTH}
+        outputHeight={STORY_IMAGE_HEIGHT}
         quality={0.86}
         onCancel={() => setCropFile(null)}
         onConfirm={handleCropConfirm}
       />
 
       {selectedStory ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 p-0 sm:p-4">
           <button
             type="button"
             aria-label="Fechar historias"
@@ -404,7 +408,7 @@ export function StoriesTray() {
             <ChevronLeft size={24} />
           </button>
 
-          <div className="relative aspect-[9/16] max-h-[88vh] w-full max-w-[28rem] overflow-hidden rounded-[28px] bg-black">
+          <div className="relative h-[100dvh] w-screen overflow-hidden bg-black sm:aspect-[9/16] sm:h-auto sm:max-h-[88vh] sm:w-full sm:max-w-[28rem] sm:rounded-[28px]">
             <div className="absolute left-3 right-3 top-3 z-10 flex gap-1">
               {selectedGroup?.stories.map((story: any, index: number) => (
                 <div key={story.id} className="h-1 flex-1 rounded-full bg-white/30">

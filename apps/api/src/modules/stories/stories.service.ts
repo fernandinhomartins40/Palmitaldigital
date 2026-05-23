@@ -14,6 +14,9 @@ const storyInclude = {
   _count: { select: { views: true } },
 } as const;
 
+const STORY_IMAGE_WIDTH = 1080;
+const STORY_IMAGE_HEIGHT = 1920;
+
 @Injectable()
 export class StoriesService {
   constructor(private prisma: PrismaService) {}
@@ -24,7 +27,11 @@ export class StoriesService {
     if (media.uploaderId !== authorId)
       throw new ForbiddenException('cannot use media from another user');
 
-    if (media.width && media.height && media.height <= media.width) {
+    if (media.type === 'IMAGE') {
+      if (media.width !== STORY_IMAGE_WIDTH || media.height !== STORY_IMAGE_HEIGHT) {
+        throw new BadRequestException('story images must be 1080x1920');
+      }
+    } else if (media.width && media.height && media.height <= media.width) {
       throw new BadRequestException('stories require vertical 9:16 media');
     }
 

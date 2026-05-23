@@ -1,9 +1,11 @@
 import { type ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Spinner } from '@palmital/ui';
 import { useAuthStore } from '../../store/authStore';
+import { getLoginPath } from '../../utils/pwa';
 
 export function AuthGuard({ children }: { children: ReactNode }) {
+  const location = useLocation();
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -15,6 +17,9 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to={getLoginPath(location.pathname)} replace state={{ from: location.pathname }} />;
+  }
+
   return <>{children}</>;
 }
