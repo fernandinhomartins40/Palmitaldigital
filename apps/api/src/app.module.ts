@@ -13,6 +13,9 @@ import { ChatModule } from './modules/chat/chat.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { HealthModule } from './modules/health/health.module';
+import { RidesModule } from './modules/rides/rides.module';
+import { DeliveryModule } from './modules/delivery/delivery.module';
+import { NewsModule } from './modules/news/news.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
@@ -31,6 +34,9 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
     CategoriesModule,
     CompaniesModule,
     HealthModule,
+    RidesModule,
+    DeliveryModule,
+    NewsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

@@ -6,9 +6,13 @@ import { desktopNavItems, isNavItemActive } from './navigation';
 
 const accentByPath: Record<string, { halo: string; dot: string }> = {
   '/feed': { halo: 'halo-coral', dot: 'bg-coral' },
+  '/services': { halo: 'halo-mint', dot: 'bg-mint' },
+  '/rides': { halo: 'halo-cobalt', dot: 'bg-cobalt' },
+  '/delivery': { halo: 'halo-coral', dot: 'bg-coral' },
+  '/news': { halo: 'halo-magenta', dot: 'bg-magenta' },
   '/classifieds': { halo: 'halo-citrus', dot: 'bg-citrus' },
-  '/companies': { halo: 'halo-cobalt', dot: 'bg-cobalt' },
-  '/chat': { halo: 'halo-mint', dot: 'bg-mint' },
+  '/companies': { halo: 'halo-mint', dot: 'bg-mint' },
+  '/chat': { halo: 'halo-cobalt', dot: 'bg-cobalt' },
   '/profile': { halo: 'halo-magenta', dot: 'bg-magenta' },
 };
 

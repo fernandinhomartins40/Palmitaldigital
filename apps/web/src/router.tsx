@@ -23,6 +23,28 @@ const ProfilePage = lazy(() => import('./pages/profile/ProfilePage').then((m) =>
 const UserProfilePage = lazy(() => import('./pages/profile/UserProfilePage').then((m) => ({ default: m.UserProfilePage })));
 const CreatePostPage = lazy(() => import('./pages/create/CreatePostPage').then((m) => ({ default: m.CreatePostPage })));
 
+// Super-app hub + mini-apps
+const ServicesHubPage = lazy(() => import('./pages/services/ServicesHubPage').then((m) => ({ default: m.ServicesHubPage })));
+
+// Rides (mobilidade)
+const RidesHomePage = lazy(() => import('./pages/rides/RidesHomePage').then((m) => ({ default: m.RidesHomePage })));
+const RideRequestPage = lazy(() => import('./pages/rides/RideRequestPage').then((m) => ({ default: m.RideRequestPage })));
+const RideTrackPage = lazy(() => import('./pages/rides/RideTrackPage').then((m) => ({ default: m.RideTrackPage })));
+const DriverDashboardPage = lazy(() => import('./pages/rides/DriverDashboardPage').then((m) => ({ default: m.DriverDashboardPage })));
+const DriverRegisterPage = lazy(() => import('./pages/rides/DriverRegisterPage').then((m) => ({ default: m.DriverRegisterPage })));
+
+// Delivery
+const DeliveryHomePage = lazy(() => import('./pages/delivery/DeliveryHomePage').then((m) => ({ default: m.DeliveryHomePage })));
+const RestaurantPage = lazy(() => import('./pages/delivery/RestaurantPage').then((m) => ({ default: m.RestaurantPage })));
+const OrderTrackPage = lazy(() => import('./pages/delivery/OrderTrackPage').then((m) => ({ default: m.OrderTrackPage })));
+const RestaurantManagerPage = lazy(() => import('./pages/delivery/RestaurantManagerPage').then((m) => ({ default: m.RestaurantManagerPage })));
+
+// News
+const NewsPortalPage = lazy(() => import('./pages/news/NewsPortalPage').then((m) => ({ default: m.NewsPortalPage })));
+const ArticlePage = lazy(() => import('./pages/news/ArticlePage').then((m) => ({ default: m.ArticlePage })));
+const WriteArticlePage = lazy(() => import('./pages/news/WriteArticlePage').then((m) => ({ default: m.WriteArticlePage })));
+const JournalistApplyPage = lazy(() => import('./pages/news/JournalistApplyPage').then((m) => ({ default: m.JournalistApplyPage })));
+
 const Loader = () => (
   <div className="flex h-screen items-center justify-center">
     <Spinner size="lg" />
@@ -72,6 +94,28 @@ export const router = createBrowserRouter([
       { path: '/profile', element: <Page><ProfilePage /></Page> },
       { path: '/profile/:id', element: <Page><UserProfilePage /></Page> },
       { path: '/create', element: <Page><CreatePostPage /></Page> },
+
+      // Super-app hub
+      { path: '/services', element: <Page><ServicesHubPage /></Page> },
+
+      // Mobilidade (Rides)
+      { path: '/rides', element: <Page><RidesHomePage /></Page> },
+      { path: '/rides/request', element: <Page><RideRequestPage /></Page> },
+      { path: '/rides/track/:id', element: <Page><RideTrackPage /></Page> },
+      { path: '/rides/driver', element: <Page><DriverDashboardPage /></Page> },
+      { path: '/rides/driver/register', element: <Page><DriverRegisterPage /></Page> },
+
+      // Delivery
+      { path: '/delivery', element: <Page><DeliveryHomePage /></Page> },
+      { path: '/delivery/restaurant/:slug', element: <Page><RestaurantPage /></Page> },
+      { path: '/delivery/order/:id', element: <Page><OrderTrackPage /></Page> },
+      { path: '/delivery/manage', element: <Page><RestaurantManagerPage /></Page> },
+
+      // News
+      { path: '/news', element: <Page><NewsPortalPage /></Page> },
+      { path: '/news/article/:slug', element: <Page><ArticlePage /></Page> },
+      { path: '/news/write', element: <Page><WriteArticlePage /></Page> },
+      { path: '/news/apply', element: <Page><JournalistApplyPage /></Page> },
     ],
   },
 ]);

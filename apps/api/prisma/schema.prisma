@@ -11,7 +11,54 @@ datasource db {
 enum UserRole {
   USER
   BUSINESS_OWNER
+  JOURNALIST
+  DRIVER
+  RESTAURANT_OWNER
   ADMIN
+}
+
+enum DriverStatus {
+  OFFLINE
+  ONLINE
+  ON_RIDE
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  DRIVER_ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  ON_THE_WAY
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+
+enum ArticleStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum JournalistApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum PostType {
@@ -59,30 +106,41 @@ model User {
   passwordHash String
   role         UserRole @default(USER)
   isActive     Boolean  @default(true)
+  pixKey       String?
+  pixKeyType   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  profile       Profile?
-  company       Company?
-  posts         Post[]
-  classifieds   Classified[]
-  postLikes     PostLike[]
-  postReactions PostReaction[]
-  postComments  PostComment[]
-  commentLikes  PostCommentLike[]
+  profile          Profile?
+  company          Company?
+  posts            Post[]
+  classifieds      Classified[]
+  postLikes        PostLike[]
+  postReactions    PostReaction[]
+  postComments     PostComment[]
+  commentLikes     PostCommentLike[]
   commentReactions PostCommentReaction[]
-  postShares    PostShare[]
-  following     Follow[]                  @relation("Following")
-  followers     Follow[]                  @relation("Followers")
-  stories       Story[]
-  storyViews    StoryView[]
-  sentMessages  Message[]                 @relation("SentMessages")
-  conversations ConversationParticipant[]
-  mediaUploads  Media[]
-  refreshTokens RefreshToken[]
+  postShares       PostShare[]
+  following        Follow[]                  @relation("Following")
+  followers        Follow[]                  @relation("Followers")
+  stories          Story[]
+  storyViews       StoryView[]
+  sentMessages     Message[]                 @relation("SentMessages")
+  conversations    ConversationParticipant[]
+  mediaUploads     Media[]
+  refreshTokens    RefreshToken[]
+
+  driverProfile         Driver?
+  ridesAsPassenger      Ride[]                 @relation("RidesAsPassenger")
+  restaurant            Restaurant?
+  ordersAsCustomer      Order[]                @relation("OrdersAsCustomer")
+  articles              Article[]
+  articleComments       ArticleComment[]
+  journalistApplication JournalistApplication?
 
   @@index([email])
   @@index([phone])
+  @@index([role])
 }
 
 model RefreshToken {
@@ -453,4 +511,280 @@ model Message {
 
   @@index([conversationId])
   @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// MOBILIDADE (Rides)
+// ─────────────────────────────────────────────────────────────────
+
+model Driver {
+  id           String       @id @default(cuid())
+  userId       String       @unique
+  licensePlate String
+  vehicleModel String
+  vehicleColor String?
+  vehicleYear  Int?
+  documentUrl  String?
+  status       DriverStatus @default(OFFLINE)
+  isVerified   Boolean      @default(false)
+  currentLat   Float?
+  currentLng   Float?
+  lastSeenAt   DateTime?
+  ratingAvg    Float        @default(5.0)
+  ratingCount  Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rides Ride[] @relation("RidesAsDriver")
+
+  @@index([status])
+  @@index([currentLat, currentLng])
+}
+
+model Ride {
+  id               String     @id @default(cuid())
+  passengerId      String
+  driverId         String?
+  originLabel      String
+  originLat        Float
+  originLng        Float
+  destinationLabel String
+  destinationLat   Float
+  destinationLng   Float
+  distanceMeters   Int?
+  estimatedPrice   Decimal?   @db.Decimal(10, 2)
+  finalPrice       Decimal?   @db.Decimal(10, 2)
+  status           RideStatus @default(REQUESTED)
+  notes            String?
+  passengerRating  Int?
+  driverRating     Int?
+  cancelReason     String?
+  acceptedAt       DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  passenger User           @relation("RidesAsPassenger", fields: [passengerId], references: [id])
+  driver    Driver?        @relation("RidesAsDriver", fields: [driverId], references: [id])
+  locations RideLocation[]
+
+  @@index([passengerId])
+  @@index([driverId])
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}
+
+model RideLocation {
+  id         String   @id @default(cuid())
+  rideId     String
+  lat        Float
+  lng        Float
+  heading    Float?
+  speed      Float?
+  recordedAt DateTime @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id], onDelete: Cascade)
+
+  @@index([rideId, recordedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// DELIVERY
+// ─────────────────────────────────────────────────────────────────
+
+model Restaurant {
+  id             String   @id @default(cuid())
+  ownerId        String   @unique
+  name           String
+  slug           String   @unique
+  description    String?
+  logoUrl        String?
+  coverUrl       String?
+  phone          String?
+  address        String?
+  city           String?
+  cuisine        String?
+  isOpen         Boolean  @default(false)
+  isVerified     Boolean  @default(false)
+  deliveryFee    Decimal? @db.Decimal(10, 2)
+  minOrder       Decimal? @db.Decimal(10, 2)
+  avgPrepMinutes Int      @default(30)
+  ratingAvg      Float    @default(5.0)
+  ratingCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  owner    User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  menu     MenuItem[]
+  orders   Order[]
+  sections MenuSection[]
+
+  @@index([slug])
+  @@index([city])
+  @@index([isOpen])
+}
+
+model MenuSection {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  items      MenuItem[]
+
+  @@index([restaurantId])
+}
+
+model MenuItem {
+  id           String   @id @default(cuid())
+  restaurantId String
+  sectionId    String?
+  name         String
+  description  String?
+  price        Decimal  @db.Decimal(10, 2)
+  imageUrl     String?
+  isAvailable  Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  section    MenuSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  orderItems OrderItem[]
+
+  @@index([restaurantId])
+  @@index([sectionId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  restaurantId    String
+  customerId      String
+  type            OrderType   @default(DELIVERY)
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  deliveryFee     Decimal     @default(0) @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  deliveryAddress String?
+  deliveryNotes   String?
+  customerNotes   String?
+  paymentMethod   String      @default("PIX_MANUAL")
+  cancelReason    String?
+  acceptedAt      DateTime?
+  preparingAt     DateTime?
+  readyAt         DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id])
+  customer   User        @relation("OrdersAsCustomer", fields: [customerId], references: [id])
+  items      OrderItem[]
+
+  @@index([restaurantId, status])
+  @@index([customerId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  menuItemId String?
+  name       String
+  price      Decimal @db.Decimal(10, 2)
+  quantity   Int     @default(1)
+  notes      String?
+
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// NOTÍCIAS / BLOG
+// ─────────────────────────────────────────────────────────────────
+
+model JournalistApplication {
+  id         String                      @id @default(cuid())
+  userId     String                      @unique
+  bio        String
+  portfolio  String?
+  reason     String
+  status     JournalistApplicationStatus @default(PENDING)
+  reviewedAt DateTime?
+  reviewerId String?
+  notes      String?
+  createdAt  DateTime                    @default(now())
+  updatedAt  DateTime                    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model ArticleCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  color     String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  articles Article[]
+
+  @@index([slug])
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  authorId    String
+  categoryId  String?
+  title       String
+  slug        String        @unique
+  excerpt     String?
+  body        String
+  coverUrl    String?
+  tags        String[]      @default([])
+  status      ArticleStatus @default(DRAFT)
+  views       Int           @default(0)
+  isFeatured  Boolean       @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  author   User             @relation(fields: [authorId], references: [id])
+  category ArticleCategory? @relation(fields: [categoryId], references: [id])
+  comments ArticleComment[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([slug])
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([isFeatured, publishedAt(sort: Desc)])
+}
+
+model ArticleComment {
+  id        String   @id @default(cuid())
+  articleId String
+  authorId  String
+  parentId  String?
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent  ArticleComment?  @relation("ArticleCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies ArticleComment[] @relation("ArticleCommentReplies")
+
+  @@index([articleId, createdAt(sort: Desc)])
+  @@index([authorId])
+  @@index([parentId])
 }

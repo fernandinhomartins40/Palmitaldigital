@@ -3,6 +3,7 @@ import { isNavItemActive, mobileNavItems } from './navigation';
 
 const accentByPath: Record<string, string> = {
   '/feed': 'halo-coral',
+  '/services': 'halo-mint',
   '/classifieds': 'halo-citrus',
   '/chat': 'halo-cobalt',
   '/profile': 'halo-magenta',
@@ -10,6 +11,7 @@ const accentByPath: Record<string, string> = {
 
 const dotByPath: Record<string, string> = {
   '/feed': 'bg-coral',
+  '/services': 'bg-mint',
   '/classifieds': 'bg-citrus',
   '/chat': 'bg-cobalt',
   '/profile': 'bg-magenta',
