@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 
@@ -20,20 +19,31 @@ export function PwaSplashPage() {
   }, [hasHydrated, isAuthenticated, navigate, ready]);
 
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.34),transparent_28%),linear-gradient(155deg,#1d4ed8_0%,#2563eb_42%,#0f766e_100%)] px-8 text-white">
-      <div className="relative flex w-full max-w-xs flex-col items-center text-center">
-        <div className="absolute -top-24 h-48 w-48 rounded-full border border-white/15" />
-        <div className="absolute -top-14 h-32 w-32 rounded-full border border-white/20" />
+    <main className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-canvas px-8 text-ink">
+      {/* Halos de fundo */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-32 top-10 h-[28rem] w-[28rem] rounded-full opacity-30 blur-[120px]" style={{ background: '#FF5B49' }} />
+        <div className="absolute right-[-10rem] top-[40%] h-[26rem] w-[26rem] rounded-full opacity-25 blur-[120px]" style={{ background: '#3D5AFE' }} />
+        <div className="absolute bottom-[-8rem] left-[40%] h-[22rem] w-[22rem] rounded-full opacity-25 blur-[120px]" style={{ background: '#5EEAD4' }} />
+      </div>
 
-        <div className="pwa-logo-pulse relative flex h-24 w-24 items-center justify-center rounded-[30px] border border-white/20 bg-white/16 shadow-[0_24px_80px_rgba(15,23,42,0.28)] backdrop-blur">
-          <MapPin size={46} strokeWidth={2.4} />
+      <div className="relative flex w-full max-w-xs flex-col items-center text-center">
+        <div
+          className="pwa-logo-pulse halo halo-coral relative flex h-24 w-24 items-center justify-center bg-ink text-surface shadow-2xl"
+          style={{ borderRadius: '28px 28px 8px 28px' }}
+        >
+          <span className="font-display text-5xl font-black">P</span>
         </div>
 
-        <h1 className="mt-8 text-3xl font-black tracking-tight">Palmital Digital</h1>
-        <p className="mt-2 text-sm font-medium text-blue-50/88">Sua cidade sempre perto.</p>
+        <h1 className="mt-8 font-display text-3xl font-bold tracking-tight text-ink">
+          Palmital Digital
+        </h1>
+        <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-mute">
+          Sua cidade sempre perto
+        </p>
 
-        <div className="mt-12 h-1.5 w-44 overflow-hidden rounded-full bg-white/20">
-          <div className="pwa-splash-progress h-full rounded-full bg-white" />
+        <div className="mt-12 h-1.5 w-44 overflow-hidden rounded-full bg-ink/10 dark:bg-white/10">
+          <div className="pwa-splash-progress h-full rounded-full bg-coral" />
         </div>
       </div>
     </main>

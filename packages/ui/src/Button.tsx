@@ -1,6 +1,6 @@
 import React from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'glass';
 type Size = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -11,16 +11,18 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800',
-  secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300',
-  ghost: 'bg-transparent text-gray-700 hover:bg-gray-100',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
+  primary: 'bg-ink text-surface hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0',
+  secondary:
+    'bg-ink/5 text-ink hover:bg-ink/10 dark:bg-white/5 dark:hover:bg-white/10 border border-line',
+  ghost: 'bg-transparent text-ink hover:bg-ink/5 dark:hover:bg-white/5',
+  danger: 'bg-coral text-white hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0',
+  glass: 'glass text-ink hover:bg-white/80 dark:hover:bg-white/10',
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-lg',
+  sm: 'px-3 py-2 text-sm rounded-xl',
+  md: 'px-4 py-2.5 text-sm rounded-2xl',
+  lg: 'px-6 py-3 text-base rounded-2xl',
 };
 
 export function Button({
@@ -36,7 +38,9 @@ export function Button({
   return (
     <button
       className={[
-        'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center font-semibold transition-all duration-200',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+        'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
         variantClasses[variant],
         sizeClasses[size],
         fullWidth ? 'w-full' : '',

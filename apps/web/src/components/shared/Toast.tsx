@@ -11,31 +11,25 @@ interface ToastItemProps {
 
 const styles = {
   success: {
-    container: 'bg-white border-emerald-200 shadow-emerald-100/60',
-    icon: 'text-emerald-500',
-    bar: 'bg-emerald-500',
-    title: 'text-emerald-700',
-    text: 'text-gray-600',
+    bar: 'bg-mint',
+    iconColor: 'text-mint',
+    label: 'text-mint',
     Icon: CheckCircle2,
-    label: 'Sucesso',
+    title: 'SUCESSO',
   },
   error: {
-    container: 'bg-white border-red-200 shadow-red-100/60',
-    icon: 'text-red-500',
-    bar: 'bg-red-500',
-    title: 'text-red-700',
-    text: 'text-gray-600',
+    bar: 'bg-coral',
+    iconColor: 'text-coral',
+    label: 'text-coral',
     Icon: AlertCircle,
-    label: 'Erro',
+    title: 'ERRO',
   },
   info: {
-    container: 'bg-white border-blue-200 shadow-blue-100/60',
-    icon: 'text-blue-500',
-    bar: 'bg-blue-500',
-    title: 'text-blue-700',
-    text: 'text-gray-600',
+    bar: 'bg-cobalt',
+    iconColor: 'text-cobalt',
+    label: 'text-cobalt',
     Icon: Info,
-    label: 'Info',
+    title: 'INFO',
   },
 };
 
@@ -43,7 +37,6 @@ function ToastItem({ id, message, type, onRemove }: ToastItemProps) {
   const [visible, setVisible] = useState(false);
   const s = styles[type];
 
-  // Slide-in on mount
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 10);
     return () => clearTimeout(t);
@@ -56,28 +49,28 @@ function ToastItem({ id, message, type, onRemove }: ToastItemProps) {
 
   return (
     <div
-      className={`relative flex items-start gap-3 w-full max-w-sm rounded-2xl border px-4 py-3.5 shadow-lg
-        transition-all duration-300
-        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-        ${s.container}`}
+      className={`glass-strong shape-signature relative flex w-full max-w-sm items-start gap-3 px-4 py-3.5 transition-all duration-300 ${
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+      }`}
       role="alert"
     >
-      {/* Colored left bar */}
       <div className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-full ${s.bar}`} />
 
-      <s.Icon size={20} className={`flex-shrink-0 mt-0.5 ${s.icon}`} />
+      <s.Icon size={18} className={`mt-0.5 flex-shrink-0 ${s.iconColor}`} strokeWidth={2.2} />
 
-      <div className="flex-1 min-w-0 pl-1">
-        <p className={`text-xs font-bold uppercase tracking-wide ${s.title}`}>{s.label}</p>
-        <p className={`text-sm mt-0.5 leading-snug ${s.text}`}>{message}</p>
+      <div className="min-w-0 flex-1 pl-1">
+        <p className={`font-mono text-[10px] font-bold uppercase tracking-wider ${s.label}`}>
+          {s.title}
+        </p>
+        <p className="mt-0.5 text-sm leading-snug text-ink">{message}</p>
       </div>
 
       <button
         onClick={dismiss}
-        className="flex-shrink-0 text-gray-300 hover:text-gray-500 transition-colors p-0.5 mt-0.5"
+        className="mt-0.5 flex-shrink-0 rounded-lg p-1 text-mute transition-colors hover:bg-ink/5 hover:text-ink"
         aria-label="Fechar notificação"
       >
-        <X size={15} />
+        <X size={14} />
       </button>
     </div>
   );
@@ -88,7 +81,7 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-[9999] flex flex-col items-end gap-2 pointer-events-none">
+    <div className="pointer-events-none fixed right-4 top-20 z-[9999] flex flex-col items-end gap-2">
       {toasts.map((t) => (
         <div key={t.id} className="pointer-events-auto">
           <ToastItem id={t.id} message={t.message} type={t.type} onRemove={removeToast} />

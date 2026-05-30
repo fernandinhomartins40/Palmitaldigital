@@ -154,7 +154,7 @@ export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>
       {previews.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {previews.map((preview) => (
-            <div key={preview.localId} className="relative h-20 w-20 overflow-hidden rounded-lg bg-gray-100">
+            <div key={preview.localId} className="relative h-20 w-20 overflow-hidden rounded-2xl bg-ink/5 dark:bg-white/5">
               {preview.kind === 'video' ? (
                 <video
                   src={preview.url}
@@ -186,7 +186,7 @@ export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>
               <button
                 type="button"
                 onClick={() => removePreview(preview)}
-                className="absolute right-1 top-1 rounded-full bg-red-500 p-0.5 text-white"
+                className="absolute right-1 top-1 rounded-full bg-coral p-0.5 text-white hover:scale-110"
                 disabled={preview.status === 'uploading'}
               >
                 <X size={12} />
@@ -200,7 +200,7 @@ export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600"
+          className="flex items-center gap-2 text-sm font-semibold text-mute transition-colors hover:text-coral"
           disabled={isUploading}
         >
           {isUploading ? <Spinner size="sm" /> : <Image size={18} />}
@@ -217,8 +217,8 @@ export const ImageUploader = forwardRef<ImageUploaderHandle, ImageUploaderProps>
         onChange={handleChange}
       />
 
-      <p className="mt-2 text-xs text-gray-400">
-        Suporta JPG, PNG, WEBP e video MP4.
+      <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-mute">
+        JPG, PNG, WEBP ou MP4
       </p>
     </div>
   );

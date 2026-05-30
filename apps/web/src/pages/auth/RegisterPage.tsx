@@ -1,17 +1,16 @@
 import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, UserPlus, MapPin, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { connectSocket } from '../../services/socket';
 import { ToastContainer } from '../../components/shared/Toast';
 
-/* ── Password strength logic ── */
 type Strength = 'fraca' | 'média' | 'forte' | 'muito forte';
 
 interface PasswordAnalysis {
-  score: number; // 0-4
+  score: number;
   strength: Strength;
   color: string;
   barColor: string;
@@ -29,11 +28,11 @@ function analyzePassword(pwd: string): PasswordAnalysis {
   const score = checks.filter((c) => c.ok).length;
 
   const map: Record<number, { strength: Strength; color: string; barColor: string }> = {
-    0: { strength: 'fraca', color: 'text-red-600', barColor: 'bg-red-500' },
-    1: { strength: 'fraca', color: 'text-red-600', barColor: 'bg-red-500' },
-    2: { strength: 'média', color: 'text-amber-600', barColor: 'bg-amber-400' },
-    3: { strength: 'forte', color: 'text-emerald-600', barColor: 'bg-emerald-500' },
-    4: { strength: 'muito forte', color: 'text-emerald-700', barColor: 'bg-emerald-600' },
+    0: { strength: 'fraca', color: 'text-coral', barColor: 'bg-coral' },
+    1: { strength: 'fraca', color: 'text-coral', barColor: 'bg-coral' },
+    2: { strength: 'média', color: 'text-amber', barColor: 'bg-amber' },
+    3: { strength: 'forte', color: 'text-mint', barColor: 'bg-mint' },
+    4: { strength: 'muito forte', color: 'text-mint', barColor: 'bg-mint' },
   };
 
   return { score, checks, ...map[score] };
@@ -59,7 +58,7 @@ export function RegisterPage() {
 
   const analysis = useMemo(() => analyzePassword(form.password), [form.password]);
   const passwordsMatch = form.password === form.confirmPassword;
-  const passwordMeetsMinReqs = analysis.checks.slice(0, 3).every((c) => c.ok); // first 3 are required
+  const passwordMeetsMinReqs = analysis.checks.slice(0, 3).every((c) => c.ok);
 
   function set(field: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -75,7 +74,7 @@ export function RegisterPage() {
     setTouched({ displayName: true, email: true, password: true, confirmPassword: true });
 
     if (!passwordMeetsMinReqs) {
-      setError('Sua senha não atende aos requisitos mínimos de segurança.');
+      setError('Sua senha não atende aos requisitos mínimos.');
       return;
     }
     if (!passwordsMatch) {
@@ -91,10 +90,10 @@ export function RegisterPage() {
       const { data } = await api.post('/auth/register', payload);
       setAuth(data.accessToken, data.refreshToken, data.user);
       connectSocket();
-      addToast('Conta criada com sucesso! Bem-vindo(a) 🎉', 'success');
+      addToast('Conta criada com sucesso!', 'success');
       navigate('/feed');
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Erro ao criar conta. Tente novamente.';
+      const msg = err.response?.data?.message || 'Erro ao criar conta.';
       const display = Array.isArray(msg) ? msg.join(', ') : msg;
       setError(display);
       addToast(display, 'error');
@@ -106,257 +105,256 @@ export function RegisterPage() {
   const showPassError = touched.password && form.password.length > 0 && !passwordMeetsMinReqs;
   const showMatchError = touched.confirmPassword && form.confirmPassword.length > 0 && !passwordsMatch;
 
+  const inputBase =
+    'w-full rounded-2xl border bg-ink/[0.03] px-4 py-3 text-sm text-ink outline-none transition-all placeholder:text-subtle dark:bg-white/[0.04]';
+  const inputDefault = 'border-line focus:border-coral focus:bg-surface focus:ring-4 focus:ring-coral/15';
+  const inputError = 'border-coral focus:ring-4 focus:ring-coral/20';
+  const inputOk = 'border-mint focus:ring-4 focus:ring-mint/20';
+
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="relative min-h-screen overflow-hidden bg-canvas text-ink">
       <ToastContainer />
-      {/* Left branding panel */}
-      <div className="hidden lg:flex flex-1 flex-col items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700 p-12 text-white">
-        <div className="max-w-sm text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mx-auto mb-6">
-            <MapPin size={32} className="text-white" />
-          </div>
-          <h2 className="text-3xl font-extrabold mb-3">Junte-se à comunidade!</h2>
-          <p className="text-blue-100 text-lg leading-relaxed">
-            Crie sua conta gratuitamente e conecte-se com toda a cidade de Palmital.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 text-sm text-blue-100">
-            {['Cadastro 100% gratuito', 'Sem anúncios invasivos', 'Dados protegidos e seguros', 'Suporte em português'].map(
-              (item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-blue-300 flex-shrink-0" />
-                  {item}
-                </div>
-              ),
-            )}
-          </div>
-        </div>
+
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -right-32 top-10 h-[28rem] w-[28rem] rounded-full opacity-25 blur-[120px]" style={{ background: '#E94FCB' }} />
+        <div className="absolute left-[-10rem] top-[40%] h-[26rem] w-[26rem] rounded-full opacity-20 blur-[120px]" style={{ background: '#5EEAD4' }} />
+        <div className="absolute bottom-[-8rem] right-[40%] h-[22rem] w-[22rem] rounded-full opacity-20 blur-[120px]" style={{ background: '#FFB020' }} />
       </div>
 
-      {/* Right – register form */}
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-10 overflow-y-auto">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="lg:hidden mb-6 text-center">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
-              <MapPin size={24} className="text-white" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-blue-700">Palmital Digital</h1>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="text-2xl font-extrabold text-gray-900">Criar conta grátis</h2>
-            <p className="mt-1 text-sm text-gray-500">Leva menos de 1 minuto</p>
-          </div>
-
-          {/* Error banner */}
-          {error && (
-            <div className="mb-4 flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-              <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Display name */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="reg-name" className="text-sm font-semibold text-gray-700">
-                Nome completo
-              </label>
-              <input
-                id="reg-name"
-                type="text"
-                required
-                minLength={2}
-                value={form.displayName}
-                onChange={set('displayName')}
-                onBlur={touch('displayName')}
-                placeholder="Seu nome"
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition-all
-                  placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-              />
+      <div className="flex min-h-screen items-center justify-center px-4 py-10">
+        <div className="grid w-full max-w-5xl gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          {/* Form */}
+          <div className="glass shape-signature-lg p-6 sm:p-8">
+            <div className="mb-6 lg:hidden">
+              <div className="halo halo-magenta inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-ink text-surface">
+                <span className="font-display text-xl font-black">P</span>
+              </div>
             </div>
 
-            {/* Email */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="reg-email" className="text-sm font-semibold text-gray-700">
-                E-mail
-              </label>
-              <input
-                id="reg-email"
-                type="email"
-                required
-                value={form.email}
-                onChange={set('email')}
-                onBlur={touch('email')}
-                placeholder="seu@email.com"
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition-all
-                  placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-              />
-            </div>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-ink lg:text-3xl">
+              Criar conta
+            </h2>
+            <p className="mt-1 font-mono text-[11px] uppercase tracking-wider text-mute">
+              Leva menos de 1 minuto
+            </p>
 
-            {/* Password */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="reg-password" className="text-sm font-semibold text-gray-700">
-                Senha
-              </label>
-              <div className="relative">
+            {error && (
+              <div className="mt-5 flex items-start gap-2.5 rounded-2xl border border-coral/30 bg-coral/10 px-4 py-3 text-sm text-coral">
+                <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="reg-name" className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  Nome
+                </label>
                 <input
-                  id="reg-password"
-                  type={showPass ? 'text' : 'password'}
+                  id="reg-name"
+                  type="text"
                   required
-                  value={form.password}
-                  onChange={set('password')}
-                  onBlur={touch('password')}
-                  placeholder="••••••••"
-                  className={`w-full rounded-xl border bg-white px-4 py-2.5 pr-11 text-sm text-gray-900 outline-none transition-all
-                    placeholder:text-gray-400 focus:ring-2
-                    ${showPassError
-                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
-                    }`}
+                  minLength={2}
+                  value={form.displayName}
+                  onChange={set('displayName')}
+                  onBlur={touch('displayName')}
+                  placeholder="Seu nome"
+                  className={`${inputBase} ${inputDefault}`}
                 />
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  onClick={() => setShowPass((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5"
-                  aria-label={showPass ? 'Ocultar senha' : 'Exibir senha'}
-                >
-                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
               </div>
 
-              {/* Strength bar */}
-              {form.password.length > 0 && (
-                <div className="mt-2 space-y-1.5">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((i) => (
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="reg-email" className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  E-mail
+                </label>
+                <input
+                  id="reg-email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={set('email')}
+                  onBlur={touch('email')}
+                  placeholder="seu@email.com"
+                  className={`${inputBase} ${inputDefault}`}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="reg-password" className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  Senha
+                </label>
+                <div className="relative">
+                  <input
+                    id="reg-password"
+                    type={showPass ? 'text' : 'password'}
+                    required
+                    value={form.password}
+                    onChange={set('password')}
+                    onBlur={touch('password')}
+                    placeholder="••••••••"
+                    className={`${inputBase} pr-11 ${showPassError ? inputError : inputDefault}`}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowPass((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-mute hover:text-ink"
+                    aria-label={showPass ? 'Ocultar senha' : 'Exibir senha'}
+                  >
+                    {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                {form.password.length > 0 && (
+                  <div className="mt-2 space-y-1.5">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                            i <= analysis.score ? analysis.barColor : 'bg-line'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className={`font-mono text-[10px] font-bold uppercase tracking-wider ${analysis.color}`}>
+                      Força: {analysis.strength}
+                    </p>
+                  </div>
+                )}
+
+                {(touched.password || form.password.length > 0) && (
+                  <div className="mt-2 space-y-1">
+                    {analysis.checks.map(({ label, ok }) => (
                       <div
-                        key={i}
-                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                          i <= analysis.score ? analysis.barColor : 'bg-gray-200'
-                        }`}
-                      />
+                        key={label}
+                        className={`flex items-center gap-1.5 text-xs ${ok ? 'text-mint dark:text-mint' : 'text-mute'}`}
+                      >
+                        {ok ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                        {label}
+                      </div>
                     ))}
                   </div>
-                  <p className={`text-xs font-semibold ${analysis.color}`}>
-                    Força: {analysis.strength}
-                  </p>
-                </div>
-              )}
-
-              {/* Password requirements */}
-              {(touched.password || form.password.length > 0) && (
-                <div className="mt-2 space-y-1">
-                  {analysis.checks.map(({ label, ok }) => (
-                    <div key={label} className={`flex items-center gap-1.5 text-xs ${ok ? 'text-emerald-600' : 'text-gray-400'}`}>
-                      {ok ? <CheckCircle2 size={12} className="flex-shrink-0" /> : <XCircle size={12} className="flex-shrink-0" />}
-                      {label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Confirm password */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="reg-confirm" className="text-sm font-semibold text-gray-700">
-                Confirmar senha
-              </label>
-              <div className="relative">
-                <input
-                  id="reg-confirm"
-                  type={showConfirm ? 'text' : 'password'}
-                  required
-                  value={form.confirmPassword}
-                  onChange={set('confirmPassword')}
-                  onBlur={touch('confirmPassword')}
-                  placeholder="••••••••"
-                  className={`w-full rounded-xl border bg-white px-4 py-2.5 pr-11 text-sm text-gray-900 outline-none transition-all
-                    placeholder:text-gray-400 focus:ring-2
-                    ${showMatchError
-                      ? 'border-red-400 focus:border-red-400 focus:ring-red-400/20'
-                      : form.confirmPassword && passwordsMatch
-                      ? 'border-emerald-400 focus:border-emerald-400 focus:ring-emerald-400/20'
-                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500/20'
-                    }`}
-                />
-                <button
-                  type="button"
-                  tabIndex={-1}
-                  onClick={() => setShowConfirm((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-0.5"
-                  aria-label={showConfirm ? 'Ocultar senha' : 'Exibir senha'}
-                >
-                  {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                )}
               </div>
-              {showMatchError && (
-                <p className="text-xs text-red-600 flex items-center gap-1 mt-0.5">
-                  <AlertCircle size={11} /> As senhas não coincidem
-                </p>
-              )}
-              {form.confirmPassword && passwordsMatch && touched.confirmPassword && (
-                <p className="text-xs text-emerald-600 flex items-center gap-1 mt-0.5">
-                  <CheckCircle2 size={11} /> Senhas conferem
-                </p>
-              )}
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="reg-confirm" className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  Confirmar senha
+                </label>
+                <div className="relative">
+                  <input
+                    id="reg-confirm"
+                    type={showConfirm ? 'text' : 'password'}
+                    required
+                    value={form.confirmPassword}
+                    onChange={set('confirmPassword')}
+                    onBlur={touch('confirmPassword')}
+                    placeholder="••••••••"
+                    className={`${inputBase} pr-11 ${
+                      showMatchError
+                        ? inputError
+                        : form.confirmPassword && passwordsMatch
+                          ? inputOk
+                          : inputDefault
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => setShowConfirm((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-mute hover:text-ink"
+                    aria-label={showConfirm ? 'Ocultar senha' : 'Exibir senha'}
+                  >
+                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {showMatchError && (
+                  <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-coral">
+                    <AlertCircle size={11} /> Senhas não coincidem
+                  </p>
+                )}
+                {form.confirmPassword && passwordsMatch && touched.confirmPassword && (
+                  <p className="mt-0.5 flex items-center gap-1 text-xs font-medium text-mint">
+                    <CheckCircle2 size={11} /> Senhas conferem
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="reg-phone" className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  Telefone <span className="font-normal text-subtle">(opcional)</span>
+                </label>
+                <input
+                  id="reg-phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={set('phone')}
+                  placeholder="(44) 99999-9999"
+                  className={`${inputBase} ${inputDefault}`}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                id="register-submit"
+                className="halo halo-magenta flex w-full items-center justify-center gap-2 rounded-2xl bg-ink py-3.5 font-bold text-surface transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-60 disabled:transform-none"
+              >
+                {loading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    Criando...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus size={18} strokeWidth={2.4} />
+                    Criar conta
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-5 text-center text-sm text-mute">
+              Já tem conta?{' '}
+              <Link to="/login" className="font-bold text-coral hover:underline">
+                Entrar
+              </Link>
+            </p>
+            <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-wider text-mute">
+              <Link to="/" className="hover:text-ink">← Página inicial</Link>
+            </p>
+          </div>
+
+          {/* Branding direita */}
+          <div className="hidden lg:block">
+            <div className="halo halo-magenta inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-surface">
+              <span className="font-display text-2xl font-black">P</span>
             </div>
-
-            {/* Phone (optional) */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="reg-phone" className="text-sm font-semibold text-gray-700">
-                Telefone{' '}
-                <span className="font-normal text-gray-400">(opcional)</span>
-              </label>
-              <input
-                id="reg-phone"
-                type="tel"
-                value={form.phone}
-                onChange={set('phone')}
-                placeholder="(44) 99999-9999"
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 outline-none transition-all
-                  placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-              />
+            <h1 className="mt-6 font-display text-5xl font-bold tracking-tight text-ink">
+              Faça parte<br />de Palmital.
+            </h1>
+            <p className="mt-4 max-w-md text-lg leading-relaxed text-mute">
+              Sua cidade num só lugar — feed, mercado, empresas e mensagens. Sem azul de banco.
+            </p>
+            <div className="mt-8 space-y-3">
+              {[
+                { c: 'bg-coral', t: 'Cadastro 100% gratuito' },
+                { c: 'bg-citrus', t: 'Sem anúncios invasivos' },
+                { c: 'bg-cobalt', t: 'Dados protegidos' },
+                { c: 'bg-magenta', t: 'Suporte em português' },
+              ].map((item) => (
+                <div key={item.t} className="flex items-center gap-3">
+                  <span className={`h-2 w-2 rounded-full ${item.c}`} />
+                  <CheckCircle2 size={15} className="text-mute" />
+                  <span className="text-sm text-ink">{item.t}</span>
+                </div>
+              ))}
             </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              id="register-submit"
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800
-                text-white font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-blue-200
-                disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Criando conta...
-                </>
-              ) : (
-                <>
-                  <UserPlus size={18} />
-                  Criar conta
-                </>
-              )}
-            </button>
-          </form>
-
-          <p className="mt-5 text-center text-sm text-gray-500">
-            Já tem conta?{' '}
-            <Link to="/login" className="font-semibold text-blue-600 hover:underline">
-              Entrar
-            </Link>
-          </p>
-          <p className="mt-3 text-center text-xs text-gray-400">
-            <Link to="/" className="hover:text-gray-600 transition-colors">
-              ← Voltar para a página inicial
-            </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

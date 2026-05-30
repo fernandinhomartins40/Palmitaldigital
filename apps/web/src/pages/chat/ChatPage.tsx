@@ -78,87 +78,102 @@ export function ChatPage() {
   }
 
   return (
-    <div className="px-4 pb-6 lg:px-0">
-      <div className="lg:grid lg:grid-cols-[360px,minmax(0,1fr)] lg:gap-6">
-        <div className="hidden lg:block">
-          <ChatSidebar activeConversationId={conversationId} />
-        </div>
+    <div className="lg:grid lg:grid-cols-[360px,minmax(0,1fr)] lg:gap-6">
+      <div className="hidden lg:block">
+        <ChatSidebar activeConversationId={conversationId} />
+      </div>
 
-        <div className="flex h-[calc(100vh-8.75rem)] min-h-[32rem] flex-col overflow-hidden rounded-[32px] border border-white/80 bg-[linear-gradient(to_bottom,_#f8fbff,_#eef5ff)] shadow-[0_12px_30px_rgba(15,23,42,0.06)]">
-          <div className="border-b border-white/80 bg-white/80 px-4 py-3 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
+      <div className="glass shape-signature-lg flex h-[calc(100vh-9rem)] min-h-[32rem] flex-col overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-line px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="relative">
               <Avatar
                 src={otherProfile?.avatarUrl}
                 name={otherProfile?.displayName ?? otherParticipant?.user?.email ?? 'Usuário'}
                 size="md"
               />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-gray-900">
-                  {otherProfile?.displayName ?? otherParticipant?.user?.email ?? 'Usuário'}
-                </p>
-                <p className="truncate text-xs text-gray-500">
-                  {isTyping ? 'digitando...' : otherProfile?.city || 'Conversa privada'}
-                </p>
-              </div>
+              {isTyping && <span className="absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full bg-mint ring-2 ring-surface dark:ring-canvas" />}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate font-display text-sm font-bold text-ink">
+                {otherProfile?.displayName ?? otherParticipant?.user?.email ?? 'Usuário'}
+              </p>
+              <p className="truncate font-mono text-[10px] uppercase tracking-wider text-mute">
+                {isTyping ? 'digitando...' : otherProfile?.city || 'Conversa privada'}
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
-            {hasNextPage && (
-              <button onClick={() => fetchNextPage()} className="w-full py-2 text-center text-xs text-blue-600">
-                Carregar mensagens anteriores
-              </button>
-            )}
-            {messages.map((msg) => {
-              const isMe = msg.senderId === currentUser?.id;
-              const profile = msg.sender?.profile;
-              return (
-                <div key={msg.id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                  {!isMe && <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="xs" />}
-                  <div
-                    className={`max-w-[78%] rounded-2xl px-3 py-2 text-sm ${
-                      isMe
-                        ? 'rounded-tr-sm bg-blue-600 text-white'
-                        : 'rounded-tl-sm bg-white text-gray-900 shadow-sm'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              );
-            })}
-            {isTyping && (
-              <div className="flex gap-2">
-                <Avatar
-                  src={otherProfile?.avatarUrl}
-                  name={otherProfile?.displayName ?? otherParticipant?.user?.email ?? '?'}
-                  size="xs"
-                />
-                <div className="rounded-2xl rounded-tl-sm bg-white px-3 py-2 text-sm text-gray-500 shadow-sm">
-                  digitando...
+        {/* Mensagens */}
+        <div className="glass-scrollbar flex-1 space-y-3 overflow-y-auto px-4 py-4">
+          {hasNextPage && (
+            <button
+              onClick={() => fetchNextPage()}
+              className="w-full py-2 text-center font-mono text-[10px] font-bold uppercase tracking-wider text-coral hover:underline"
+            >
+              ↑ Mensagens anteriores
+            </button>
+          )}
+          {messages.map((msg) => {
+            const isMe = msg.senderId === currentUser?.id;
+            const profile = msg.sender?.profile;
+            return (
+              <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                {!isMe && <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="xs" />}
+                <div
+                  className={`max-w-[78%] px-4 py-2.5 text-sm leading-5 ${
+                    isMe
+                      ? 'halo halo-coral bg-coral text-white'
+                      : 'glass-strong text-ink'
+                  }`}
+                  style={{
+                    borderRadius: isMe ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                  }}
+                >
+                  {msg.content}
                 </div>
               </div>
-            )}
-            <div ref={bottomRef} />
-          </div>
-
-          <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-white/80 bg-white/90 px-4 py-3">
-            <input
-              value={text}
-              onChange={handleInput}
-              placeholder="Mensagem..."
-              className="flex-1 rounded-full border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500"
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              disabled={!text.trim()}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white disabled:opacity-40"
-            >
-              <Send size={16} />
-            </button>
-          </form>
+            );
+          })}
+          {isTyping && (
+            <div className="flex items-end gap-2">
+              <Avatar
+                src={otherProfile?.avatarUrl}
+                name={otherProfile?.displayName ?? otherParticipant?.user?.email ?? '?'}
+                size="xs"
+              />
+              <div
+                className="glass-strong flex items-center gap-1 px-4 py-3"
+                style={{ borderRadius: '20px 20px 20px 4px' }}
+              >
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mute" style={{ animationDelay: '0ms' }} />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mute" style={{ animationDelay: '150ms' }} />
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-mute" style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
         </div>
+
+        {/* Input */}
+        <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-line px-4 py-3">
+          <input
+            value={text}
+            onChange={handleInput}
+            placeholder="Mensagem..."
+            className="flex-1 rounded-2xl border border-line bg-ink/[0.03] px-4 py-2.5 text-sm text-ink outline-none placeholder:text-subtle focus:border-coral focus:bg-surface focus:ring-2 focus:ring-coral/15 dark:bg-white/[0.03]"
+            autoComplete="off"
+          />
+          <button
+            type="submit"
+            disabled={!text.trim()}
+            className="halo halo-coral flex h-11 w-11 items-center justify-center rounded-2xl bg-coral text-white transition-all hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
+          >
+            <Send size={16} strokeWidth={2.2} />
+          </button>
+        </form>
       </div>
     </div>
   );

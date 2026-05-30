@@ -28,12 +28,17 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <p className="text-lg font-semibold text-gray-800">Algo deu errado</p>
-            <p className="mt-1 text-sm text-gray-500">{this.state.error?.message}</p>
+          <div className="glass shape-signature mx-auto my-12 max-w-md p-8 text-center">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-coral">
+              ERRO
+            </p>
+            <p className="mt-2 font-display text-xl font-bold tracking-tight text-ink">
+              Algo deu errado
+            </p>
+            <p className="mt-1 text-sm text-mute">{this.state.error?.message}</p>
             <button
               onClick={() => this.setState({ hasError: false })}
-              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              className="btn-ink mt-5"
             >
               Tentar novamente
             </button>

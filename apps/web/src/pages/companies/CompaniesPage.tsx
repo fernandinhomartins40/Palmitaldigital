@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Avatar, Card, Spinner } from '@palmital/ui';
+import { Avatar, Spinner } from '@palmital/ui';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
-import { BadgeCheck, Building2, PlusCircle, Settings2 } from 'lucide-react';
+import { BadgeCheck, Building2, MapPin, PlusCircle, Search, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 export function CompaniesPage() {
@@ -36,58 +36,101 @@ export function CompaniesPage() {
   });
 
   return (
-    <div className="space-y-5 px-4 pb-6 lg:px-0">
-      <Card className="rounded-[28px] border-blue-100/80 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 p-5 text-white shadow-[0_12px_28px_rgba(37,99,235,0.22)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100">Empresas locais</p>
-            <h1 className="mt-2 text-2xl font-bold">Crie e gerencie o perfil completo da sua loja</h1>
-            <p className="mt-2 max-w-2xl text-sm text-blue-50">
-              Configure identidade visual, informacoes comerciais, catalogo de produtos e a pagina publica da empresa.
+    <div className="space-y-5">
+      {/* HERO Empresas */}
+      <section className="glass shape-signature-lg halo halo-cobalt relative overflow-hidden p-6 lg:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="chip chip-cobalt">
+              <Building2 size={11} strokeWidth={2.5} />
+              EMPRESAS LOCAIS
+            </div>
+            <h1 className="mt-3 font-display text-4xl font-bold leading-tight tracking-tight text-ink lg:text-5xl">
+              Apoie quem está<br />ao seu lado.
+            </h1>
+            <p className="mt-3 max-w-xl text-base text-mute lg:text-lg">
+              Descubra negócios da sua região, conecte-se com lojistas e crie o seu próprio perfil.
             </p>
           </div>
 
           <Link to="/companies/manage" className="shrink-0">
-            <span className="inline-flex min-w-[16rem] items-center justify-center rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50">
-              {myCompany ? <Settings2 size={16} /> : <PlusCircle size={16} />}
-              <span className="ml-2">{myCompany ? 'Gerenciar minha empresa' : 'Criar perfil da empresa'}</span>
+            <span className="halo halo-cobalt inline-flex min-w-[16rem] items-center justify-center gap-2 rounded-2xl bg-ink px-5 py-3.5 font-bold text-surface transition-all hover:-translate-y-0.5 hover:shadow-xl">
+              {myCompany ? (
+                <>
+                  <Settings2 size={16} strokeWidth={2.2} />
+                  Gerenciar empresa
+                </>
+              ) : (
+                <>
+                  <PlusCircle size={16} strokeWidth={2.2} />
+                  Criar perfil da empresa
+                </>
+              )}
             </span>
           </Link>
         </div>
-      </Card>
+      </section>
 
-      <input
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        placeholder="Buscar empresas por cidade..."
-        className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
-      />
+      <label className="relative block">
+        <Search
+          size={16}
+          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-mute"
+        />
+        <input
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Buscar por cidade"
+          className="w-full rounded-2xl border border-line bg-ink/[0.03] py-3.5 pl-11 pr-4 text-sm text-ink outline-none placeholder:text-subtle focus:border-coral focus:bg-surface focus:ring-2 focus:ring-coral/15 dark:bg-white/[0.04]"
+        />
+      </label>
 
       {isLoading ? (
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12">
+          <Spinner size="lg" />
+        </div>
       ) : !companies?.length ? (
-        <div className="flex flex-col items-center py-16 text-gray-400">
+        <div className="glass shape-signature flex flex-col items-center py-16 text-mute">
           <Building2 size={48} strokeWidth={1} />
-          <p className="mt-3">Nenhuma empresa encontrada</p>
+          <p className="mt-3 font-display font-bold text-ink">Nenhuma empresa encontrada</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {companies.map((company) => (
             <Link key={company.id} to={`/companies/${company.slug}`}>
-              <Card className="flex h-full gap-4 rounded-[28px] p-4 transition-shadow hover:shadow-md">
-                <Avatar src={company.logoUrl} name={company.name} size="lg" />
+              <div className="glass shape-signature flex h-full gap-3 p-4 transition-all hover:-translate-y-0.5">
+                <Avatar
+                  src={company.logoUrl}
+                  name={company.name}
+                  size="lg"
+                  accent="cobalt"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1">
-                    <p className="truncate text-sm font-semibold text-gray-900">{company.name}</p>
-                    {company.isVerified && <BadgeCheck size={14} className="shrink-0 text-blue-500" />}
+                    <p className="truncate font-display text-sm font-bold text-ink">
+                      {company.name}
+                    </p>
+                    {company.isVerified && (
+                      <BadgeCheck size={14} className="shrink-0 fill-cobalt text-surface" />
+                    )}
                   </div>
-                  {company.category && <p className="text-xs text-gray-500">{company.category}</p>}
-                  {company.city && <p className="mt-1 text-xs text-gray-400">{company.city}</p>}
+                  {company.category && (
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                      {company.category}
+                    </p>
+                  )}
+                  {company.city && (
+                    <p className="mt-1 flex items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-mute">
+                      <MapPin size={10} />
+                      {company.city}
+                    </p>
+                  )}
                   {company.description && (
-                    <p className="mt-2 line-clamp-2 text-sm text-gray-600">{company.description}</p>
+                    <p className="mt-2 line-clamp-2 text-xs leading-5 text-mute">
+                      {company.description}
+                    </p>
                   )}
                 </div>
-              </Card>
+              </div>
             </Link>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Avatar, Button, Card, Spinner } from '@palmital/ui';
+import { Avatar, Button, Spinner } from '@palmital/ui';
 import { formatCurrency } from '@palmital/utils';
 import { PromotionKind } from '@palmital/types';
 import { api } from '../../services/api';
@@ -12,6 +12,7 @@ import {
   BadgeCheck,
   ExternalLink,
   MapPin,
+  MessageCircle,
   Package2,
   Phone,
   Settings2,
@@ -47,68 +48,69 @@ export function CompanyProfilePage() {
     );
   }
 
-  if (!company) {
-    return null;
-  }
+  if (!company) return null;
 
   const isOwner = currentUser?.id === company.ownerId;
   const totalProducts = company._count?.products ?? company.products?.length ?? 0;
   const totalPosts = company._count?.posts ?? company.posts?.length ?? 0;
 
   return (
-    <div className="space-y-5 px-4 pb-6 lg:px-0">
-      <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
-        <div className="relative h-40 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-56">
+    <div className="space-y-5">
+      <div className="glass shape-signature-lg overflow-hidden">
+        <div className="relative h-40 overflow-hidden bg-ink/[0.04] lg:h-56 dark:bg-white/[0.04]">
           {company.coverUrl ? (
             <img src={company.coverUrl} alt="" className="h-full w-full object-cover" />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-slate-950/10 to-transparent" />
+          ) : (
+            <div className="absolute inset-0 opacity-30" style={{ background: 'radial-gradient(circle at 30% 50%, #3D5AFE 0%, transparent 55%), radial-gradient(circle at 70% 50%, #5EEAD4 0%, transparent 55%)' }} />
+          )}
         </div>
 
-        <div className="px-4 pb-5 pt-4 lg:px-8 lg:pb-8 lg:pt-0">
+        <div className="px-5 pb-6 pt-4 lg:px-8 lg:pb-8">
           <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
             <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
-              <div className="-mt-10 inline-flex lg:-mt-14">
-                <div className="rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
-                  <Avatar
-                    src={company.logoUrl}
-                    name={company.name}
-                    size="lg"
-                    className="h-20 w-20 text-2xl lg:h-24 lg:w-24 lg:text-3xl"
-                  />
+              <div className="-mt-12 inline-flex lg:-mt-16">
+                <div
+                  className="bg-surface p-1 dark:bg-canvas"
+                  style={{ borderRadius: '28px 28px 8px 28px' }}
+                >
+                  <div className="overflow-hidden" style={{ borderRadius: '24px 24px 4px 24px' }}>
+                    <Avatar
+                      src={company.logoUrl}
+                      name={company.name}
+                      size="xl"
+                      accent="cobalt"
+                      className="!h-24 !w-24 !rounded-none !ring-0 lg:!h-28 lg:!w-28 lg:!text-3xl"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="mt-4 min-w-0 space-y-2 lg:mt-0 lg:pb-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">
+                  <h1 className="font-display text-2xl font-bold leading-tight tracking-tight text-ink lg:text-[2rem]">
                     {company.name}
                   </h1>
-                  {company.isVerified ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
-                      <BadgeCheck size={14} />
-                      Verificada
+                  {company.isVerified && (
+                    <span className="chip chip-cobalt">
+                      <BadgeCheck size={11} />
+                      VERIFICADA
                     </span>
-                  ) : null}
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                      company.isActive
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'bg-amber-50 text-amber-600'
-                    }`}
-                  >
-                    {company.isActive ? 'Ativa' : 'Pausada'}
+                  )}
+                  <span className={company.isActive ? 'chip chip-mint' : 'chip chip-amber'}>
+                    {company.isActive ? 'ATIVA' : 'PAUSADA'}
                   </span>
                 </div>
 
-                {company.category ? (
-                  <p className="text-sm text-gray-500 lg:text-base">{company.category}</p>
-                ) : null}
+                {company.category && (
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                    {company.category}
+                  </p>
+                )}
 
-                <div className="space-y-1 text-sm text-gray-600">
+                <div className="space-y-1 font-mono text-[11px] uppercase tracking-wider text-mute">
                   {(company.address || company.city) && (
                     <p className="flex items-start gap-2">
-                      <MapPin size={14} className="mt-0.5 shrink-0" />
+                      <MapPin size={11} className="mt-0.5 shrink-0" />
                       <span>
                         {company.address && company.city
                           ? `${company.address}, ${company.city}`
@@ -118,7 +120,7 @@ export function CompanyProfilePage() {
                   )}
                   {company.phone && (
                     <p className="flex items-center gap-2">
-                      <Phone size={14} className="shrink-0" />
+                      <Phone size={11} className="shrink-0" />
                       {company.phone}
                     </p>
                   )}
@@ -126,10 +128,10 @@ export function CompanyProfilePage() {
               </div>
             </div>
 
-            <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:w-[19rem] lg:shrink-0">
+            <div className="mt-5 flex flex-col gap-2 lg:mt-0 lg:w-[19rem] lg:shrink-0">
               {isOwner ? (
-                <Link to="/companies/manage" className="block">
-                  <Button fullWidth className="rounded-xl py-3">
+                <Link to="/companies/manage">
+                  <Button fullWidth>
                     <Settings2 size={16} />
                     <span className="ml-2">Gerenciar empresa</span>
                   </Button>
@@ -137,98 +139,89 @@ export function CompanyProfilePage() {
               ) : (
                 <Button
                   fullWidth
-                  className="rounded-xl py-3"
                   onClick={() => startChatMutation.mutate()}
                   isLoading={startChatMutation.isPending}
                 >
-                  Enviar mensagem
+                  <MessageCircle size={16} />
+                  <span className="ml-2">Enviar mensagem</span>
                 </Button>
               )}
 
-              {company.owner?.id ? (
-                <Link to={`/profile/${company.owner.id}`} className="block">
-                  <Button variant="secondary" fullWidth className="rounded-xl py-3">
-                    <ExternalLink size={16} />
-                    <span className="ml-2">Ver perfil do responsavel</span>
+              {company.owner?.id && (
+                <Link to={`/profile/${company.owner.id}`}>
+                  <Button variant="glass" fullWidth>
+                    <ExternalLink size={15} />
+                    <span className="ml-2">Ver responsável</span>
                   </Button>
                 </Link>
-              ) : null}
+              )}
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 lg:mt-8 lg:grid-cols-3">
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Status</p>
-              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">
-                {company.isActive ? 'Perfil publico ativo' : 'Perfil pausado'}
+          <div className="mt-5 grid gap-2 lg:mt-7 lg:grid-cols-3">
+            <div className="relative rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 dark:bg-white/[0.04]">
+              <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-cobalt" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Status</p>
+              <p className="mt-1 font-display text-sm font-bold text-ink">
+                {company.isActive ? 'Perfil público' : 'Perfil pausado'}
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Produtos</p>
-              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-gray-900 lg:text-base">
-                <Package2 size={16} className="text-gray-400" />
-                {totalProducts} item(ns)
+            <div className="relative rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 dark:bg-white/[0.04]">
+              <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-citrus" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Produtos</p>
+              <p className="mt-1 flex items-center gap-2 font-display text-sm font-bold text-ink">
+                <Package2 size={14} className="text-mute" />
+                {totalProducts}
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                Publicacoes
-              </p>
-              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-gray-900 lg:text-base">
-                <Store size={16} className="text-gray-400" />
-                {totalPosts} publicacao(oes)
+            <div className="relative rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 dark:bg-white/[0.04]">
+              <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-coral" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Publicações</p>
+              <p className="mt-1 flex items-center gap-2 font-display text-sm font-bold text-ink">
+                <Store size={14} className="text-mute" />
+                {totalPosts}
               </p>
             </div>
           </div>
 
-          {company.description ? (
-            <p className="mt-5 text-sm leading-relaxed text-gray-700 lg:mt-6 lg:text-base">
+          {company.description && (
+            <p className="mt-5 text-[15px] leading-relaxed text-ink lg:mt-6">
               {company.description}
             </p>
-          ) : null}
+          )}
         </div>
-      </Card>
+      </div>
 
       {company.products?.length > 0 && (
         <div>
-          <h2 className="mb-3 text-lg font-bold text-gray-900">Catalogo</h2>
+          <h2 className="mb-3 font-display text-xl font-bold tracking-tight text-ink">Catálogo</h2>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {company.products.map((product: any) => (
-              <Card key={product.id} className="overflow-hidden rounded-[28px] p-0">
+              <div key={product.id} className="glass shape-signature overflow-hidden">
                 {product.imageUrl ? (
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="h-44 w-full object-cover"
-                  />
+                  <img src={product.imageUrl} alt={product.name} className="h-44 w-full object-cover" />
                 ) : (
-                  <div className="flex h-44 items-center justify-center bg-gray-100 text-xs text-gray-300">
+                  <div className="flex h-44 items-center justify-center bg-ink/5 font-mono text-[10px] uppercase text-mute dark:bg-white/5">
                     sem foto
                   </div>
                 )}
                 <div className="space-y-2 p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-semibold text-gray-900">{product.name}</p>
-                    <span
-                      className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-semibold ${
-                        product.isAvailable
-                          ? 'bg-emerald-50 text-emerald-600'
-                          : 'bg-gray-100 text-gray-500'
-                      }`}
-                    >
-                      {product.isAvailable ? 'Disponivel' : 'Indisponivel'}
+                    <p className="font-display text-sm font-bold text-ink">{product.name}</p>
+                    <span className={product.isAvailable ? 'chip chip-mint' : 'chip'}>
+                      {product.isAvailable ? 'OK' : 'INDISP.'}
                     </span>
                   </div>
                   {product.description && (
-                    <p className="text-sm text-gray-600">{product.description}</p>
+                    <p className="text-xs leading-5 text-mute">{product.description}</p>
                   )}
                   {product.price != null && (
-                    <p className="text-sm font-bold text-blue-600">
+                    <p className="font-mono text-sm font-bold text-ink">
                       {formatCurrency(Number(product.price))}
                     </p>
                   )}
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
@@ -236,100 +229,94 @@ export function CompanyProfilePage() {
 
       {company.posts?.length > 0 && (
         <div>
-          <h2 className="mb-3 text-lg font-bold text-gray-900">Publicacoes da empresa</h2>
+          <h2 className="mb-3 font-display text-xl font-bold tracking-tight text-ink">Publicações</h2>
           <div className="grid gap-3 xl:grid-cols-2">
             {company.posts.map((post: any) => (
-              <Card key={post.id} className="space-y-4 rounded-[28px] p-4">
-                {post.promotion ? (
-                  <div className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                    <Sparkles size={13} />
-                    Publicacao impulsionada
-                  </div>
-                ) : null}
+              <div key={post.id} className="glass shape-signature space-y-4 p-5">
+                {post.promotion && (
+                  <span className="chip chip-magenta">
+                    <Sparkles size={11} />
+                    IMPULSIONADO
+                  </span>
+                )}
 
                 <div className="flex items-center justify-between gap-3">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                  <span className="chip">
                     {new Date(post.createdAt).toLocaleDateString('pt-BR')}
                   </span>
-                  <span className="text-xs text-gray-400">
-                    {post.media?.length ?? 0} arquivo(s)
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                    {post.media?.length ?? 0} arquivos
                   </span>
                 </div>
 
-                {post.promotion?.headline ? (
+                {post.promotion?.headline && (
                   <div>
-                    <p className="text-base font-semibold text-gray-900">
+                    <p className="font-display text-base font-bold text-ink">
                       {post.promotion.headline}
                     </p>
-                    {post.promotion.subtitle ? (
-                      <p className="mt-1 text-sm leading-relaxed text-gray-600">
+                    {post.promotion.subtitle && (
+                      <p className="mt-1 text-sm leading-relaxed text-mute">
                         {post.promotion.subtitle}
                       </p>
-                    ) : null}
+                    )}
                   </div>
-                ) : null}
+                )}
 
                 {post.content ? (
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink">
                     {post.content}
                   </p>
                 ) : (
-                  <p className="text-sm text-gray-400">Publicacao sem texto.</p>
+                  <p className="text-sm text-mute">Publicação sem texto.</p>
                 )}
 
                 <PostMediaGallery media={post.media ?? []} />
 
                 {post.promotion?.kind === PromotionKind.COMPANY_PRODUCTS &&
-                post.promotion.products?.length ? (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {post.promotion.products.map((item: any) => {
-                      const product = item.product;
-
-                      if (!product) return null;
-
-                      return (
-                        <div
-                          key={product.id}
-                          className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-50"
-                        >
-                          {product.imageUrl ? (
-                            <img
-                              src={product.imageUrl}
-                              alt={product.name}
-                              className="h-32 w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-32 items-center justify-center text-gray-300">
-                              <Package2 size={24} />
-                            </div>
-                          )}
-                          <div className="space-y-1 p-3">
-                            <p className="line-clamp-2 text-sm font-semibold text-gray-900">
-                              {product.name}
-                            </p>
-                            {product.description ? (
-                              <p className="line-clamp-2 text-xs leading-5 text-gray-500">
-                                {product.description}
-                              </p>
-                            ) : null}
-                            {product.price != null ? (
-                              <p className="text-sm font-bold text-blue-600">
-                                {formatCurrency(Number(product.price))}
-                              </p>
+                  post.promotion.products?.length > 0 && (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {post.promotion.products.map((item: any) => {
+                        const product = item.product;
+                        if (!product) return null;
+                        return (
+                          <div
+                            key={product.id}
+                            className="overflow-hidden rounded-2xl border border-line bg-ink/[0.02] dark:bg-white/[0.04]"
+                          >
+                            {product.imageUrl ? (
+                              <img src={product.imageUrl} alt={product.name} className="h-32 w-full object-cover" />
                             ) : (
-                              <p className="text-xs font-medium text-gray-500">
-                                Consulte disponibilidade
-                              </p>
+                              <div className="flex h-32 items-center justify-center text-mute">
+                                <Package2 size={24} />
+                              </div>
                             )}
+                            <div className="space-y-1 p-3">
+                              <p className="line-clamp-2 font-display text-sm font-bold text-ink">
+                                {product.name}
+                              </p>
+                              {product.description && (
+                                <p className="line-clamp-2 text-xs leading-5 text-mute">
+                                  {product.description}
+                                </p>
+                              )}
+                              {product.price != null ? (
+                                <p className="font-mono text-sm font-bold text-ink">
+                                  {formatCurrency(Number(product.price))}
+                                </p>
+                              ) : (
+                                <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                                  A consultar
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
+                        );
+                      })}
+                    </div>
+                  )}
 
-                <PostEngagement post={post} />
-              </Card>
+                <PostEngagement post={post} accent="cobalt" />
+              </div>
             ))}
           </div>
         </div>

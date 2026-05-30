@@ -1,315 +1,346 @@
 import { Link } from 'react-router-dom';
 import {
-  Users,
-  Store,
+  ArrowRight,
+  Building2,
+  ChevronRight,
   MessageCircle,
   Rss,
-  ChevronRight,
-  MapPin,
+  Sparkles,
   Star,
-  Bell,
-  ShoppingBag,
+  Store,
 } from 'lucide-react';
 
-const features = [
-  {
-    icon: Rss,
-    title: 'Feed Comunitário',
-    desc: 'Acompanhe as novidades, eventos e histórias da sua cidade em um só lugar.',
-    color: 'from-blue-500 to-blue-600',
-  },
-  {
-    icon: Store,
-    title: 'Classificados Locais',
-    desc: 'Compre e venda produtos e serviços com segurança dentro da sua comunidade.',
-    color: 'from-emerald-500 to-emerald-600',
-  },
-  {
-    icon: MessageCircle,
-    title: 'Chat em Tempo Real',
-    desc: 'Converse com vizinhos, empresas e amigos de forma rápida e segura.',
-    color: 'from-violet-500 to-violet-600',
-  },
-  {
-    icon: Users,
-    title: 'Empresas Locais',
-    desc: 'Descubra e apoie os negócios da sua região. Crie seu perfil profissional.',
-    color: 'from-orange-500 to-orange-600',
-  },
+type AccentTone = 'coral' | 'citrus' | 'cobalt' | 'magenta' | 'mint';
+
+const features: Array<{ icon: any; title: string; desc: string; accent: AccentTone }> = [
+  { icon: Rss, title: 'Feed Comunitário', desc: 'Acompanhe novidades, eventos e histórias da sua cidade.', accent: 'coral' },
+  { icon: Store, title: 'Mercado Local', desc: 'Compre e venda com vizinhos. Pratos, móveis, serviços.', accent: 'citrus' },
+  { icon: Building2, title: 'Empresas', desc: 'Descubra negócios da sua região. Crie um perfil profissional.', accent: 'cobalt' },
+  { icon: MessageCircle, title: 'Conversas', desc: 'Mensagens diretas com qualquer pessoa da plataforma.', accent: 'magenta' },
 ];
 
 const stats = [
-  { value: '10k+', label: 'Moradores conectados' },
-  { value: '500+', label: 'Empresas cadastradas' },
-  { value: '25k+', label: 'Publicações mensais' },
-  { value: '4.9★', label: 'Avaliação dos usuários' },
+  { value: '10k+', label: 'Moradores', accent: 'bg-coral' },
+  { value: '500+', label: 'Empresas', accent: 'bg-cobalt' },
+  { value: '25k+', label: 'Posts/mês', accent: 'bg-citrus' },
+  { value: '4.9', label: 'Avaliação', accent: 'bg-magenta' },
 ];
 
-const testimonials = [
+const testimonials: Array<{ name: string; role: string; text: string; accent: AccentTone }> = [
   {
     name: 'Ana Paula S.',
-    role: 'Comerciante local',
-    text: 'Com o Palmital Digital triplicamos os pedidos do nosso restaurante sem precisar de delivery externo!',
-    avatar: 'AP',
+    role: 'Restaurante local',
+    text: 'Triplicamos os pedidos do restaurante sem precisar de delivery externo.',
+    accent: 'coral',
   },
   {
     name: 'Carlos M.',
-    role: 'Morador do bairro',
-    text: 'Consegui vender meu carro em 2 dias pelos classificados. A plataforma é muito fácil de usar.',
-    avatar: 'CM',
+    role: 'Morador',
+    text: 'Vendi meu carro em 2 dias pelo mercado. Plataforma fácil de usar.',
+    accent: 'citrus',
   },
   {
     name: 'Maria L.',
     role: 'Prestadora de serviços',
-    text: 'Hoje tenho clientes que nunca saberiam que eu existia. O alcance local é incrível!',
-    avatar: 'ML',
+    text: 'Hoje tenho clientes que nunca saberiam que eu existia. Alcance local incrível.',
+    accent: 'magenta',
   },
 ];
 
+const accentBg: Record<string, string> = {
+  coral: 'bg-coral',
+  citrus: 'bg-citrus text-ink',
+  cobalt: 'bg-cobalt',
+  magenta: 'bg-magenta',
+  mint: 'bg-mint text-ink',
+};
+
+const accentHalo: Record<string, string> = {
+  coral: 'halo-coral',
+  citrus: 'halo-citrus',
+  cobalt: 'halo-cobalt',
+  magenta: 'halo-magenta',
+  mint: 'halo-mint',
+};
+
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-white font-sans">
-      {/* ── HEADER ── */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-              <MapPin size={16} className="text-white" />
+    <div className="relative min-h-screen overflow-hidden bg-canvas text-ink">
+      {/* Halos de fundo */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -left-32 -top-32 h-[36rem] w-[36rem] rounded-full opacity-25 blur-[150px]" style={{ background: '#FF5B49' }} />
+        <div className="absolute right-[-12rem] top-[20%] h-[32rem] w-[32rem] rounded-full opacity-20 blur-[140px]" style={{ background: '#3D5AFE' }} />
+        <div className="absolute -bottom-32 left-[25%] h-[30rem] w-[30rem] rounded-full opacity-20 blur-[140px]" style={{ background: '#5EEAD4' }} />
+        <div className="absolute right-[15%] bottom-[20%] h-[24rem] w-[24rem] rounded-full opacity-15 blur-[120px]" style={{ background: '#E94FCB' }} />
+      </div>
+
+      {/* HEADER flutuante */}
+      <header className="fixed inset-x-3 top-3 z-50 lg:inset-x-6 lg:top-4">
+        <div className="glass shape-signature mx-auto flex h-14 max-w-6xl items-center justify-between px-3 lg:h-16 lg:px-5">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="halo halo-coral flex h-8 w-8 items-center justify-center rounded-xl bg-ink text-surface">
+              <span className="font-display text-base font-black">P</span>
             </div>
-            <span className="text-lg font-bold text-blue-700 tracking-tight">Palmital Digital</span>
-          </div>
-          <div className="flex items-center gap-3">
+            <span className="font-display text-base font-bold tracking-tight text-ink">
+              Palmital
+            </span>
+          </Link>
+          <div className="flex items-center gap-2">
             <Link
               to="/login"
-              className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-50"
+              className="rounded-xl px-3 py-1.5 text-sm font-bold text-ink transition-colors hover:bg-ink/5 dark:hover:bg-white/5"
             >
               Entrar
             </Link>
             <Link
               to="/register"
-              className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-lg transition-colors shadow-sm"
+              className="btn-ink !py-2 !text-sm"
             >
-              Criar conta grátis
+              Criar conta
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ── HERO ── */}
-      <section className="pt-14 min-h-screen flex items-center bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-12 items-center">
-          {/* Left content */}
-          <div className="flex flex-col gap-6">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full w-fit">
-              <Bell size={12} />
-              Novidades todo dia na sua cidade
+      {/* HERO */}
+      <section className="px-4 pb-16 pt-32 lg:px-6 lg:pt-40">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+            <div>
+              <div className="chip chip-coral">
+                <Sparkles size={11} strokeWidth={2.5} />
+                NOVO EM PALMITAL
+              </div>
+              <h1 className="mt-4 font-display text-5xl font-bold leading-[1.05] tracking-tight text-ink lg:text-7xl">
+                A rede da{' '}
+                <span className="relative inline-block">
+                  <span className="halo halo-coral relative z-10">sua cidade</span>
+                  <span className="absolute -bottom-1 left-0 h-3 w-full bg-coral/40" />
+                </span>
+                .
+              </h1>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-mute lg:text-xl">
+                Feed, mercado, empresas e mensagens. Tudo em um só lugar, sem azul-genérico e sem
+                promessa vazia.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  to="/register"
+                  className="halo halo-coral group flex items-center justify-center gap-2 rounded-2xl bg-ink px-6 py-4 font-bold text-surface transition-all hover:-translate-y-0.5 hover:shadow-xl"
+                >
+                  Criar conta grátis
+                  <ArrowRight size={18} strokeWidth={2.4} className="transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  to="/login"
+                  className="btn-glass !py-4"
+                >
+                  Já tenho conta
+                </Link>
+              </div>
+
+              <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {stats.map((s) => (
+                  <div key={s.label} className="relative">
+                    <span className={`absolute -top-1 left-0 h-1.5 w-1.5 rounded-full ${s.accent}`} />
+                    <p className="font-display text-2xl font-bold text-ink lg:text-3xl">{s.value}</p>
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-mute">
+                      {s.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-              A rede social da{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                sua comunidade
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Conecte-se com moradores, descubra empresas locais, compre e venda nos classificados —
-              tudo em uma plataforma feita especialmente para Palmital e região.
+
+            {/* Mockup */}
+            <div className="hidden lg:flex justify-center">
+              <div className="relative">
+                <div
+                  className="halo halo-coral relative h-[560px] w-[300px] bg-ink p-3 shadow-2xl"
+                  style={{ borderRadius: '48px 48px 24px 48px' }}
+                >
+                  <div
+                    className="flex h-full flex-col overflow-hidden bg-canvas"
+                    style={{ borderRadius: '36px 36px 14px 36px' }}
+                  >
+                    <div className="glass flex items-center justify-between px-4 py-3">
+                      <span className="font-display text-sm font-bold text-ink">Feed</span>
+                      <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-coral text-white">
+                        <MessageCircle size={12} />
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-3 overflow-hidden p-3">
+                      {[
+                        { name: 'Prefeitura', time: '2min', txt: 'Festa junina confirmada sábado!', accent: 'coral' },
+                        { name: 'João M.', time: '15min', txt: 'Honda Fit 2019 — R$52.000', accent: 'citrus' },
+                        { name: 'Padaria Central', time: '1h', txt: 'Pão de queijo fresquinho desde as 6h', accent: 'cobalt' },
+                      ].map((item) => (
+                        <div key={item.name} className="glass p-3" style={{ borderRadius: '14px 14px 4px 14px' }}>
+                          <div className="mb-1.5 flex items-center gap-2">
+                            <div className={`flex h-5 w-5 items-center justify-center rounded-md ${accentBg[item.accent]} text-[8px] font-bold`}>
+                              {item.name[0]}
+                            </div>
+                            <span className="text-[11px] font-bold text-ink">{item.name}</span>
+                            <span className="ml-auto font-mono text-[9px] uppercase text-mute">
+                              {item.time}
+                            </span>
+                          </div>
+                          <p className="text-[11px] leading-tight text-ink">{item.txt}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="glass flex justify-around border-t border-line py-2">
+                      {[Rss, Store, MessageCircle, Building2].map((Icon, i) => (
+                        <div key={i} className={`p-1.5 ${i === 0 ? 'text-coral' : 'text-mute'}`}>
+                          <Icon size={16} strokeWidth={i === 0 ? 2.4 : 1.5} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass absolute -left-10 top-32 animate-bounce-slow p-3" style={{ borderRadius: '16px 16px 4px 16px' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="halo halo-citrus flex h-8 w-8 items-center justify-center rounded-lg bg-citrus text-ink">
+                      <Store size={15} />
+                    </div>
+                    <div>
+                      <p className="font-display text-[11px] font-bold text-ink">Novo anúncio</p>
+                      <p className="font-mono text-[9px] uppercase text-mute">Bike — R$350</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass absolute -right-10 bottom-32 p-3" style={{ borderRadius: '16px 16px 4px 16px' }}>
+                  <div className="flex items-center gap-2">
+                    <div className="halo halo-magenta flex h-8 w-8 items-center justify-center rounded-lg bg-magenta text-white">
+                      <Star size={15} />
+                    </div>
+                    <div>
+                      <p className="font-display text-[11px] font-bold text-ink">4.9 ★</p>
+                      <p className="font-mono text-[9px] uppercase text-mute">Avaliação</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="px-4 py-20 lg:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-coral">
+              O que tem aqui
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <h2 className="mt-2 font-display text-4xl font-bold leading-tight tracking-tight text-ink lg:text-5xl">
+              Tudo que sua cidade precisa,<br />em um só lugar.
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map(({ icon: Icon, title, desc, accent }) => (
+              <div
+                key={title}
+                className="glass shape-signature group p-5 transition-all hover:-translate-y-1"
+              >
+                <div className={`halo ${accentHalo[accent]} flex h-12 w-12 items-center justify-center rounded-xl ${accentBg[accent]}`}>
+                  <Icon size={22} strokeWidth={2.2} className={accent === 'citrus' || accent === 'mint' ? 'text-ink' : 'text-white'} />
+                </div>
+                <h3 className="mt-4 font-display text-lg font-bold tracking-tight text-ink">{title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-mute">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="px-4 py-20 lg:px-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-magenta">
+              Histórias reais
+            </p>
+            <h2 className="mt-2 font-display text-4xl font-bold leading-tight tracking-tight text-ink lg:text-5xl">
+              Quem usa, aprova.
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+            {testimonials.map(({ name, role, text, accent }) => (
+              <div key={name} className="glass shape-signature p-6">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} size={13} className="fill-amber text-amber" />
+                  ))}
+                </div>
+                <p className="mt-4 text-[15px] leading-relaxed text-ink">"{text}"</p>
+                <div className="mt-5 flex items-center gap-3">
+                  <div className={`halo ${accentHalo[accent]} flex h-10 w-10 items-center justify-center rounded-xl ${accentBg[accent]} font-display text-sm font-bold text-white`}>
+                    {name[0]}
+                  </div>
+                  <div>
+                    <p className="font-display text-sm font-bold text-ink">{name}</p>
+                    <p className="font-mono text-[10px] uppercase tracking-wider text-mute">{role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="px-4 py-20 lg:px-6">
+        <div className="mx-auto max-w-3xl">
+          <div className="glass-strong shape-signature-lg halo halo-coral relative overflow-hidden p-8 text-center lg:p-14">
+            <div className="chip chip-coral mx-auto">
+              <Sparkles size={11} strokeWidth={2.5} />
+              GRÁTIS PARA SEMPRE
+            </div>
+            <h2 className="mt-4 font-display text-4xl font-bold leading-tight tracking-tight text-ink lg:text-5xl">
+              Bem-vindo a Palmital<br />Digital.
+            </h2>
+            <p className="mt-4 text-lg text-mute">
+              É gratuito, leva menos de 1 minuto e conecta você com toda a cidade.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
                 to="/register"
-                className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 rounded-xl text-base transition-all shadow-lg shadow-blue-200 hover:shadow-blue-300 hover:-translate-y-0.5 active:translate-y-0"
+                className="halo halo-coral inline-flex items-center justify-center gap-2 rounded-2xl bg-ink px-8 py-4 font-bold text-surface transition-all hover:-translate-y-0.5"
               >
-                Criar conta grátis
-                <ChevronRight size={18} />
+                Criar conta
+                <ChevronRight size={18} strokeWidth={2.4} />
               </Link>
               <Link
                 to="/login"
-                className="flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-800 font-semibold px-6 py-3.5 rounded-xl text-base transition-all border border-gray-200 shadow-sm hover:shadow hover:-translate-y-0.5 active:translate-y-0"
+                className="btn-glass !py-4"
               >
                 Já tenho conta
               </Link>
             </div>
-            {/* Stats strip */}
-            <div className="flex flex-wrap gap-6 pt-2">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <p className="text-2xl font-extrabold text-blue-600">{s.value}</p>
-                  <p className="text-xs text-gray-500">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right: App preview mockup */}
-          <div className="hidden md:flex justify-center">
-            <div className="relative">
-              {/* Phone frame */}
-              <div className="w-[280px] h-[520px] bg-gray-900 rounded-[3rem] shadow-2xl p-3 ring-4 ring-gray-800">
-                <div className="h-full bg-gray-50 rounded-[2.4rem] overflow-hidden flex flex-col">
-                  {/* Fake app bar */}
-                  <div className="bg-white px-4 py-2.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="font-bold text-blue-600 text-sm">Palmital Digital</span>
-                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Bell size={12} className="text-blue-600" />
-                    </div>
-                  </div>
-                  {/* Fake posts */}
-                  <div className="flex-1 overflow-hidden p-3 space-y-3">
-                    {[
-                      { user: 'Prefeitura', time: '2min', txt: '🎉 Festa junina confirmada na praça central este sábado!' },
-                      { user: 'João M.', time: '15min', txt: 'Vendo Honda Fit 2019, único dono. Valor: R$52.000' },
-                      { user: 'Padaria Central', time: '1h', txt: 'Pão de queijo fresquinho todos os dias a partir das 6h!' },
-                    ].map((item) => (
-                      <div key={item.user} className="bg-white rounded-xl p-3 shadow-sm">
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-[8px] text-white font-bold">
-                            {item.user[0]}
-                          </div>
-                          <span className="text-[11px] font-semibold text-gray-800">{item.user}</span>
-                          <span className="text-[10px] text-gray-400 ml-auto">{item.time}</span>
-                        </div>
-                        <p className="text-[11px] text-gray-700 leading-relaxed">{item.txt}</p>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Fake bottom nav */}
-                  <div className="bg-white border-t border-gray-100 flex justify-around py-2">
-                    {[Rss, ShoppingBag, MessageCircle, Users].map((Icon, i) => (
-                      <div key={i} className={`p-2 rounded-xl ${i === 0 ? 'text-blue-600' : 'text-gray-300'}`}>
-                        <Icon size={18} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {/* Floating cards */}
-              <div className="absolute -left-12 top-24 bg-white shadow-xl rounded-2xl p-3 flex items-center gap-2 w-44 animate-bounce-slow">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <Store size={16} className="text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold text-gray-800">Novo classificado</p>
-                  <p className="text-[10px] text-gray-500">Bike aro 26 — R$350</p>
-                </div>
-              </div>
-              <div className="absolute -right-10 bottom-32 bg-white shadow-xl rounded-2xl p-3 flex items-center gap-2 w-40">
-                <div className="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-                  <Star size={16} className="text-violet-600" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold text-gray-800">4.9 ★★★★★</p>
-                  <p className="text-[10px] text-gray-500">Avaliação média</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">
-              Tudo que sua cidade precisa em um só app
-            </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              Uma plataforma completa desenvolvida para fortalecer as conexões e a economia local.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map(({ icon: Icon, title, desc, color }) => (
-              <div
-                key={title}
-                className="group p-6 rounded-2xl border border-gray-100 hover:border-blue-100 hover:shadow-lg hover:-translate-y-1 transition-all bg-white"
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-4 shadow-sm`}>
-                  <Icon size={22} className="text-white" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1.5">{title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TESTIMONIALS ── */}
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">
-              Quem usa, aprova
-            </h2>
-            <p className="text-gray-500">Histórias reais de quem transformou sua vida na plataforma.</p>
-          </div>
-          <div className="grid sm:grid-cols-3 gap-6">
-            {testimonials.map(({ name, role, text, avatar }) => (
-              <div key={name} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-start gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} size={14} className="fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 text-sm leading-relaxed mb-5 italic">"{text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
-                    {avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm">{name}</p>
-                    <p className="text-xs text-gray-500">{role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-extrabold text-white mb-4">
-            Faça parte da comunidade digital de Palmital
-          </h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            É gratuito, leva menos de 1 minuto e conecta você com toda a cidade.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 font-bold px-8 py-3.5 rounded-xl text-base hover:bg-blue-50 transition-all shadow-lg hover:-translate-y-0.5"
-            >
-              Criar conta gratuita
-              <ChevronRight size={18} />
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500/30 hover:bg-blue-500/50 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-all border border-white/20"
-            >
-              Já tenho conta
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ── */}
-      <footer className="bg-gray-900 text-gray-400 py-10">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* FOOTER */}
+      <footer className="px-4 py-10 lg:px-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 border-t border-line pt-8 sm:flex-row">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center">
-              <MapPin size={12} className="text-white" />
+            <div className="halo halo-coral flex h-6 w-6 items-center justify-center rounded-md bg-ink text-surface">
+              <span className="font-display text-xs font-black">P</span>
             </div>
-            <span className="font-bold text-white text-sm">Palmital Digital</span>
+            <span className="font-display text-sm font-bold text-ink">Palmital Digital</span>
           </div>
-          <p className="text-xs text-center">
-            © {new Date().getFullYear()} Palmital Digital. Conectando a cidade.
+          <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+            © {new Date().getFullYear()} — Conectando a cidade
           </p>
-          <div className="flex gap-4 text-xs">
-            <a href="#" className="hover:text-white transition-colors">Privacidade</a>
-            <a href="#" className="hover:text-white transition-colors">Termos</a>
-            <a href="#" className="hover:text-white transition-colors">Suporte</a>
+          <div className="flex gap-4 font-mono text-[10px] uppercase tracking-wider text-mute">
+            <a href="#" className="hover:text-ink">Privacidade</a>
+            <a href="#" className="hover:text-ink">Termos</a>
+            <a href="#" className="hover:text-ink">Suporte</a>
           </div>
         </div>
       </footer>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Button, Card, Input, Spinner } from '@palmital/ui';
+import { Avatar, Button, Input, Spinner } from '@palmital/ui';
 import { api } from '../../services/api';
 import { ImageCropDialog } from '../../components/shared/ImageCropDialog';
 import { useAuthStore } from '../../store/authStore';
@@ -37,14 +37,12 @@ export function ProfilePage() {
 
   useEffect(() => {
     if (!profile) return;
-
     setForm({
       displayName: profile.profile?.displayName ?? '',
       bio: profile.profile?.bio ?? '',
       city: profile.profile?.city ?? '',
       phone: profile.phone ?? '',
     });
-
     setUser({
       id: profile.id,
       email: profile.email,
@@ -150,27 +148,33 @@ export function ProfilePage() {
   }
 
   if (isLoading) {
-    return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
   }
 
   const p = profile?.profile;
   const displayName = p?.displayName ?? user?.profile?.displayName ?? user?.email ?? 'Usuario';
 
   return (
-    <div className="space-y-6 px-4 pb-8 pt-4 lg:px-0">
-      <Card className="overflow-hidden border-blue-100/80 p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
-        <div className="relative h-28 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-40">
+    <div className="space-y-5">
+      <div className="glass shape-signature-lg overflow-hidden">
+        {/* Cover */}
+        <div className="relative h-32 overflow-hidden bg-ink/[0.04] sm:h-44 lg:h-52 dark:bg-white/[0.04]">
           {p?.coverUrl ? (
             <img src={p.coverUrl} alt="" className="h-full w-full object-cover" />
-          ) : null}
-          <div className="absolute inset-y-0 right-0 w-32 rounded-full bg-white/10 blur-2xl lg:w-48" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent" />
+          ) : (
+            <div className="absolute inset-0 opacity-30" style={{ background: 'radial-gradient(circle at 30% 50%, #FF5B49 0%, transparent 55%), radial-gradient(circle at 70% 50%, #3D5AFE 0%, transparent 55%)' }} />
+          )}
           <button
             type="button"
             onClick={() => coverInputRef.current?.click()}
-            className="absolute right-3 top-3 rounded-xl bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-white"
+            className="btn-glass absolute right-3 top-3 !py-2 !text-xs"
             disabled={coverMutation.isPending}
           >
+            <Camera size={14} />
             Trocar capa
           </button>
           <input
@@ -182,25 +186,30 @@ export function ProfilePage() {
           />
         </div>
 
-        <div className="px-4 pb-5 pt-4 lg:px-8 lg:pb-8 lg:pt-0">
+        <div className="px-5 pb-6 pt-4 lg:px-8 lg:pb-8">
           <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
             <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
-              <div className="-mt-10 inline-flex lg:-mt-14">
-                <div className="relative rounded-[28px] border-4 border-white bg-white shadow-lg shadow-blue-900/10">
-                  <Avatar
-                    src={p?.avatarUrl}
-                    name={displayName}
-                    size="lg"
-                    className="h-16 w-16 text-2xl lg:h-24 lg:w-24 lg:text-3xl"
-                  />
+              <div className="-mt-14 inline-flex lg:-mt-20">
+                <div
+                  className="relative bg-surface p-1 dark:bg-canvas"
+                  style={{ borderRadius: '28px 28px 8px 28px' }}
+                >
+                  <div className="overflow-hidden" style={{ borderRadius: '24px 24px 4px 24px' }}>
+                    <Avatar
+                      src={p?.avatarUrl}
+                      name={displayName}
+                      size="xl"
+                      className="!h-24 !w-24 !rounded-none !ring-0 lg:!h-32 lg:!w-32 lg:!text-4xl"
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => avatarInputRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
+                    className="halo halo-coral absolute -bottom-1 -right-1 rounded-full border-2 border-surface bg-coral p-2 text-white transition-colors hover:scale-110 dark:border-canvas"
                     disabled={avatarMutation.isPending}
                     aria-label="Alterar avatar"
                   >
-                    <Camera size={14} />
+                    <Camera size={14} strokeWidth={2.4} />
                   </button>
                   <input
                     ref={avatarInputRef}
@@ -213,65 +222,76 @@ export function ProfilePage() {
               </div>
 
               <div className="mt-4 min-w-0 space-y-1 lg:mt-0 lg:pb-2">
-                <h1 className="text-[1.35rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">{displayName}</h1>
-                <p className="break-all text-sm text-gray-500 lg:text-base">{profile?.email}</p>
+                <h1 className="font-display text-2xl font-bold leading-tight tracking-tight text-ink lg:text-[2rem]">
+                  {displayName}
+                </h1>
+                <p className="break-all font-mono text-[10px] uppercase tracking-wider text-mute">
+                  {profile?.email}
+                </p>
                 {p?.bio && (
-                  <p className="max-w-3xl pt-2 text-sm leading-relaxed text-gray-600">
+                  <p className="max-w-3xl pt-2 text-sm leading-relaxed text-ink">
                     {p.bio}
                   </p>
                 )}
               </div>
             </div>
 
-            <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:w-[19rem] lg:shrink-0">
+            <div className="mt-5 flex flex-col gap-2 lg:mt-0 lg:w-[19rem] lg:shrink-0">
               <Button
-                variant="secondary"
-                size="sm"
+                variant="primary"
                 fullWidth
-                className="rounded-xl py-3"
                 onClick={() => setEditing((value) => !value)}
               >
-                {editing ? 'Fechar edicao' : 'Gerenciar perfil'}
+                {editing ? 'Fechar edição' : 'Editar perfil'}
               </Button>
               {user?.id && (
-                <Link to={`/profile/${user.id}?preview=public`} className="block">
-                  <Button fullWidth size="sm" className="rounded-xl px-4 py-3 whitespace-nowrap">
-                    <ExternalLink size={16} />
-                    <span className="ml-2">Ver versao publica</span>
+                <Link to={`/profile/${user.id}?preview=public`}>
+                  <Button fullWidth variant="glass">
+                    <ExternalLink size={15} />
+                    <span className="ml-2">Ver perfil público</span>
                   </Button>
                 </Link>
               )}
-              <Button
-                variant="secondary"
-                size="sm"
-                fullWidth
-                className="rounded-xl py-3"
-                onClick={() => removeCoverMutation.mutate()}
-                disabled={!p?.coverUrl || removeCoverMutation.isPending}
-              >
-                Remover capa
-              </Button>
+              {p?.coverUrl && (
+                <Button
+                  variant="ghost"
+                  fullWidth
+                  size="sm"
+                  onClick={() => removeCoverMutation.mutate()}
+                  disabled={removeCoverMutation.isPending}
+                >
+                  Remover capa
+                </Button>
+              )}
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 lg:mt-8 lg:grid-cols-2">
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Cidade</p>
-              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">{p?.city || 'Nao informada'}</p>
+          <div className="mt-5 grid gap-2 lg:mt-7 lg:grid-cols-2">
+            <div className="relative rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 dark:bg-white/[0.04]">
+              <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-coral" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Cidade</p>
+              <p className="mt-1 font-display text-sm font-bold text-ink">
+                {p?.city || 'Não informada'}
+              </p>
             </div>
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 px-3 py-3.5 lg:px-4 lg:py-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Telefone</p>
-              <p className="mt-1 text-sm font-semibold text-gray-900 lg:text-base">{profile?.phone || 'Nao informado'}</p>
+            <div className="relative rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 dark:bg-white/[0.04]">
+              <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-cobalt" />
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Telefone</p>
+              <p className="mt-1 font-display text-sm font-bold text-ink">
+                {profile?.phone || 'Não informado'}
+              </p>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       {editing ? (
-        <Card className="space-y-4 p-4 lg:p-6">
+        <div className="glass shape-signature space-y-4 p-5 lg:p-6">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Editar perfil</h2>
-            <p className="text-sm text-gray-500">Atualize como a comunidade ve voce.</p>
+            <h2 className="font-display text-lg font-bold text-ink">Editar perfil</h2>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+              Como Palmital te vê
+            </p>
           </div>
 
           <form
@@ -282,21 +302,23 @@ export function ProfilePage() {
             className="space-y-4"
           >
             <Input
-              label="Nome de exibicao"
+              label="Nome de exibição"
               value={form.displayName}
               onChange={(e) => setForm((state) => ({ ...state, displayName: e.target.value }))}
               required
               maxLength={100}
             />
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Bio</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                Bio
+              </label>
               <textarea
                 value={form.bio}
                 onChange={(e) => setForm((state) => ({ ...state, bio: e.target.value }))}
                 rows={4}
                 maxLength={300}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="rounded-2xl border border-line bg-ink/[0.03] px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-subtle focus:border-coral focus:bg-surface focus:ring-4 focus:ring-coral/15 dark:bg-white/[0.04]"
               />
             </div>
 
@@ -307,7 +329,6 @@ export function ProfilePage() {
                 onChange={(e) => setForm((state) => ({ ...state, city: e.target.value }))}
                 maxLength={100}
               />
-
               <Input
                 label="Telefone"
                 value={form.phone}
@@ -316,51 +337,48 @@ export function ProfilePage() {
               />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                variant="secondary"
-                fullWidth
-                type="button"
-                onClick={() => setEditing(false)}
-              >
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button variant="ghost" fullWidth type="button" onClick={() => setEditing(false)}>
                 Cancelar
               </Button>
               <Button fullWidth type="submit" isLoading={updateMutation.isPending}>
-                Salvar alteracoes
+                Salvar
               </Button>
             </div>
           </form>
-        </Card>
+        </div>
       ) : (
-        <Card className="space-y-4 p-4 lg:p-6">
+        <div className="glass shape-signature space-y-4 p-5 lg:p-6">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Minha conta</h2>
-            <p className="text-sm text-gray-500">Gerencie seus dados principais e sessao ativa.</p>
+            <h2 className="font-display text-lg font-bold text-ink">Conta</h2>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+              Dados principais e sessão
+            </p>
           </div>
 
-          <div className="grid gap-3 text-sm text-gray-600 lg:grid-cols-2">
+          <div className="grid gap-3 text-sm text-ink lg:grid-cols-2">
             <p className="flex items-center gap-2">
-              <UserCircle2 size={16} className="text-gray-400" />
+              <UserCircle2 size={16} className="text-mute" />
               {displayName}
             </p>
             <p className="flex items-center gap-2">
-              <MapPin size={16} className="text-gray-400" />
-              {p?.city || 'Cidade nao informada'}
+              <MapPin size={16} className="text-mute" />
+              {p?.city || 'Cidade não informada'}
             </p>
             <p className="flex items-center gap-2 lg:col-span-2">
-              <Phone size={16} className="text-gray-400" />
-              {profile?.phone || 'Telefone nao informado'}
+              <Phone size={16} className="text-mute" />
+              {profile?.phone || 'Telefone não informado'}
             </p>
           </div>
 
           <button
             onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 py-3 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-coral/30 bg-coral/[0.05] py-3 text-sm font-bold text-coral transition-colors hover:bg-coral hover:text-white"
           >
             <LogOut size={16} />
             Sair da conta
           </button>
-        </Card>
+        </div>
       )}
 
       <ImageCropDialog

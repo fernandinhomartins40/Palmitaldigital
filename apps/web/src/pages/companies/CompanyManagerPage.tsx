@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Avatar, Button, Card, Input, Spinner } from '@palmital/ui';
+import { Avatar, Button, Input, Spinner } from '@palmital/ui';
 import { PostEngagement } from '../../components/feed/PostEngagement';
 import { PostMediaGallery } from '../../components/feed/PostMediaGallery';
 import { ImageCropDialog } from '../../components/shared/ImageCropDialog';
@@ -352,20 +352,22 @@ export function CompanyManagerPage() {
   }
 
   return (
-    <div className="space-y-6 px-4 pb-8 pt-4 lg:px-0">
+    <div className="space-y-5">
       {company ? (
         <>
-          <Card className="overflow-hidden p-0 shadow-[0_10px_30px_rgba(37,99,235,0.08)]">
-            <div className="relative h-40 overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 lg:h-52">
+          <div className="glass shape-signature-lg overflow-hidden">
+            <div className="relative h-40 overflow-hidden bg-ink/[0.04] lg:h-52 dark:bg-white/[0.04]">
               {companyCover ? (
                 <img src={companyCover} alt="" className="h-full w-full object-cover" />
-              ) : null}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-slate-950/10 to-transparent" />
+              ) : (
+                <div className="absolute inset-0 opacity-30" style={{ background: 'radial-gradient(circle at 30% 50%, #3D5AFE 0%, transparent 55%), radial-gradient(circle at 70% 50%, #5EEAD4 0%, transparent 55%)' }} />
+              )}
               <button
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
-                className="absolute right-4 top-4 rounded-xl bg-white/90 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-white"
+                className="btn-glass absolute right-4 top-4 !py-2 !text-xs"
               >
+                <Camera size={14} />
                 Trocar capa
               </button>
               <input
@@ -381,7 +383,7 @@ export function CompanyManagerPage() {
               <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
                 <div className="lg:flex lg:min-w-0 lg:flex-1 lg:items-end lg:gap-5">
                   <div className="-mt-10 inline-flex lg:-mt-14">
-                    <div className="relative rounded-[28px] border-4 border-white bg-white shadow-lg">
+                    <div className="relative bg-surface p-1 dark:bg-canvas" style={{ borderRadius: '28px 28px 8px 28px' }}>
                       <Avatar
                         src={companyLogo}
                         name={company.name}
@@ -391,7 +393,7 @@ export function CompanyManagerPage() {
                       <button
                         type="button"
                         onClick={() => logoInputRef.current?.click()}
-                        className="absolute -bottom-1 -right-1 rounded-full border-2 border-white bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700"
+                        className="halo halo-cobalt absolute -bottom-1 -right-1 rounded-full border-2 border-surface bg-cobalt p-2 text-white transition-transform hover:scale-110 dark:border-canvas"
                         aria-label="Alterar logo"
                       >
                         <Camera size={14} />
@@ -408,25 +410,25 @@ export function CompanyManagerPage() {
 
                   <div className="mt-4 min-w-0 space-y-2 lg:mt-0 lg:pb-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-[1.45rem] font-bold leading-tight text-gray-900 lg:text-[2rem]">
+                      <h1 className="font-display text-[1.5rem] font-bold leading-tight tracking-tight text-ink lg:text-[2rem]">
                         {company.name}
                       </h1>
                       {company.isVerified ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-600">
-                          <BadgeCheck size={14} />
-                          Verificada
+                        <span className="chip chip-cobalt">
+                          <BadgeCheck size={11} />
+                          VERIFICADA
                         </span>
                       ) : null}
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold ${company.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}
+                        className={company.isActive ? 'chip chip-mint' : 'chip chip-amber'}
                       >
-                        {company.isActive ? 'Ativa' : 'Pausada'}
+                        {company.isActive ? 'ATIVA' : 'PAUSADA'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      {company.category || 'Categoria nao informada'}
+                    <p className="font-mono text-[11px] uppercase tracking-wider text-mute">
+                      {company.category || 'Categoria não informada'}
                     </p>
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                    <div className="flex flex-wrap gap-3 font-mono text-[10px] uppercase tracking-wider text-mute">
                       {company.city ? (
                         <span className="inline-flex items-center gap-1.5">
                           <MapPin size={14} />
@@ -445,25 +447,25 @@ export function CompanyManagerPage() {
 
                 <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:w-[19rem] lg:shrink-0">
                   <Link to={`/companies/${company.slug}`} className="block">
-                    <Button fullWidth className="rounded-xl py-3">
+                    <Button fullWidth>
                       <ExternalLink size={16} />
-                      <span className="ml-2">Ver perfil publico</span>
+                      <span className="ml-2">Ver perfil público</span>
                     </Button>
                   </Link>
                   <div className="grid grid-cols-2 gap-3">
                     <Button
-                      variant="secondary"
+                      variant="glass"
+                      size="sm"
                       fullWidth
-                      className="rounded-xl py-3"
                       onClick={() => removeImageMutation.mutate('logo')}
                       disabled={!companyLogo}
                     >
                       Remover logo
                     </Button>
                     <Button
-                      variant="secondary"
+                      variant="glass"
+                      size="sm"
                       fullWidth
-                      className="rounded-xl py-3"
                       onClick={() => removeImageMutation.mutate('cover')}
                       disabled={!companyCover}
                     >
@@ -473,63 +475,57 @@ export function CompanyManagerPage() {
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card className="rounded-[28px] p-5 shadow-sm">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="glass shape-signature p-5">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-blue-50 p-3 text-blue-600">
+                <div className="halo halo-cobalt flex h-11 w-11 items-center justify-center rounded-xl bg-cobalt text-white">
                   <Store size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
-                    Status
-                  </p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {company.isActive ? 'Perfil publico ativo' : 'Perfil pausado'}
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Status</p>
+                  <p className="font-display text-base font-bold text-ink">
+                    {company.isActive ? 'Público ativo' : 'Pausado'}
                   </p>
                 </div>
               </div>
-            </Card>
+            </div>
 
-            <Card className="rounded-[28px] p-5 shadow-sm">
+            <div className="glass shape-signature p-5">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-600">
+                <div className="halo halo-citrus flex h-11 w-11 items-center justify-center rounded-xl bg-citrus text-ink">
                   <Package2 size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
-                    Catalogo
-                  </p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {totalProducts} produto(s)
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Catálogo</p>
+                  <p className="font-display text-base font-bold text-ink">
+                    {totalProducts} produtos
                   </p>
                 </div>
               </div>
-            </Card>
+            </div>
 
-            <Card className="rounded-[28px] p-5 shadow-sm">
+            <div className="glass shape-signature p-5">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-indigo-50 p-3 text-indigo-600">
+                <div className="halo halo-magenta flex h-11 w-11 items-center justify-center rounded-xl bg-magenta text-white">
                   <Megaphone size={18} />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
-                    Conteudo
-                  </p>
-                  <p className="text-base font-semibold text-gray-900">
-                    {totalPosts} publicacao(oes)
+                  <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Posts</p>
+                  <p className="font-display text-base font-bold text-ink">
+                    {totalPosts} publicações
                   </p>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
 
-          <Card className="space-y-5 p-4 lg:p-6">
+          <div className="glass shape-signature space-y-5 p-5 lg:p-6">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Configuracoes da empresa</h2>
-              <p className="text-sm text-gray-500">
-                Atualize os dados do perfil, disponibilidade e informacoes de contato.
+              <h2 className="font-display text-lg font-bold tracking-tight text-ink">Configurações da empresa</h2>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                Atualize dados, disponibilidade e contato
               </p>
             </div>
 
@@ -571,8 +567,8 @@ export function CompanyManagerPage() {
                 maxLength={200}
               />
 
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">Descricao</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
                 <textarea
                   value={companyForm.description}
                   onChange={(e) =>
@@ -580,95 +576,96 @@ export function CompanyManagerPage() {
                   }
                   rows={5}
                   maxLength={1000}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="rounded-2xl border border-line bg-ink/[0.03] px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-subtle focus:border-coral focus:bg-surface focus:ring-4 focus:ring-coral/15 dark:bg-white/[0.04]"
                 />
               </div>
 
-              <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+              <label className="flex items-center gap-3 rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 text-sm text-ink dark:bg-white/[0.04]">
                 <input
                   type="checkbox"
                   checked={companyForm.isActive}
                   onChange={(e) =>
                     setCompanyForm((state) => ({ ...state, isActive: e.target.checked }))
                   }
+                  className="h-4 w-4 rounded"
                 />
-                Exibir empresa e catalogo para outros usuarios
+                Exibir empresa e catálogo publicamente
               </label>
 
               <Button fullWidth type="submit" isLoading={updateCompanyMutation.isPending}>
-                Salvar configuracoes
+                Salvar configurações
               </Button>
             </form>
-          </Card>
+          </div>
 
-          <Card className="space-y-5 p-4 lg:p-6">
+          <div className="glass shape-signature space-y-5 p-5 lg:p-6">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Publicacoes da empresa</h2>
-                <p className="text-sm text-gray-500">
-                  Use posts empresariais para divulgar novidades, promocoes e avisos oficiais.
+                <h2 className="font-display text-lg font-bold tracking-tight text-ink">Publicações</h2>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                  Divulgue novidades e promoções
                 </p>
               </div>
               <Link to="/create" className="block lg:w-[18rem]">
-                <Button fullWidth className="rounded-xl">
+                <Button fullWidth>
                   <Megaphone size={16} />
-                  <span className="ml-2">Criar publicacao empresarial</span>
+                  <span className="ml-2">Criar publicação</span>
                 </Button>
               </Link>
             </div>
 
             {!recentPosts.length ? (
-              <div className="rounded-3xl border border-dashed border-gray-200 px-4 py-10 text-center text-sm text-gray-500">
-                Nenhuma publicacao empresarial vinculada a esta empresa ainda.
+              <div className="rounded-2xl border border-dashed border-line px-4 py-10 text-center text-sm text-mute">
+                Nenhuma publicação empresarial ainda.
               </div>
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
                 {recentPosts.map((post: any) => (
-                  <Card key={post.id} className="space-y-4 rounded-[28px] p-4 shadow-sm">
+                  <div key={post.id} className="rounded-2xl border border-line bg-ink/[0.02] p-4 dark:bg-white/[0.04]">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                      <span className="chip">
                         {new Date(post.createdAt).toLocaleDateString('pt-BR')}
                       </span>
-                      <span className="text-xs text-gray-400">
-                        {post.media?.length ?? 0} arquivo(s)
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                        {post.media?.length ?? 0} arquivos
                       </span>
                     </div>
 
                     {post.content ? (
-                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-ink">
                         {post.content}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-400">Publicacao somente com imagem/video.</p>
+                      <p className="mt-3 text-sm text-mute">Somente mídia.</p>
                     )}
 
                     <PostMediaGallery media={post.media ?? []} />
-                    <PostEngagement post={post} />
-                  </Card>
+                    <PostEngagement post={post} accent="cobalt" />
+                  </div>
                 ))}
               </div>
             )}
-          </Card>
+          </div>
 
-          <Card className="space-y-5 p-4 lg:p-6">
+          <div className="glass shape-signature space-y-5 p-5 lg:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Catalogo de produtos</h2>
-                <p className="text-sm text-gray-500">
-                  Cadastre, edite e organize o que sua empresa oferece.
+                <h2 className="font-display text-lg font-bold tracking-tight text-ink">Catálogo de produtos</h2>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                  Cadastre, edite e organize
                 </p>
               </div>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
-                {products.length} item(ns)
+              <span className="chip chip-citrus">
+                {products.length} itens
               </span>
             </div>
 
             <form
               onSubmit={handleNewProductSubmit}
-              className="space-y-4 rounded-3xl border border-dashed border-blue-200 bg-blue-50/40 p-4"
+              className="space-y-4 rounded-2xl border border-dashed border-coral/30 bg-coral/[0.04] p-4"
             >
-              <div className="flex items-center gap-2 text-sm font-semibold text-blue-700">
-                <PlusCircle size={16} />
+              <div className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-wider text-coral">
+                <PlusCircle size={14} />
                 Novo produto
               </div>
               <div className="grid gap-4 lg:grid-cols-2">
@@ -687,26 +684,27 @@ export function CompanyManagerPage() {
                   onChange={(e) => setNewProduct((state) => ({ ...state, price: e.target.value }))}
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-gray-700">Descricao</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
                 <textarea
                   value={newProduct.description}
                   onChange={(e) =>
                     setNewProduct((state) => ({ ...state, description: e.target.value }))
                   }
                   rows={3}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none placeholder:text-subtle focus:border-coral focus:ring-4 focus:ring-coral/15"
                 />
               </div>
-              <label className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm text-gray-700">
+              <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
                 <input
                   type="checkbox"
                   checked={newProduct.isAvailable}
                   onChange={(e) =>
                     setNewProduct((state) => ({ ...state, isAvailable: e.target.checked }))
                   }
+                  className="h-4 w-4 rounded"
                 />
-                Produto disponivel para exibicao
+                Produto disponível para exibição
               </label>
               <Button type="submit" isLoading={createProductMutation.isPending}>
                 Criar produto
@@ -714,7 +712,7 @@ export function CompanyManagerPage() {
             </form>
 
             {!products.length ? (
-              <div className="rounded-3xl border border-dashed border-gray-200 px-4 py-10 text-center text-sm text-gray-500">
+              <div className="rounded-2xl border border-dashed border-line px-4 py-10 text-center text-sm text-mute">
                 Nenhum produto cadastrado ainda.
               </div>
             ) : (
@@ -723,9 +721,9 @@ export function CompanyManagerPage() {
                   const draft = productDrafts[product.id] ?? emptyProductForm;
 
                   return (
-                    <Card key={product.id} className="space-y-4 rounded-[28px] p-4 shadow-sm">
+                    <div key={product.id} className="rounded-2xl border border-line bg-ink/[0.02] p-4 space-y-4 dark:bg-white/[0.04]">
                       <div className="flex items-start gap-4">
-                        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gray-100">
+                        <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-ink/5 dark:bg-white/5">
                           {product.imageUrl ? (
                             <img
                               src={product.imageUrl}
@@ -733,18 +731,18 @@ export function CompanyManagerPage() {
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <ImagePlus size={22} className="text-gray-300" />
+                            <ImagePlus size={22} className="text-mute" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-base font-semibold text-gray-900">
+                          <p className="truncate font-display text-base font-bold text-ink">
                             {product.name}
                           </p>
-                          <p className="mt-1 text-sm text-gray-500">
-                            {product.isAvailable ? 'Visivel no catalogo' : 'Oculto do catalogo'}
+                          <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-mute">
+                            {product.isAvailable ? 'Visível' : 'Oculto'}
                           </p>
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700">
+                            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink hover:bg-ink/5">
                               <Camera size={14} />
                               Trocar imagem
                               <input
@@ -759,9 +757,8 @@ export function CompanyManagerPage() {
                               />
                             </label>
                             <Button
-                              variant="secondary"
+                              variant="ghost"
                               size="sm"
-                              className="rounded-xl"
                               onClick={() => removeProductImageMutation.mutate(product.id)}
                               disabled={!product.imageUrl}
                             >
@@ -797,8 +794,8 @@ export function CompanyManagerPage() {
                         />
                       </div>
 
-                      <div className="flex flex-col gap-1">
-                        <label className="text-sm font-medium text-gray-700">Descricao</label>
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
                         <textarea
                           value={draft.description}
                           onChange={(e) =>
@@ -808,11 +805,11 @@ export function CompanyManagerPage() {
                             }))
                           }
                           rows={3}
-                          className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none focus:border-coral focus:ring-4 focus:ring-coral/15"
                         />
                       </div>
 
-                      <label className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                      <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
                         <input
                           type="checkbox"
                           checked={draft.isAvailable}
@@ -822,11 +819,12 @@ export function CompanyManagerPage() {
                               [product.id]: { ...draft, isAvailable: e.target.checked },
                             }))
                           }
+                          className="h-4 w-4 rounded"
                         />
-                        Produto disponivel para venda/exibicao
+                        Disponível para venda/exibição
                       </label>
 
-                      <div className="flex flex-col gap-3 sm:flex-row">
+                      <div className="flex flex-col gap-2 sm:flex-row">
                         <Button
                           fullWidth
                           onClick={() =>
@@ -834,12 +832,11 @@ export function CompanyManagerPage() {
                           }
                           isLoading={updateProductMutation.isPending}
                         >
-                          Salvar produto
+                          Salvar
                         </Button>
                         <Button
-                          variant="secondary"
+                          variant="danger"
                           fullWidth
-                          className="border-red-100 text-red-600 hover:bg-red-50"
                           onClick={() => removeProductMutation.mutate(product.id)}
                           isLoading={removeProductMutation.isPending}
                         >
@@ -847,24 +844,23 @@ export function CompanyManagerPage() {
                           <span className="ml-2">Excluir</span>
                         </Button>
                       </div>
-                    </Card>
+                    </div>
                   );
                 })}
               </div>
             )}
-          </Card>
+          </div>
         </>
       ) : (
-        <Card className="space-y-5 p-4 lg:p-6">
+        <div className="glass shape-signature-lg space-y-5 p-5 lg:p-6">
           <div className="flex items-start gap-4">
-            <div className="rounded-3xl bg-blue-50 p-4 text-blue-600">
-              <Store size={28} />
+            <div className="halo halo-cobalt flex h-14 w-14 items-center justify-center rounded-2xl bg-cobalt text-white">
+              <Store size={26} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Criar perfil da sua empresa</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Configure sua vitrine local com identidade visual, contato, catalogo e pagina
-                publica.
+              <h1 className="font-display text-xl font-bold tracking-tight text-ink">Criar perfil da empresa</h1>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-wider text-mute">
+                Identidade visual + catálogo + página pública
               </p>
             </div>
           </div>
@@ -901,14 +897,14 @@ export function CompanyManagerPage() {
             </div>
 
             <Input
-              label="Endereco"
+              label="Endereço"
               value={companyForm.address}
               onChange={(e) => setCompanyForm((state) => ({ ...state, address: e.target.value }))}
               maxLength={200}
             />
 
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Descricao</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
               <textarea
                 value={companyForm.description}
                 onChange={(e) =>
@@ -916,7 +912,7 @@ export function CompanyManagerPage() {
                 }
                 rows={5}
                 maxLength={1000}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="rounded-2xl border border-line bg-ink/[0.03] px-4 py-3 text-sm text-ink outline-none placeholder:text-subtle focus:border-coral focus:bg-surface focus:ring-4 focus:ring-coral/15 dark:bg-white/[0.04]"
               />
             </div>
 
@@ -924,7 +920,7 @@ export function CompanyManagerPage() {
               Criar empresa
             </Button>
           </form>
-        </Card>
+        </div>
       )}
 
       <ImageCropDialog

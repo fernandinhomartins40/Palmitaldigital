@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { MessageCircle, MapPin } from 'lucide-react';
+import { MessageCircle, Moon, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
+import { useThemeStore } from '../../store/themeStore';
 
 const titles: Record<string, string> = {
   '/feed': 'Feed',
-  '/classifieds': 'Classificados',
+  '/classifieds': 'Mercado',
   '/companies': 'Empresas',
   '/companies/manage': 'Minha empresa',
-  '/chat': 'Mensagens',
+  '/chat': 'Conversas',
   '/profile': 'Perfil',
-  '/create': 'Nova publicacao',
+  '/create': 'Publicar',
 };
 
 export function TopBar() {
@@ -19,14 +20,18 @@ export function TopBar() {
   const currentUser = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const accessToken = useAuthStore((s) => s.accessToken);
-  const title = titles[pathname]
-    ?? (pathname.startsWith('/profile/')
-      ? 'Perfil publico'
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggle);
+
+  const title =
+    titles[pathname] ??
+    (pathname.startsWith('/profile/')
+      ? 'Perfil'
       : pathname.startsWith('/companies/')
-        ? 'Perfil da empresa'
+        ? 'Empresa'
         : pathname.startsWith('/chat/')
-          ? 'Mensagens'
-          : 'Palmital Digital');
+          ? 'Conversa'
+          : 'Palmital');
 
   const { data: conversations } = useQuery({
     queryKey: ['conversations'],
@@ -42,11 +47,9 @@ export function TopBar() {
     conversations?.filter((conversation) => {
       const lastMsg = conversation.messages?.[0];
       if (!lastMsg) return false;
-
       const participation = conversation.participants?.find(
         (participant: any) => participant.userId === currentUser?.id,
       );
-
       return (
         participation &&
         (!participation.lastReadAt ||
@@ -55,30 +58,44 @@ export function TopBar() {
     }).length ?? 0;
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-40 h-14 border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-sm">
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-3 px-4 lg:px-6">
-        <Link to="/feed" className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-blue-700">
-            <MapPin size={14} className="text-white" />
+    <header className="fixed left-0 right-0 top-0 z-40 px-3 pt-3 lg:px-6 lg:pt-4">
+      <div className="glass shape-signature mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 lg:h-16 lg:px-5">
+        <Link to="/feed" className="flex items-center gap-2.5">
+          <div className="halo halo-coral relative flex h-8 w-8 items-center justify-center rounded-xl bg-coral text-white">
+            <span className="font-display text-base font-black">P</span>
           </div>
-          <span className="text-base font-bold tracking-tight text-blue-700">Palmital Digital</span>
-        </Link>
-
-        <div className="flex min-w-0 flex-1 items-center justify-center gap-1 text-center text-sm font-semibold text-gray-500">
-          {title !== 'Palmital Digital' && title !== 'Feed' ? title : ''}
-        </div>
-
-        <Link
-          to={isAuthenticated ? '/chat' : '/login'}
-          className="relative rounded-xl p-2 transition-colors hover:bg-gray-100"
-        >
-          <MessageCircle size={22} className="text-gray-600" />
-          {unread > 0 && (
-            <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white shadow-sm">
-              {unread > 9 ? '9+' : unread}
+          <div className="leading-none">
+            <span className="block font-display text-base font-bold tracking-tight text-ink">
+              Palmital
             </span>
-          )}
+            <span className="block text-[10px] font-mono uppercase tracking-[0.18em] text-mute">
+              {title}
+            </span>
+          </div>
         </Link>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-ink transition-colors hover:bg-ink/5 dark:hover:bg-white/5"
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          <Link
+            to={isAuthenticated ? '/chat' : '/login'}
+            className="relative flex h-10 w-10 items-center justify-center rounded-xl text-ink transition-colors hover:bg-ink/5 dark:hover:bg-white/5"
+          >
+            <MessageCircle size={20} />
+            {unread > 0 && (
+              <span className="halo halo-coral absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-bold text-white">
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
     </header>
   );

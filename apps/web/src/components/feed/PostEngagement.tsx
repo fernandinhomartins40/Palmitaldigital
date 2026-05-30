@@ -3,10 +3,12 @@ import { PostReactionType } from '@palmital/types';
 import { Avatar, Button } from '@palmital/ui';
 import { formatRelativeTime } from '@palmital/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { MessageCircle, Send, Share2, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Send, Share2, Sparkles, ThumbsUp, Trash2, Zap } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
+
+type AccentColor = 'coral' | 'citrus' | 'cobalt' | 'magenta' | 'mint';
 
 const reactionLabels: Record<PostReactionType, string> = {
   [PostReactionType.LIKE]: 'Curtir',
@@ -22,27 +24,59 @@ const reactionEmojis: Record<PostReactionType, string> = {
   [PostReactionType.WOW]: '\u{1F62E}',
 };
 
-const emojiReactionTypes = [
-  PostReactionType.LOVE,
-  PostReactionType.CLAP,
-  PostReactionType.WOW,
-];
+const reactionAccent: Record<PostReactionType, AccentColor> = {
+  [PostReactionType.LIKE]: 'cobalt',
+  [PostReactionType.LOVE]: 'coral',
+  [PostReactionType.CLAP]: 'citrus',
+  [PostReactionType.WOW]: 'magenta',
+};
+
+const emojiReactionTypes = [PostReactionType.LOVE, PostReactionType.CLAP, PostReactionType.WOW];
+
+const accentBg: Record<AccentColor, string> = {
+  coral: 'bg-coral',
+  citrus: 'bg-citrus',
+  cobalt: 'bg-cobalt',
+  magenta: 'bg-magenta',
+  mint: 'bg-mint',
+};
+
+const accentText: Record<AccentColor, string> = {
+  coral: 'text-coral',
+  citrus: 'text-citrus',
+  cobalt: 'text-cobalt',
+  magenta: 'text-magenta',
+  mint: 'text-mint',
+};
+
+const accentHalo: Record<AccentColor, string> = {
+  coral: 'halo-coral',
+  citrus: 'halo-citrus',
+  cobalt: 'halo-cobalt',
+  magenta: 'halo-magenta',
+  mint: 'halo-mint',
+};
 
 function compactCount(value?: number) {
-  return value && value > 0 ? value : 0;
+  if (!value || value <= 0) return 0;
+  if (value > 999) return `${(value / 1000).toFixed(1)}k`;
+  return value;
 }
 
-export function PostEngagement({ post }: { post: any }) {
+interface PostEngagementProps {
+  post: any;
+  accent?: AccentColor;
+  compact?: boolean;
+}
+
+export function PostEngagement({ post, accent = 'coral', compact = false }: PostEngagementProps) {
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [comment, setComment] = useState('');
   const [showReactions, setShowReactions] = useState(false);
   const [showCommentReactionsFor, setShowCommentReactionsFor] = useState<string | null>(null);
   const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
-  const [floatingReaction, setFloatingReaction] = useState<{
-    id: number;
-    type: PostReactionType;
-  } | null>(null);
+  const [floatingReaction, setFloatingReaction] = useState<{ id: number; type: PostReactionType } | null>(null);
   const [floatingCommentReaction, setFloatingCommentReaction] = useState<{
     id: number;
     commentId: string;
@@ -169,7 +203,6 @@ export function PostEngagement({ post }: { post: any }) {
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/feed?post=${post.id}`;
     const title = post.content?.slice(0, 80) || 'Publicacao no Palmital Digital';
-
     try {
       if (navigator.share) {
         await navigator.share({ title, url: shareUrl });
@@ -199,25 +232,22 @@ export function PostEngagement({ post }: { post: any }) {
     const commentReplies = item.replies ?? [];
 
     return (
-      <div key={item.id} className={depth ? 'ml-7 border-l border-slate-200 pl-3' : ''}>
-        <div className="flex gap-2 rounded-2xl bg-slate-50 p-3">
-          <Avatar
-            src={item.author?.profile?.avatarUrl}
-            name={authorName}
-            size="sm"
-            className="h-8 w-8"
-          />
+      <div key={item.id} className={depth ? 'ml-6 border-l-2 border-line pl-3' : ''}>
+        <div className="flex gap-2 rounded-2xl bg-ink/[0.03] p-3 dark:bg-white/[0.03]">
+          <Avatar src={item.author?.profile?.avatarUrl} name={authorName} size="sm" />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-sm font-semibold text-slate-900">{authorName}</p>
-                <p className="text-xs text-slate-400">{formatRelativeTime(item.createdAt)}</p>
+                <p className="font-display text-sm font-bold text-ink">{authorName}</p>
+                <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+                  {formatRelativeTime(item.createdAt)}
+                </p>
               </div>
               {canDelete ? (
                 <button
                   type="button"
                   aria-label="Remover comentario"
-                  className="rounded-full p-1 text-slate-400 hover:bg-white hover:text-red-600"
+                  className="rounded-lg p-1 text-mute hover:bg-coral/10 hover:text-coral"
                   onClick={() => deleteCommentMutation.mutate(item.id)}
                 >
                   <Trash2 size={14} />
@@ -225,24 +255,25 @@ export function PostEngagement({ post }: { post: any }) {
               ) : null}
             </div>
 
-            <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">
+            <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6 text-ink">
               {item.content}
             </p>
 
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-mute">
               <button
                 type="button"
-                className={`font-semibold hover:text-blue-600 ${item.viewerLiked ? 'text-blue-600' : ''}`}
+                className={`inline-flex items-center gap-1 font-semibold transition-colors ${
+                  item.viewerLiked ? accentText.cobalt : 'hover:text-cobalt'
+                }`}
                 onClick={() => commentLikeMutation.mutate(item.id)}
                 disabled={commentLikeMutation.isPending}
               >
-                {reactionEmojis[PostReactionType.LIKE]} Curtir
+                <ThumbsUp size={12} strokeWidth={item.viewerLiked ? 2.5 : 1.8} />
+                {compactCount(commentCounts.likes) || 'Curtir'}
               </button>
 
-              <span>{compactCount(commentCounts.likes)} curtida(s)</span>
-
               <span className="relative">
-                {floatingCommentReaction?.commentId === item.id ? (
+                {floatingCommentReaction?.commentId === item.id && (
                   <span
                     key={floatingCommentReaction!.id}
                     className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-1/2 animate-[reaction-float_820ms_ease-out_forwards] text-2xl drop-shadow-lg"
@@ -251,38 +282,46 @@ export function PostEngagement({ post }: { post: any }) {
                   >
                     {reactionEmojis[floatingCommentReaction!.type]}
                   </span>
-                ) : null}
+                )}
                 <button
                   type="button"
-                  className={`font-semibold hover:text-blue-600 ${item.viewerReaction ? 'text-blue-600' : ''}`}
+                  className={`inline-flex items-center gap-1 font-semibold transition-colors ${
+                    item.viewerReaction
+                      ? accentText[reactionAccent[item.viewerReaction as PostReactionType]]
+                      : 'hover:text-magenta'
+                  }`}
                   onClick={() =>
                     setShowCommentReactionsFor((current) => (current === item.id ? null : item.id))
                   }
                 >
-                  {item.viewerReaction ? reactionEmojis[item.viewerReaction as PostReactionType] : '\u{1F642}'}{' '}
-                  Reagir
+                  <Sparkles size={12} strokeWidth={item.viewerReaction ? 2.5 : 1.8} />
+                  {compactCount(commentCounts.reactions) || 'Reagir'}
                 </button>
 
-                {showCommentReactionsFor === item.id ? (
-                  <span className="absolute bottom-6 left-0 z-20 flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1.5 shadow-lg">
-                    {emojiReactionTypes.map((type) => (
+                {showCommentReactionsFor === item.id && (
+                  <div className="glass absolute bottom-6 left-0 z-20 flex items-center gap-1 rounded-2xl p-1.5">
+                    {emojiReactionTypes.map((type) => {
+                      const tone = reactionAccent[type];
+                      const isSelected = item.viewerReaction === type;
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          aria-label={reactionLabels[type]}
+                          title={reactionLabels[type]}
+                          className={`flex h-9 w-9 items-center justify-center rounded-xl text-xl transition-all hover:-translate-y-1 hover:scale-125 ${
+                            isSelected ? `halo ${accentHalo[tone]} ${accentBg[tone]}` : ''
+                          }`}
+                          onClick={() => handleCommentReact(item.id, type)}
+                        >
+                          <span aria-hidden="true">{reactionEmojis[type]}</span>
+                        </button>
+                      );
+                    })}
+                    {item.viewerReaction && (
                       <button
-                        key={type}
                         type="button"
-                        aria-label={reactionLabels[type]}
-                        title={reactionLabels[type]}
-                        className={`flex h-9 w-9 items-center justify-center rounded-full text-xl transition duration-150 hover:-translate-y-1 hover:scale-125 hover:bg-slate-50 ${
-                          item.viewerReaction === type ? 'bg-blue-50 ring-2 ring-blue-200' : ''
-                        }`}
-                        onClick={() => handleCommentReact(item.id, type)}
-                      >
-                        <span aria-hidden="true">{reactionEmojis[type]}</span>
-                      </button>
-                    ))}
-                    {item.viewerReaction ? (
-                      <button
-                        type="button"
-                        className="ml-1 rounded-full px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                        className="ml-1 rounded-xl px-3 py-2 text-xs font-bold text-coral hover:bg-coral/10"
                         onClick={() =>
                           commentReactionMutation.mutate({
                             commentId: item.id,
@@ -292,16 +331,14 @@ export function PostEngagement({ post }: { post: any }) {
                       >
                         Remover
                       </button>
-                    ) : null}
-                  </span>
-                ) : null}
+                    )}
+                  </div>
+                )}
               </span>
-
-              <span>{compactCount(commentCounts.reactions)} reacao(oes)</span>
 
               <button
                 type="button"
-                className="font-semibold hover:text-blue-600"
+                className="font-semibold hover:text-ink"
                 onClick={() => {
                   setReplyingToCommentId((current) => (current === item.id ? null : item.id));
                   setReplyContent('');
@@ -313,16 +350,16 @@ export function PostEngagement({ post }: { post: any }) {
               {commentReactionSummary.map(([type, count]) => (
                 <span
                   key={type}
-                  className="inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 font-medium"
+                  className="chip"
                   title={reactionLabels[type as PostReactionType]}
                 >
                   <span aria-hidden="true">{reactionEmojis[type as PostReactionType]}</span>
-                  <span>{count as number}</span>
+                  <span className="font-mono">{count as number}</span>
                 </span>
               ))}
             </div>
 
-            {replyingToCommentId === item.id ? (
+            {replyingToCommentId === item.id && (
               <form onSubmit={(event) => handleReplySubmit(event, item.id)} className="mt-3 flex items-end gap-2">
                 <textarea
                   value={replyContent}
@@ -330,73 +367,75 @@ export function PostEngagement({ post }: { post: any }) {
                   rows={2}
                   maxLength={1000}
                   placeholder={`Responder ${authorName}...`}
-                  className="min-h-[2.5rem] flex-1 resize-none rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  className="min-h-[2.5rem] flex-1 resize-none rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-coral focus:ring-2 focus:ring-coral/20"
                 />
-                <Button
-                  type="submit"
-                  size="sm"
-                  disabled={!replyContent.trim()}
-                  isLoading={replyMutation.isPending}
-                >
+                <Button type="submit" size="sm" disabled={!replyContent.trim()} isLoading={replyMutation.isPending}>
                   <Send size={15} />
                 </Button>
               </form>
-            ) : null}
+            )}
           </div>
         </div>
 
-        {commentReplies.length ? (
+        {commentReplies.length > 0 && (
           <div className="mt-2 space-y-2">
             {commentReplies.map((reply: any) => renderComment(reply, depth + 1))}
           </div>
-        ) : null}
+        )}
       </div>
     );
   };
 
+  const counterClass = 'font-mono text-[10px] uppercase tracking-wider text-mute';
+
   return (
-    <div className="mt-4 border-t border-slate-100 pt-3">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-        <div className="flex flex-wrap items-center gap-3">
-          <span>{compactCount(counts.likes)} curtida(s)</span>
-          <span>{compactCount(counts.reactions)} reacao(oes)</span>
-          <span>{compactCount(counts.comments)} comentario(s)</span>
-          <span>{compactCount(counts.shares)} compartilhamento(s)</span>
-        </div>
-
-        {emojiReactionSummary.length ? (
-          <div className="flex items-center gap-1.5">
-            {emojiReactionSummary.map(([type, count]) => (
-              <span
-                key={type}
-                className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-medium"
-                title={reactionLabels[type as PostReactionType]}
-              >
-                <span aria-hidden="true">{reactionEmojis[type as PostReactionType]}</span>
-                <span>{count as number}</span>
-              </span>
-            ))}
+    <div className={compact ? 'space-y-3' : 'mt-4 space-y-3 border-t border-line pt-3'}>
+      {/* contadores compactos */}
+      {!compact && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className={`flex flex-wrap items-center gap-3 ${counterClass}`}>
+            <span>{compactCount(counts.likes)} curtidas</span>
+            <span>•</span>
+            <span>{compactCount(counts.reactions)} reações</span>
+            <span>•</span>
+            <span>{compactCount(counts.comments)} comentários</span>
           </div>
-        ) : null}
-      </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <Button
+          {emojiReactionSummary.length > 0 && (
+            <div className="flex items-center gap-1">
+              {emojiReactionSummary.map(([type, count]) => (
+                <span
+                  key={type}
+                  className="chip"
+                  title={reactionLabels[type as PostReactionType]}
+                >
+                  <span aria-hidden="true">{reactionEmojis[type as PostReactionType]}</span>
+                  <span className="font-mono">{count as number}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* botões de ação */}
+      <div className="grid grid-cols-4 gap-1.5">
+        <button
           type="button"
-          variant={viewerLiked ? 'primary' : 'secondary'}
-          size="sm"
-          fullWidth
           disabled={likeMutation.isPending}
           onClick={() => likeMutation.mutate()}
+          className={`flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all ${
+            viewerLiked
+              ? `halo halo-cobalt bg-cobalt text-white`
+              : 'bg-ink/[0.04] text-ink hover:bg-ink/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08]'
+          }`}
         >
-          <span className="text-base leading-none" aria-hidden="true">
-            {reactionEmojis[PostReactionType.LIKE]}
-          </span>
-          <span className="ml-1.5 truncate">Curtir</span>
-        </Button>
+          <ThumbsUp size={14} strokeWidth={viewerLiked ? 2.5 : 1.9} />
+          <span className="hidden sm:inline">Curtir</span>
+        </button>
 
         <div className="relative">
-          {floatingReaction ? (
+          {floatingReaction && (
             <span
               key={floatingReaction.id}
               className="pointer-events-none absolute left-1/2 top-0 z-30 -translate-x-1/2 animate-[reaction-float_820ms_ease-out_forwards] text-3xl drop-shadow-lg"
@@ -405,102 +444,118 @@ export function PostEngagement({ post }: { post: any }) {
             >
               {reactionEmojis[floatingReaction.type]}
             </span>
-          ) : null}
+          )}
 
-          <Button
+          <button
             type="button"
-            variant={viewerReaction ? 'primary' : 'secondary'}
-            size="sm"
-            fullWidth
             disabled={reactMutation.isPending}
             onClick={() => setShowReactions((value) => !value)}
+            className={`flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all ${
+              viewerReaction
+                ? `halo ${accentHalo[reactionAccent[viewerReaction]]} ${accentBg[reactionAccent[viewerReaction]]} text-white`
+                : 'bg-ink/[0.04] text-ink hover:bg-ink/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08]'
+            }`}
           >
-            <span className="text-base leading-none" aria-hidden="true">
-              {viewerReaction ? reactionEmojis[viewerReaction] : '\u{1F642}'}
-            </span>
-            <span className="ml-1.5 truncate">
+            {viewerReaction ? (
+              <span className="text-base leading-none" aria-hidden="true">
+                {reactionEmojis[viewerReaction]}
+              </span>
+            ) : (
+              <Heart size={14} strokeWidth={1.9} />
+            )}
+            <span className="hidden sm:inline">
               {viewerReaction ? reactionLabels[viewerReaction] : 'Reagir'}
             </span>
-          </Button>
+          </button>
 
-          {showReactions ? (
-            <div className="absolute bottom-11 left-0 z-20 flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1.5 shadow-lg">
-              {emojiReactionTypes.map((type) => (
+          {showReactions && (
+            <div className="glass absolute bottom-12 left-0 z-20 flex items-center gap-1 rounded-2xl p-1.5">
+              {emojiReactionTypes.map((type) => {
+                const tone = reactionAccent[type];
+                const isSelected = viewerReaction === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    aria-label={reactionLabels[type]}
+                    title={reactionLabels[type]}
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl text-2xl transition-all hover:-translate-y-1 hover:scale-125 ${
+                      isSelected ? `halo ${accentHalo[tone]} ${accentBg[tone]}` : 'hover:bg-ink/5'
+                    }`}
+                    onClick={() => handleReact(type)}
+                  >
+                    <span aria-hidden="true">{reactionEmojis[type]}</span>
+                  </button>
+                );
+              })}
+              {viewerReaction && (
                 <button
-                  key={type}
                   type="button"
-                  aria-label={reactionLabels[type]}
-                  title={reactionLabels[type]}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full text-2xl transition duration-150 hover:-translate-y-1 hover:scale-125 hover:bg-slate-50 ${
-                    viewerReaction === type ? 'bg-blue-50 ring-2 ring-blue-200' : ''
-                  }`}
-                  onClick={() => handleReact(type)}
-                >
-                  <span aria-hidden="true">{reactionEmojis[type]}</span>
-                </button>
-              ))}
-              {viewerReaction ? (
-                <button
-                  type="button"
-                  className="ml-1 rounded-full px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                  className="ml-1 rounded-xl px-3 py-2 text-xs font-bold text-coral hover:bg-coral/10"
                   onClick={() => reactMutation.mutate(viewerReaction)}
                 >
                   Remover
                 </button>
-              ) : null}
+              )}
             </div>
-          ) : null}
+          )}
         </div>
 
-        <Button
+        <button
           type="button"
-          variant="secondary"
-          size="sm"
-          fullWidth
           onClick={() => setIsCommentsOpen((value) => !value)}
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-ink/[0.04] py-2.5 text-xs font-semibold text-ink transition-all hover:bg-ink/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
         >
-          <MessageCircle size={15} />
-          <span className="ml-1.5">Comentar</span>
-        </Button>
+          <MessageCircle size={14} strokeWidth={1.9} />
+          <span className="hidden sm:inline">Comentar</span>
+        </button>
 
-        <Button type="button" variant="secondary" size="sm" fullWidth onClick={handleShare}>
-          <Share2 size={15} />
-          <span className="ml-1.5">Compartilhar</span>
-        </Button>
+        <button
+          type="button"
+          onClick={handleShare}
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-ink/[0.04] py-2.5 text-xs font-semibold text-ink transition-all hover:bg-ink/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+        >
+          <Share2 size={14} strokeWidth={1.9} />
+          <span className="hidden sm:inline">Enviar</span>
+        </button>
       </div>
 
-      {isCommentsOpen ? (
-        <div className="mt-4 space-y-3">
+      {compact && (counts.likes > 0 || counts.reactions > 0 || counts.comments > 0) && (
+        <div className={`flex items-center gap-3 ${counterClass}`}>
+          <span>
+            <Zap size={10} className={`inline ${accentText[accent]}`} />{' '}
+            {compactCount(counts.likes)} • {compactCount(counts.reactions)} •{' '}
+            {compactCount(counts.comments)}
+          </span>
+        </div>
+      )}
+
+      {isCommentsOpen && (
+        <div className="space-y-3">
           <form onSubmit={handleSubmitComment} className="flex items-end gap-2">
             <textarea
               value={comment}
               onChange={(event) => setComment(event.target.value)}
               rows={2}
               maxLength={1000}
-              placeholder="Escreva um comentario..."
-              className="min-h-[2.75rem] flex-1 resize-none rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              placeholder="Adicione um comentário..."
+              className="min-h-[2.75rem] flex-1 resize-none rounded-2xl border border-line bg-ink/[0.02] px-3 py-2 text-sm text-ink outline-none focus:border-coral focus:bg-surface focus:ring-2 focus:ring-coral/20 dark:bg-white/[0.03]"
             />
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!comment.trim()}
-              isLoading={commentMutation.isPending}
-            >
+            <Button type="submit" size="sm" disabled={!comment.trim()} isLoading={commentMutation.isPending}>
               <Send size={15} />
             </Button>
           </form>
 
           <div className="space-y-2">
             {comments.map((item: any) => renderComment(item))}
-
-            {!comments.length ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 px-4 py-5 text-center text-sm text-slate-500">
-                Nenhum comentario ainda.
+            {!comments.length && (
+              <div className="rounded-2xl border border-dashed border-line px-4 py-5 text-center text-sm text-mute">
+                Seja o primeiro a comentar.
               </div>
-            ) : null}
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

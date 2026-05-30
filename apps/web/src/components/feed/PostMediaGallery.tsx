@@ -97,7 +97,7 @@ export function PostMediaGallery({ media }: PostMediaGalleryProps) {
 
   return (
     <div className="mt-3 space-y-2">
-      <div className="group relative overflow-hidden rounded-2xl bg-slate-100">
+      <div className="group relative overflow-hidden rounded-2xl bg-ink/5 dark:bg-white/5">
         <div
           className="w-full cursor-zoom-in"
           role="button"
@@ -119,7 +119,7 @@ export function PostMediaGallery({ media }: PostMediaGalleryProps) {
             <button
               type="button"
               aria-label="Midia anterior"
-              className="absolute left-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+              className="glass absolute left-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-ink transition hover:scale-110"
               onClick={goToPrevious}
             >
               <ChevronLeft size={18} />
@@ -127,12 +127,12 @@ export function PostMediaGallery({ media }: PostMediaGalleryProps) {
             <button
               type="button"
               aria-label="Proxima midia"
-              className="absolute right-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm transition hover:bg-white"
+              className="glass absolute right-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-ink transition hover:scale-110"
               onClick={goToNext}
             >
               <ChevronRight size={18} />
             </button>
-            <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-slate-950/70 px-2.5 py-1 text-xs font-semibold text-white">
+            <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-lg bg-ink/80 px-2.5 py-1 font-mono text-[10px] font-bold text-surface">
               <Images size={13} />
               {counterLabel}
             </div>
@@ -147,8 +147,8 @@ export function PostMediaGallery({ media }: PostMediaGalleryProps) {
               key={item.id}
               type="button"
               aria-label={`Ir para midia ${index + 1}`}
-              className={`h-2 rounded-full transition-all ${
-                index === activeIndex ? 'w-6 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-slate-400'
+              className={`h-1.5 rounded-full transition-all ${
+                index === activeIndex ? 'w-8 bg-coral' : 'w-1.5 bg-line hover:bg-mute'
               }`}
               onClick={() => setActiveIndex(index)}
             />

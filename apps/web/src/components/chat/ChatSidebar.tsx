@@ -59,7 +59,6 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
   const filteredConversations = useMemo(() => {
     if (!conversations) return [];
     if (!deferredSearch) return conversations;
-
     const term = deferredSearch.toLocaleLowerCase();
     return conversations.filter((conversation) => {
       const other = getOtherParticipant(conversation, currentUser?.id);
@@ -70,31 +69,33 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
   }, [conversations, currentUser?.id, deferredSearch]);
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-white/80 bg-white/95 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur-sm">
-      <div className="border-b border-gray-100 px-4 py-4">
+    <div className="glass shape-signature overflow-hidden">
+      <div className="border-b border-line px-5 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-            <MessageCircle size={20} />
+          <div className="halo halo-cobalt flex h-10 w-10 items-center justify-center rounded-xl bg-cobalt text-white">
+            <MessageCircle size={18} strokeWidth={2.2} />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-gray-900">Conversas</h2>
-            <p className="text-sm text-gray-500">Busque pessoas e continue o atendimento.</p>
+            <h2 className="font-display text-base font-bold tracking-tight text-ink">Conversas</h2>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+              Mensagens diretas
+            </p>
           </div>
         </div>
 
-        <label className="mt-4 flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 focus-within:border-blue-500 focus-within:bg-white">
-          <Search size={18} className="text-gray-400" />
+        <label className="mt-4 flex items-center gap-3 rounded-2xl border border-line bg-ink/[0.03] px-3 py-2.5 focus-within:border-coral focus-within:bg-surface focus-within:ring-2 focus-within:ring-coral/15 dark:bg-white/[0.03]">
+          <Search size={16} className="text-mute" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome ou email"
-            className="w-full bg-transparent text-sm text-gray-700 outline-none"
+            className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-subtle"
           />
           {isSearching && <Spinner size="sm" />}
         </label>
       </div>
 
-      <div className="max-h-[calc(100vh-14rem)] overflow-y-auto">
+      <div className="glass-scrollbar max-h-[calc(100vh-16rem)] overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-12">
             <Spinner size="lg" />
@@ -113,28 +114,35 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
                     <Link
                       key={conversation.id}
                       to={`/chat/${conversation.id}`}
-                      className={`flex items-center gap-3 rounded-2xl px-3 py-3 transition-colors ${
-                        isActive ? 'bg-blue-50' : 'hover:bg-gray-50 active:bg-gray-100'
+                      className={`group flex items-center gap-3 rounded-2xl px-3 py-3 transition-all ${
+                        isActive
+                          ? 'bg-cobalt/[0.08] dark:bg-cobalt/[0.15]'
+                          : 'hover:bg-ink/[0.03] active:bg-ink/[0.06] dark:hover:bg-white/[0.03]'
                       }`}
                     >
-                      <Avatar
-                        src={profile?.avatarUrl}
-                        name={profile?.displayName ?? other?.user?.email ?? '?'}
-                        size="md"
-                      />
+                      <div className="relative">
+                        {isActive && (
+                          <span className="halo halo-cobalt absolute inset-0 rounded-full" />
+                        )}
+                        <Avatar
+                          src={profile?.avatarUrl}
+                          name={profile?.displayName ?? other?.user?.email ?? '?'}
+                          size="md"
+                        />
+                      </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="truncate font-semibold text-gray-900">
+                          <span className="truncate font-display text-sm font-bold text-ink">
                             {profile?.displayName ?? other?.user?.email ?? 'Usuário'}
                           </span>
                           {lastMsg && (
-                            <span className="shrink-0 text-xs text-gray-400">
+                            <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-mute">
                               {formatRelativeTime(lastMsg.createdAt)}
                             </span>
                           )}
                         </div>
-                        <p className="truncate text-sm text-gray-500">
-                          {lastMsg?.content ?? 'Toque para iniciar a conversa'}
+                        <p className="truncate text-sm text-mute">
+                          {lastMsg?.content ?? 'Toque para iniciar'}
                         </p>
                       </div>
                     </Link>
@@ -144,15 +152,15 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
             )}
 
             {deferredSearch.length >= 2 && (
-              <div className="border-t border-gray-100 px-4 pb-3 pt-4">
-                <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
-                  <UserRoundSearch size={14} />
-                  Usuários encontrados
+              <div className="border-t border-line px-4 pb-3 pt-4">
+                <div className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-mute">
+                  <UserRoundSearch size={12} />
+                  Pessoas encontradas
                 </div>
 
                 {!users?.length ? (
-                  <p className="rounded-2xl bg-gray-50 px-3 py-4 text-sm text-gray-500">
-                    Nenhum usuário encontrado para essa busca.
+                  <p className="rounded-2xl bg-ink/[0.03] px-3 py-4 text-sm text-mute dark:bg-white/[0.03]">
+                    Nenhuma pessoa encontrada.
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -161,7 +169,7 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
                         key={user.id}
                         type="button"
                         onClick={() => startConversationMutation.mutate(user.id)}
-                        className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 px-3 py-3 text-left transition-colors hover:bg-gray-50"
+                        className="flex w-full items-center gap-3 rounded-2xl border border-line px-3 py-3 text-left transition-colors hover:border-cobalt hover:bg-cobalt/[0.05]"
                         disabled={startConversationMutation.isPending}
                       >
                         <Avatar
@@ -170,14 +178,16 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
                           size="md"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-gray-900">
+                          <p className="truncate font-display text-sm font-bold text-ink">
                             {user.profile?.displayName ?? user.email}
                           </p>
-                          <p className="truncate text-xs text-gray-500">
+                          <p className="truncate font-mono text-[10px] uppercase tracking-wider text-mute">
                             {user.profile?.city || user.email}
                           </p>
                         </div>
-                        <span className="text-xs font-semibold text-blue-600">Conversar</span>
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-cobalt">
+                          Iniciar →
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -186,18 +196,20 @@ export function ChatSidebar({ activeConversationId }: ChatSidebarProps) {
             )}
 
             {!filteredConversations.length && !deferredSearch && (
-              <div className="flex flex-col items-center justify-center px-6 py-16 text-center text-gray-400">
-                <MessageCircle size={44} strokeWidth={1.4} />
-                <p className="mt-3 text-base font-medium text-gray-600">Nenhuma conversa ainda</p>
-                <p className="mt-1 text-sm">Busque pelo nome de um usuário para iniciar.</p>
+              <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+                <MessageCircle size={44} strokeWidth={1.2} className="text-mute" />
+                <p className="mt-3 font-display text-base font-bold text-ink">Sem conversas</p>
+                <p className="mt-1 text-sm text-mute">Busque por nome para iniciar.</p>
               </div>
             )}
 
-            {!filteredConversations.length && deferredSearch.length > 0 && deferredSearch.length < 2 && (
-              <div className="px-4 py-6 text-sm text-gray-500">
-                Digite pelo menos 2 caracteres para buscar novos usuários.
-              </div>
-            )}
+            {!filteredConversations.length &&
+              deferredSearch.length > 0 &&
+              deferredSearch.length < 2 && (
+                <div className="px-4 py-6 text-sm text-mute">
+                  Digite ao menos 2 caracteres para buscar.
+                </div>
+              )}
           </>
         )}
       </div>

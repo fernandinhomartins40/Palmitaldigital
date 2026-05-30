@@ -5,7 +5,7 @@ import { formatCurrency, formatDate } from '@palmital/utils';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
-import { MapPin, Tag } from 'lucide-react';
+import { CheckCircle2, MapPin, MessageCircle, Tag } from 'lucide-react';
 
 export function ClassifiedDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +39,12 @@ export function ClassifiedDetailPage() {
     },
   });
 
-  if (isLoading) return <div className="flex justify-center py-12"><Spinner size="lg" /></div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner size="lg" />
+      </div>
+    );
   if (!item) return null;
 
   const isOwner = currentUser?.id === item.authorId;
@@ -47,52 +52,94 @@ export function ClassifiedDetailPage() {
   const images = item.post?.media ?? [];
 
   return (
-    <div className="pb-6">
+    <div className="space-y-5">
       {images.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto px-4 pb-2">
+        <div className="glass-scrollbar flex gap-2 overflow-x-auto pb-1">
           {images.map((m: any) => (
-            <img key={m.id} src={m.url} alt="" className="h-56 w-56 flex-shrink-0 rounded-2xl object-cover" />
+            <img
+              key={m.id}
+              src={m.url}
+              alt=""
+              className="h-72 w-72 flex-shrink-0 object-cover"
+              style={{ borderRadius: '24px 24px 8px 24px' }}
+            />
           ))}
         </div>
       )}
 
-      <div className="px-4 pt-4 space-y-4">
+      <div className="glass shape-signature space-y-5 p-6 lg:p-8">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">{item.title}</h1>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
-            {item.isFree ? 'Grátis' : item.price ? formatCurrency(Number(item.price)) : 'A consultar'}
+          <div className="chip chip-citrus">
+            <Tag size={11} strokeWidth={2.5} />
+            CLASSIFICADO
+          </div>
+          <h1 className="mt-3 font-display text-2xl font-bold leading-tight tracking-tight text-ink lg:text-3xl">
+            {item.title}
+          </h1>
+          <p className="mt-2 font-mono text-3xl font-bold text-ink">
+            {item.isFree
+              ? 'GRÁTIS'
+              : item.price
+                ? formatCurrency(Number(item.price))
+                : 'A consultar'}
           </p>
           {item.status === 'SOLD' && (
-            <span className="inline-block mt-1 rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-600">Vendido</span>
+            <span className="chip chip-coral mt-2">
+              <CheckCircle2 size={11} />
+              VENDIDO
+            </span>
           )}
         </div>
 
-        <p className="text-gray-700">{item.description}</p>
+        <p className="text-[15px] leading-7 text-ink">{item.description}</p>
 
-        <div className="flex flex-wrap gap-3 text-sm text-gray-500">
-          {item.city && <span className="flex items-center gap-1"><MapPin size={14} />{item.city}</span>}
-          {item.category && <span className="flex items-center gap-1"><Tag size={14} />{item.category.name}</span>}
-          <span>Publicado em {formatDate(item.createdAt)}</span>
+        <div className="flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider text-mute">
+          {item.city && (
+            <span className="chip">
+              <MapPin size={10} />
+              {item.city}
+            </span>
+          )}
+          {item.category && (
+            <span className="chip">
+              <Tag size={10} />
+              {item.category.name}
+            </span>
+          )}
+          <span className="chip">{formatDate(item.createdAt)}</span>
         </div>
 
-        <Link to={`/profile/${item.authorId}`} className="block">
-          <div className="flex items-center gap-3 rounded-xl border border-gray-100 p-3 transition-colors hover:border-blue-100 hover:bg-blue-50/40">
-            <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="md" />
-            <div>
-              <p className="font-semibold text-gray-900">{profile?.displayName}</p>
-              <p className="text-xs text-gray-500">Ver perfil do vendedor</p>
-            </div>
+        <Link
+          to={`/profile/${item.authorId}`}
+          className="flex items-center gap-3 rounded-2xl border border-line bg-ink/[0.02] p-3 transition-colors hover:border-coral hover:bg-coral/[0.05] dark:bg-white/[0.04]"
+        >
+          <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="md" />
+          <div className="min-w-0">
+            <p className="font-display text-sm font-bold text-ink">{profile?.displayName}</p>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
+              Ver perfil do vendedor
+            </p>
           </div>
         </Link>
 
         {!isOwner && item.status === 'ACTIVE' && (
-          <Button fullWidth onClick={() => startChatMutation.mutate()} isLoading={startChatMutation.isPending}>
-            Enviar mensagem
+          <Button
+            fullWidth
+            onClick={() => startChatMutation.mutate()}
+            isLoading={startChatMutation.isPending}
+          >
+            <MessageCircle size={16} />
+            <span className="ml-2">Enviar mensagem</span>
           </Button>
         )}
 
         {isOwner && item.status === 'ACTIVE' && (
-          <Button variant="secondary" fullWidth onClick={() => markSoldMutation.mutate()} isLoading={markSoldMutation.isPending}>
+          <Button
+            variant="glass"
+            fullWidth
+            onClick={() => markSoldMutation.mutate()}
+            isLoading={markSoldMutation.isPending}
+          >
             Marcar como vendido
           </Button>
         )}

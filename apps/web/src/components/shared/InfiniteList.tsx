@@ -36,7 +36,12 @@ export function InfiniteList<T extends { id: string }>({
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (items.length === 0) {
-    return <div className="py-12 text-center text-gray-400">{emptyMessage}</div>;
+    return (
+      <div className="glass shape-signature px-4 py-12 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-mute">Vazio</p>
+        <p className="mt-1 font-display font-bold text-ink">{emptyMessage}</p>
+      </div>
+    );
   }
 
   return (
