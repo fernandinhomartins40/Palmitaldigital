@@ -36,7 +36,7 @@ function RideCard({ ride }: { ride: Ride }) {
         </div>
         <p className="text-sm text-ink font-medium truncate flex items-center gap-1">
           <MapPin className="w-3 h-3 text-mute flex-shrink-0" />
-          {ride.destinationAddress}
+          {ride.destinationLabel}
         </p>
         <p className="text-xs text-mute flex items-center gap-1 mt-0.5">
           <Clock className="w-3 h-3" />

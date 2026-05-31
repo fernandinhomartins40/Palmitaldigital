@@ -3,42 +3,47 @@ import { api } from './api';
 export interface Driver {
   id: string;
   vehicleModel: string;
-  vehiclePlate: string;
-  vehicleColor: string;
+  vehicleColor?: string | null;
+  licensePlate: string;
   status: string;
-  lat?: number | null;
-  lng?: number | null;
+  currentLat?: number | null;
+  currentLng?: number | null;
+  ratingAvg: number;
+  ratingCount: number;
   user: { profile: { displayName: string; avatarUrl?: string | null } };
 }
 
 export interface Ride {
   id: string;
   status: string;
-  originAddress: string;
-  destinationAddress: string;
+  originLabel: string;
+  destinationLabel: string;
   originLat: number;
   originLng: number;
   destinationLat: number;
   destinationLng: number;
   estimatedPrice?: number | null;
   finalPrice?: number | null;
-  pixQrCode?: string | null;
+  passengerRating?: number | null;
+  driverRating?: number | null;
+  cancelReason?: string | null;
   createdAt: string;
   updatedAt: string;
   driver?: Driver | null;
   passenger?: { profile: { displayName: string; avatarUrl?: string | null } };
-  rating?: number | null;
-  ratingComment?: string | null;
+  locations?: { lat: number; lng: number; recordedAt: string }[];
 }
 
 export const ridesApi = {
   requestRide: (data: {
-    originAddress: string;
-    destinationAddress: string;
+    originLabel: string;
+    destinationLabel: string;
     originLat: number;
     originLng: number;
     destinationLat: number;
     destinationLng: number;
+    distanceMeters?: number;
+    notes?: string;
   }) => api.post<Ride>('/rides/request', data),
 
   getRide: (id: string) =>
@@ -47,19 +52,18 @@ export const ridesApi = {
   listMyRides: () =>
     api.get<Ride[]>('/rides/mine'),
 
-  cancelRide: (id: string) =>
-    api.post(`/rides/${id}/cancel`),
+  cancelRide: (id: string, reason?: string) =>
+    api.post(`/rides/${id}/cancel`, { reason }),
 
   rateRide: (id: string, rating: number, comment?: string) =>
     api.post(`/rides/${id}/rate`, { rating, comment }),
 
   registerDriver: (data: {
+    licensePlate: string;
     vehicleModel: string;
-    vehiclePlate: string;
-    vehicleColor: string;
-    licenseNumber: string;
-    pixKey: string;
-    pixKeyType: string;
+    vehicleColor?: string;
+    vehicleYear?: number;
+    documentUrl?: string;
   }) => api.post<Driver>('/rides/driver/register', data),
 
   getDriverProfile: () =>
@@ -68,15 +72,12 @@ export const ridesApi = {
   setDriverStatus: (status: 'ONLINE' | 'OFFLINE') =>
     api.patch('/rides/driver/status', { status }),
 
-  driverListRides: () =>
-    api.get<Ride[]>('/rides/driver/rides'),
-
   acceptRide: (rideId: string) =>
     api.post(`/rides/${rideId}/accept`),
 
   updateRideStatus: (rideId: string, status: string) =>
     api.patch(`/rides/${rideId}/status`, { status }),
 
-  getNearbyRides: () =>
+  listAvailableRides: () =>
     api.get<Ride[]>('/rides/driver/nearby'),
 };

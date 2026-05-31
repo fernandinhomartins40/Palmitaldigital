@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ArrowLeft, Car, MapPin, Phone, Star, QrCode, X, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Car, MapPin, Star, X, CheckCircle } from 'lucide-react';
 import { useRide } from '../../hooks/useRides';
 import { ridesApi } from '../../services/ridesApi';
 
@@ -139,10 +139,10 @@ export function RideTrackPage() {
         <MapContainer center={mapCenter} zoom={15} style={{ width: '100%', height: '100%' }} zoomControl={false}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <Marker position={[ride.originLat, ride.originLng]}>
-            <Popup>Origem: {ride.originAddress}</Popup>
+            <Popup>Origem: {ride.originLabel}</Popup>
           </Marker>
           <Marker position={[ride.destinationLat, ride.destinationLng]}>
-            <Popup>Destino: {ride.destinationAddress}</Popup>
+            <Popup>Destino: {ride.destinationLabel}</Popup>
           </Marker>
           {driverPos && (
             <Marker position={[driverPos.lat, driverPos.lng]} icon={DRIVER_ICON}>
@@ -215,30 +215,27 @@ export function RideTrackPage() {
             <div className="flex-1 min-w-0">
               <p className="font-medium text-ink text-sm">{ride.driver.user.profile.displayName}</p>
               <p className="text-xs text-mute">
-                {ride.driver.vehicleColor} {ride.driver.vehicleModel} · {ride.driver.vehiclePlate}
+                {ride.driver.vehicleColor} {ride.driver.vehicleModel} · {ride.driver.licensePlate}
               </p>
             </div>
           </div>
         )}
 
-        {/* PIX on complete */}
-        {isCompleted && ride.pixQrCode && (
+        {/* Driver PIX info on complete */}
+        {isCompleted && ride.finalPrice && (
           <div className="glass rounded-2xl p-4 space-y-2 text-center">
-            <div className="flex items-center gap-2 justify-center font-semibold text-ink">
-              <QrCode className="w-4 h-4 text-cobalt" />
-              Pague com PIX
-            </div>
-            <div className="glass-strong rounded-xl p-2 font-mono text-xs text-ink break-all select-all">
-              {ride.pixQrCode}
-            </div>
-            <p className="text-xs text-mute">
-              Total: <strong className="text-ink">R$ {ride.finalPrice?.toFixed(2)}</strong>
+            <p className="font-semibold text-ink">Corrida concluída!</p>
+            <p className="text-sm text-mute">
+              Total: <strong className="text-ink">R$ {Number(ride.finalPrice).toFixed(2)}</strong>
             </p>
+            {ride.driver?.user?.profile?.displayName && (
+              <p className="text-xs text-mute">Pague o motorista via PIX combinado.</p>
+            )}
           </div>
         )}
 
         {/* Rating trigger */}
-        {isCompleted && !ride.rating && (
+        {isCompleted && !ride.passengerRating && (
           <button
             onClick={() => setShowRating(true)}
             className="w-full btn-ink py-3 font-semibold flex items-center justify-center gap-2"
@@ -249,10 +246,10 @@ export function RideTrackPage() {
           </button>
         )}
 
-        {isCompleted && ride.rating && (
+        {isCompleted && ride.passengerRating && (
           <div className="glass rounded-2xl p-3 flex items-center gap-2 justify-center">
             <CheckCircle className="w-4 h-4 text-mint" />
-            <span className="text-sm text-ink">Avaliação enviada: {ride.rating}★</span>
+            <span className="text-sm text-ink">Avaliação enviada: {ride.passengerRating}★</span>
           </div>
         )}
 

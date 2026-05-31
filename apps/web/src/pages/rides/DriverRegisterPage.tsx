@@ -1,31 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Car, Send } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { ridesApi } from '../../services/ridesApi';
-
-const PIX_TYPES = ['CPF', 'CNPJ', 'EMAIL', 'PHONE', 'RANDOM'];
 
 export function DriverRegisterPage() {
   const navigate = useNavigate();
   const [vehicleModel, setVehicleModel] = useState('');
-  const [vehiclePlate, setVehiclePlate] = useState('');
+  const [licensePlate, setLicensePlate] = useState('');
   const [vehicleColor, setVehicleColor] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [pixKey, setPixKey] = useState('');
-  const [pixKeyType, setPixKeyType] = useState('CPF');
+  const [vehicleYear, setVehicleYear] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async () => {
-    if (!vehicleModel || !vehiclePlate || !vehicleColor || !licenseNumber || !pixKey) return;
+    if (!vehicleModel || !licensePlate) return;
     setSubmitting(true);
     try {
       await ridesApi.registerDriver({
+        licensePlate: licensePlate.toUpperCase(),
         vehicleModel,
-        vehiclePlate: vehiclePlate.toUpperCase(),
-        vehicleColor,
-        licenseNumber,
-        pixKey,
-        pixKeyType,
+        vehicleColor: vehicleColor || undefined,
+        vehicleYear: vehicleYear ? parseInt(vehicleYear) : undefined,
       });
       navigate('/rides/driver');
     } finally {
@@ -63,13 +57,13 @@ export function DriverRegisterPage() {
             <input
               className="w-full glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-cobalt/50 uppercase"
               placeholder="ABC1234"
-              value={vehiclePlate}
-              onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
+              value={licensePlate}
+              onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
               maxLength={8}
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-mute font-mono uppercase tracking-wider">Cor *</label>
+            <label className="text-xs text-mute font-mono uppercase tracking-wider">Cor</label>
             <input
               className="w-full glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-cobalt/50"
               placeholder="Branco"
@@ -77,45 +71,23 @@ export function DriverRegisterPage() {
               onChange={(e) => setVehicleColor(e.target.value)}
             />
           </div>
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-xs text-mute font-mono uppercase tracking-wider">Número da CNH *</label>
-          <input
-            className="w-full glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-cobalt/50"
-            placeholder="Número da habilitação"
-            value={licenseNumber}
-            onChange={(e) => setLicenseNumber(e.target.value)}
-          />
-        </div>
-
-        <div className="border-t border-line pt-4 space-y-3">
-          <p className="text-xs font-mono uppercase tracking-wider text-mute">Pagamento — Chave PIX</p>
-          <div className="flex gap-2">
-            <select
-              className="glass-strong rounded-2xl px-3 py-2.5 text-sm text-ink outline-none border border-line focus:border-cobalt/50 bg-transparent"
-              value={pixKeyType}
-              onChange={(e) => setPixKeyType(e.target.value)}
-            >
-              {PIX_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
-              ))}
-            </select>
+          <div className="space-y-1 col-span-2">
+            <label className="text-xs text-mute font-mono uppercase tracking-wider">Ano</label>
             <input
-              className="flex-1 glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-cobalt/50"
-              placeholder="Sua chave PIX..."
-              value={pixKey}
-              onChange={(e) => setPixKey(e.target.value)}
+              className="w-full glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-cobalt/50"
+              placeholder="2020"
+              type="number"
+              min="1990"
+              max="2030"
+              value={vehicleYear}
+              onChange={(e) => setVehicleYear(e.target.value)}
             />
           </div>
-          <p className="text-xs text-mute">
-            O passageiro pagará direto para esta chave após a corrida.
-          </p>
         </div>
 
         <button
           onClick={submit}
-          disabled={submitting || !vehicleModel || !vehiclePlate || !vehicleColor || !licenseNumber || !pixKey}
+          disabled={submitting || !vehicleModel || !licensePlate}
           className="w-full py-3 rounded-2xl font-semibold text-sm text-white flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
           style={{ background: 'var(--cobalt)' }}
         >
@@ -124,15 +96,14 @@ export function DriverRegisterPage() {
         </button>
       </div>
 
-      {/* Info */}
       <div className="glass rounded-2xl p-4 space-y-2">
         <p className="text-xs font-mono uppercase tracking-wider text-mute">Como funciona</p>
         {[
           'Você se cadastra com seus dados e veículo',
           'Fique online para receber chamadas de passageiros',
           'Aceite corridas próximas de você',
-          'Passageiro paga via PIX diretamente para você',
-          'Sem comissão da plataforma no momento',
+          'Receba avaliações dos passageiros',
+          'Cadastro gratuito — sem comissão no momento',
         ].map((item, i) => (
           <div key={i} className="flex items-start gap-2 text-sm text-ink/80">
             <span

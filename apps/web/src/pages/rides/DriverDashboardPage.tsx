@@ -33,12 +33,12 @@ function PendingRideCard({ ride, onAccept, onReject }: {
       <div className="space-y-1 text-sm">
         <div className="flex items-start gap-2 text-mute">
           <div className="w-2 h-2 rounded-full border border-cobalt mt-1.5 flex-shrink-0" />
-          <span>{ride.originAddress}</span>
+          <span>{ride.originLabel}</span>
         </div>
         <div className="w-0.5 h-3 ml-1 bg-line" />
         <div className="flex items-start gap-2 text-mute">
           <MapPin className="w-3.5 h-3.5 text-coral mt-0.5 flex-shrink-0" />
-          <span>{ride.destinationAddress}</span>
+          <span>{ride.destinationLabel}</span>
         </div>
       </div>
       <div className="flex gap-2">
@@ -80,7 +80,7 @@ export function DriverDashboardPage() {
       .then((r) => {
         setDriver(r.data);
         setOnline(r.data.status === 'ONLINE');
-        if (r.data.lat && r.data.lng) setPos([r.data.lat, r.data.lng]);
+        if (r.data.currentLat && r.data.currentLng) setPos([r.data.currentLat, r.data.currentLng]);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -218,7 +218,7 @@ export function DriverDashboardPage() {
           <div className="w-10 h-10 rounded-xl bg-cobalt/15 flex items-center justify-center text-xl flex-shrink-0">🚗</div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-ink text-sm">{driver.vehicleColor} {driver.vehicleModel}</p>
-            <p className="text-xs text-mute">{driver.vehiclePlate}</p>
+            <p className="text-xs text-mute">{driver.licensePlate}</p>
           </div>
           <button
             onClick={online ? goOffline : goOnline}
@@ -248,7 +248,7 @@ export function DriverDashboardPage() {
               <p className="font-semibold text-ink">Corrida ativa</p>
               <p className="text-mute flex items-start gap-1">
                 <MapPin className="w-3.5 h-3.5 text-coral mt-0.5 flex-shrink-0" />
-                {activeRide.destinationAddress}
+                {activeRide.destinationLabel}
               </p>
             </div>
             <button

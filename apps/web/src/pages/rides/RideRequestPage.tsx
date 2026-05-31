@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -107,13 +107,17 @@ export function RideRequestPage() {
     if (!origin || !dest) return;
     setRequesting(true);
     try {
+      const dlat = dest.lat - origin.lat;
+      const dlng = dest.lng - origin.lng;
+      const distanceMeters = Math.round(Math.sqrt(dlat * dlat + dlng * dlng) * 111000);
       const r = await ridesApi.requestRide({
-        originAddress: originAddr,
-        destinationAddress: destAddr,
+        originLabel: originAddr,
+        destinationLabel: destAddr,
         originLat: origin.lat,
         originLng: origin.lng,
         destinationLat: dest.lat,
         destinationLng: dest.lng,
+        distanceMeters,
       });
       navigate(`/rides/track/${r.data.id}`);
     } finally {
