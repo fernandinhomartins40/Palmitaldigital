@@ -12,9 +12,11 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ClassifiedCard } from '../../components/feed/ClassifiedCard';
 import { InfiniteList } from '../../components/shared/InfiniteList';
 import { api } from '../../services/api';
+import { useAuthStore } from '../../store/authStore';
 
 type Category = { id: string; name: string };
 
@@ -31,6 +33,7 @@ function getCategoryIcon(name: string) {
 export function ClassifiedsPage() {
   const [categoryId, setCategoryId] = useState('');
   const [city, setCity] = useState('');
+  const currentUser = useAuthStore((s) => s.user);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -73,6 +76,16 @@ export function ClassifiedsPage() {
             <p className="mt-3 max-w-xl text-base text-mute lg:text-lg">
               Tudo de Palmital reunido — sem comissão, sem intermediário.
             </p>
+            {currentUser && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link to="/create" className="chip chip-citrus hover:scale-105 transition-transform">
+                  + Anunciar
+                </Link>
+                <Link to="/classifieds/mine" className="chip border border-line hover:scale-105 transition-transform">
+                  Meus anúncios
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 lg:min-w-[280px]">

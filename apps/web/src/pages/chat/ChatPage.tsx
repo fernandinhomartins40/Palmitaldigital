@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { Avatar, Spinner } from '@palmital/ui';
-import { Send } from 'lucide-react';
+import { Check, CheckCheck, Send } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useChat } from '../../hooks/useChat';
@@ -119,6 +119,10 @@ export function ChatPage() {
           {messages.map((msg) => {
             const isMe = msg.senderId === currentUser?.id;
             const profile = msg.sender?.profile;
+            const time = msg.createdAt
+              ? new Date(msg.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+              : '';
+            const isRead = msg.status === 'READ';
             return (
               <div key={msg.id} className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                 {!isMe && <Avatar src={profile?.avatarUrl} name={profile?.displayName ?? '?'} size="xs" />}
@@ -132,7 +136,20 @@ export function ChatPage() {
                     borderRadius: isMe ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
                   }}
                 >
-                  {msg.content}
+                  <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                  <span
+                    className={`mt-1 flex items-center gap-1 text-[10px] ${
+                      isMe ? 'justify-end text-white/70' : 'text-mute'
+                    }`}
+                  >
+                    {time}
+                    {isMe &&
+                      (isRead ? (
+                        <CheckCheck size={13} strokeWidth={2.4} className="text-white" />
+                      ) : (
+                        <Check size={13} strokeWidth={2.4} className="text-white/70" />
+                      ))}
+                  </span>
                 </div>
               </div>
             );

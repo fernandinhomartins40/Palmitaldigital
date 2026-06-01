@@ -10,9 +10,25 @@ export class ClassifiedsService {
 
   async list(query: ClassifiedsQueryDto) {
     const limit = query.limit ?? 20;
-    const where: any = { status: query.status ?? ClassifiedStatus.ACTIVE };
+    const where: any = {};
+
+    // Owner listing (authorId) sees every status unless one is explicitly requested;
+    // public listing defaults to ACTIVE only.
+    if (query.status) {
+      where.status = query.status;
+    } else if (!query.authorId) {
+      where.status = ClassifiedStatus.ACTIVE;
+    }
+
+    if (query.authorId) where.authorId = query.authorId;
     if (query.categoryId) where.categoryId = query.categoryId;
     if (query.city) where.city = { contains: query.city, mode: 'insensitive' };
+    if (query.q) {
+      where.OR = [
+        { title: { contains: query.q, mode: 'insensitive' } },
+        { description: { contains: query.q, mode: 'insensitive' } },
+      ];
+    }
 
     if (query.cursor) {
       const cursor = await this.prisma.classified.findUnique({ where: { id: query.cursor } });

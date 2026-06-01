@@ -33,15 +33,33 @@ export function useChat(conversationId?: string) {
     const handleTyping = () => setIsTyping(true);
     const handleStoppedTyping = () => setIsTyping(false);
 
+    const handleMessagesRead = (data: { userId: string }) => {
+      // The other participant read the conversation → mark my delivered messages as READ
+      queryClient.setQueryData(['messages', conversationId], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            messages: (page.messages ?? []).map((m: any) =>
+              m.senderId !== data.userId ? { ...m, status: 'READ' } : m,
+            ),
+          })),
+        };
+      });
+    };
+
     socket.on('new_message', handleNewMessage);
     socket.on('user_typing', handleTyping);
     socket.on('user_stopped_typing', handleStoppedTyping);
+    socket.on('messages_read', handleMessagesRead);
 
     return () => {
       socket.emit('leave_conversation', { conversationId });
       socket.off('new_message', handleNewMessage);
       socket.off('user_typing', handleTyping);
       socket.off('user_stopped_typing', handleStoppedTyping);
+      socket.off('messages_read', handleMessagesRead);
       setIsTyping(false);
     };
   }, [conversationId, queryClient]);

@@ -14,6 +14,7 @@ import { shouldUsePwaShell } from './utils/pwa';
 const FeedPage = lazy(() => import('./pages/feed/FeedPage').then((m) => ({ default: m.FeedPage })));
 const ClassifiedsPage = lazy(() => import('./pages/classifieds/ClassifiedsPage').then((m) => ({ default: m.ClassifiedsPage })));
 const ClassifiedDetailPage = lazy(() => import('./pages/classifieds/ClassifiedDetailPage').then((m) => ({ default: m.ClassifiedDetailPage })));
+const MyClassifiedsPage = lazy(() => import('./pages/classifieds/MyClassifiedsPage').then((m) => ({ default: m.MyClassifiedsPage })));
 const CompaniesPage = lazy(() => import('./pages/companies/CompaniesPage').then((m) => ({ default: m.CompaniesPage })));
 const CompanyProfilePage = lazy(() => import('./pages/companies/CompanyProfilePage').then((m) => ({ default: m.CompanyProfilePage })));
 const CompanyManagerPage = lazy(() => import('./pages/companies/CompanyManagerPage').then((m) => ({ default: m.CompanyManagerPage })));
@@ -87,6 +88,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/feed', element: <Page><FeedPage /></Page> },
       { path: '/classifieds', element: <Page><ClassifiedsPage /></Page> },
+      { path: '/classifieds/mine', element: <Page><MyClassifiedsPage /></Page> },
       { path: '/classifieds/:id', element: <Page><ClassifiedDetailPage /></Page> },
       { path: '/companies', element: <Page><CompaniesPage /></Page> },
       { path: '/companies/manage', element: <Page><CompanyManagerPage /></Page> },

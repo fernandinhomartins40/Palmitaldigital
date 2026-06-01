@@ -8,7 +8,19 @@ import { useAuthStore } from '../../store/authStore';
 import { useUIStore } from '../../store/uiStore';
 import { disconnectSocket } from '../../services/socket';
 import { getLoginPath } from '../../utils/pwa';
-import { Camera, ExternalLink, LogOut, MapPin, Phone, UserCircle2 } from 'lucide-react';
+import {
+  Building2,
+  Camera,
+  Car,
+  ExternalLink,
+  LogOut,
+  MapPin,
+  Newspaper,
+  Phone,
+  ShoppingBag,
+  UserCircle2,
+  UtensilsCrossed,
+} from 'lucide-react';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -157,6 +169,22 @@ export function ProfilePage() {
 
   const p = profile?.profile;
   const displayName = p?.displayName ?? user?.profile?.displayName ?? user?.email ?? 'Usuario';
+  const role = profile?.role as string | undefined;
+
+  const roleShortcuts: Array<{
+    role: string;
+    label: string;
+    chip: string;
+    icon: any;
+    to: string;
+    cta: string;
+  }> = [
+    { role: 'DRIVER', label: 'Motorista', chip: 'chip-cobalt', icon: Car, to: '/rides/driver', cta: 'Painel do motorista' },
+    { role: 'RESTAURANT_OWNER', label: 'Restaurante', chip: 'chip-coral', icon: UtensilsCrossed, to: '/delivery/manage', cta: 'Gerenciar restaurante' },
+    { role: 'JOURNALIST', label: 'Jornalista', chip: 'chip-magenta', icon: Newspaper, to: '/news/write', cta: 'Escrever matéria' },
+    { role: 'BUSINESS_OWNER', label: 'Empresa', chip: 'chip-mint', icon: Building2, to: '/companies/manage', cta: 'Gerenciar loja' },
+  ];
+  const activeRole = roleShortcuts.find((r) => r.role === role);
 
   return (
     <div className="space-y-5">
@@ -222,9 +250,17 @@ export function ProfilePage() {
               </div>
 
               <div className="mt-4 min-w-0 space-y-1 lg:mt-0 lg:pb-2">
-                <h1 className="font-display text-2xl font-bold leading-tight tracking-tight text-ink lg:text-[2rem]">
-                  {displayName}
-                </h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="font-display text-2xl font-bold leading-tight tracking-tight text-ink lg:text-[2rem]">
+                    {displayName}
+                  </h1>
+                  {activeRole && (
+                    <span className={`chip ${activeRole.chip}`}>
+                      <activeRole.icon size={11} strokeWidth={2.5} />
+                      {activeRole.label}
+                    </span>
+                  )}
+                </div>
                 <p className="break-all font-mono text-[10px] uppercase tracking-wider text-mute">
                   {profile?.email}
                 </p>
@@ -281,6 +317,45 @@ export function ProfilePage() {
                 {profile?.phone || 'Não informado'}
               </p>
             </div>
+          </div>
+
+          {/* Atividade + atalhos de papel */}
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {user?.id && (
+              <Link
+                to={`/profile/${user.id}`}
+                className="flex items-center justify-between rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 transition-colors hover:border-coral hover:bg-coral/[0.05] dark:bg-white/[0.04]"
+              >
+                <span className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <UserCircle2 size={16} className="text-coral" />
+                  Minha atividade
+                </span>
+                <ExternalLink size={15} className="text-mute" />
+              </Link>
+            )}
+            {activeRole ? (
+              <Link
+                to={activeRole.to}
+                className="flex items-center justify-between rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 transition-colors hover:border-cobalt hover:bg-cobalt/[0.05] dark:bg-white/[0.04]"
+              >
+                <span className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <activeRole.icon size={16} className="text-cobalt" />
+                  {activeRole.cta}
+                </span>
+                <ExternalLink size={15} className="text-mute" />
+              </Link>
+            ) : (
+              <Link
+                to="/classifieds/mine"
+                className="flex items-center justify-between rounded-2xl border border-line bg-ink/[0.02] px-4 py-3 transition-colors hover:border-citrus hover:bg-citrus/[0.08] dark:bg-white/[0.04]"
+              >
+                <span className="flex items-center gap-2 text-sm font-bold text-ink">
+                  <ShoppingBag size={16} className="text-citrus" />
+                  Meus anúncios
+                </span>
+                <ExternalLink size={15} className="text-mute" />
+              </Link>
+            )}
           </div>
         </div>
       </div>
