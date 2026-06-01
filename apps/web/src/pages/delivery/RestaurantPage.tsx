@@ -45,7 +45,7 @@ function MenuItemCard({ item, restaurantId, restaurantName }: {
           <p className="text-xs text-mute line-clamp-2 mt-0.5">{item.description}</p>
         )}
         <p className="font-bold text-sm mt-1" style={{ color: 'var(--coral)' }}>
-          R$ {item.price.toFixed(2)}
+          R$ {Number(item.price).toFixed(2)}
         </p>
       </div>
 
@@ -94,9 +94,9 @@ function CartSheet({ restaurant }: { restaurant: { id: string; name: string; del
   if (count === 0) return null;
 
   const subtotal = total();
-  const fee = type === 'DELIVERY' ? restaurant.deliveryFee : 0;
+  const fee = type === 'DELIVERY' ? Number(restaurant.deliveryFee) : 0;
   const grandTotal = subtotal + fee;
-  const meetsMin = subtotal >= restaurant.minOrderValue;
+  const meetsMin = subtotal >= Number(restaurant.minOrderValue);
 
   const placeOrder = async () => {
     if (!meetsMin) return;
@@ -185,7 +185,7 @@ function CartSheet({ restaurant }: { restaurant: { id: string; name: string; del
 
             {!meetsMin && (
               <p className="text-xs text-coral text-center">
-                Pedido mínimo: R$ {restaurant.minOrderValue.toFixed(2)}
+                Pedido mínimo: R$ {Number(restaurant.minOrderValue).toFixed(2)}
               </p>
             )}
 
@@ -289,13 +289,13 @@ export function RestaurantPage() {
             </span>
             <span>
               Entrega:{' '}
-              {restaurant.deliveryFee === 0 ? (
+              {Number(restaurant.deliveryFee) === 0 ? (
                 <span style={{ color: 'var(--mint)' }}>Grátis</span>
               ) : (
-                `R$ ${restaurant.deliveryFee.toFixed(2)}`
+                `R$ ${Number(restaurant.deliveryFee).toFixed(2)}`
               )}
             </span>
-            <span>Mín. R$ {restaurant.minOrderValue.toFixed(2)}</span>
+            <span>Mín. R$ {Number(restaurant.minOrderValue).toFixed(2)}</span>
           </div>
         </div>
 

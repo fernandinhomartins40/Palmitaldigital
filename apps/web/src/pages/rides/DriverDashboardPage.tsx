@@ -26,8 +26,8 @@ function PendingRideCard({ ride, onAccept, onReject }: {
       <div className="flex items-center gap-2">
         <Car className="w-5 h-5 text-cobalt" />
         <span className="font-semibold text-ink text-sm">Nova corrida!</span>
-        {ride.estimatedPrice && (
-          <span className="ml-auto font-bold text-ink">R$ {ride.estimatedPrice.toFixed(2)}</span>
+        {ride.estimatedPrice != null && (
+          <span className="ml-auto font-bold text-ink">R$ {Number(ride.estimatedPrice).toFixed(2)}</span>
         )}
       </div>
       <div className="space-y-1 text-sm">

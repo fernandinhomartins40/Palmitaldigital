@@ -49,9 +49,9 @@ function RideCard({ ride }: { ride: Ride }) {
           </p>
         )}
       </div>
-      {ride.finalPrice && (
+      {ride.finalPrice != null && (
         <div className="text-right flex-shrink-0">
-          <p className="font-bold text-ink text-sm">R$ {ride.finalPrice.toFixed(2)}</p>
+          <p className="font-bold text-ink text-sm">R$ {Number(ride.finalPrice).toFixed(2)}</p>
         </div>
       )}
       {active && <ChevronRight className="w-4 h-4 text-mute flex-shrink-0 self-center" />}

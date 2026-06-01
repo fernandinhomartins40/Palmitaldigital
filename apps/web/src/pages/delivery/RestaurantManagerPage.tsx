@@ -45,7 +45,7 @@ function OrderCard({ order, onUpdate }: { order: Order; onUpdate: () => void }) 
           <p className="text-xs text-mute">{order.type === 'DELIVERY' ? '🛵 Entrega' : '🏪 Retirada'}</p>
         </div>
         <div className="text-right">
-          <p className="font-bold text-ink">R$ {order.totalAmount.toFixed(2)}</p>
+          <p className="font-bold text-ink">R$ {Number(order.totalAmount).toFixed(2)}</p>
           <span
             className="chip text-xs"
             style={
@@ -398,7 +398,7 @@ export function RestaurantManagerPage() {
                   {item.description && <p className="text-xs text-mute truncate">{item.description}</p>}
                 </div>
                 <p className="font-bold text-sm" style={{ color: 'var(--coral)' }}>
-                  R$ {item.price.toFixed(2)}
+                  R$ {Number(item.price).toFixed(2)}
                 </p>
                 <button
                   onClick={() => removeMenuItem(item.id)}
@@ -436,11 +436,11 @@ export function RestaurantManagerPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Pedido mínimo</span>
-              <span className="text-ink">R$ {restaurant.minOrderValue.toFixed(2)}</span>
+              <span className="text-ink">R$ {Number(restaurant.minOrderValue).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Taxa de entrega</span>
-              <span className="text-ink">R$ {restaurant.deliveryFee.toFixed(2)}</span>
+              <span className="text-ink">R$ {Number(restaurant.deliveryFee).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Tempo estimado</span>

@@ -56,13 +56,13 @@ function RestaurantCard({ r }: { r: Restaurant }) {
             {r.estimatedTime} min
           </span>
           <span>
-            {r.deliveryFee === 0 ? (
+            {Number(r.deliveryFee) === 0 ? (
               <span style={{ color: 'var(--mint)' }}>Grátis</span>
             ) : (
-              `R$ ${r.deliveryFee.toFixed(2)}`
+              `R$ ${Number(r.deliveryFee).toFixed(2)}`
             )}
           </span>
-          <span>Mín. R$ {r.minOrderValue.toFixed(2)}</span>
+          <span>Mín. R$ {Number(r.minOrderValue).toFixed(2)}</span>
         </div>
       </div>
     </Link>

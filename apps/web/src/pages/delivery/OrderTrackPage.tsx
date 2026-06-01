@@ -146,7 +146,7 @@ export function OrderTrackPage() {
           <div className="glass-strong rounded-2xl p-3 font-mono text-xs text-ink break-all select-all">
             {order.pixQrCode}
           </div>
-          <p className="text-xs text-mute">Total: <strong className="text-ink">R$ {order.totalAmount.toFixed(2)}</strong></p>
+          <p className="text-xs text-mute">Total: <strong className="text-ink">R$ {Number(order.totalAmount).toFixed(2)}</strong></p>
         </div>
       )}
 
@@ -166,7 +166,7 @@ export function OrderTrackPage() {
             </div>
             <div className="text-right flex-shrink-0">
               <p className="text-xs text-mute">×{item.quantity}</p>
-              <p className="text-sm font-semibold text-ink">R$ {(item.unitPrice * item.quantity).toFixed(2)}</p>
+              <p className="text-sm font-semibold text-ink">R$ {(Number(item.unitPrice) * item.quantity).toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -174,17 +174,17 @@ export function OrderTrackPage() {
         <div className="border-t border-line pt-3 space-y-1 text-sm">
           <div className="flex justify-between text-mute">
             <span>Subtotal</span>
-            <span>R$ {(order.totalAmount - order.deliveryFee).toFixed(2)}</span>
+            <span>R$ {(Number(order.totalAmount) - Number(order.deliveryFee)).toFixed(2)}</span>
           </div>
-          {order.deliveryFee > 0 && (
+          {Number(order.deliveryFee) > 0 && (
             <div className="flex justify-between text-mute">
               <span>Taxa de entrega</span>
-              <span>R$ {order.deliveryFee.toFixed(2)}</span>
+              <span>R$ {Number(order.deliveryFee).toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between font-bold text-ink">
             <span>Total</span>
-            <span>R$ {order.totalAmount.toFixed(2)}</span>
+            <span>R$ {Number(order.totalAmount).toFixed(2)}</span>
           </div>
         </div>
       </div>
