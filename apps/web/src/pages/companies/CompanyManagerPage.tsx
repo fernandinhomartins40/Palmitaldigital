@@ -22,13 +22,19 @@ import {
   Trash2,
 } from 'lucide-react';
 
+type SellMode = 'CONTACT' | 'CART' | 'BOTH';
+
 type CompanyFormState = {
   name: string;
   category: string;
   city: string;
   phone: string;
+  whatsapp: string;
   address: string;
   description: string;
+  sellMode: SellMode;
+  pixKey: string;
+  pixKeyType: string;
   isActive: boolean;
 };
 
@@ -36,6 +42,8 @@ type ProductFormState = {
   name: string;
   description: string;
   price: string;
+  category: string;
+  isFeatured: boolean;
   isAvailable: boolean;
 };
 
@@ -44,8 +52,12 @@ const emptyCompanyForm: CompanyFormState = {
   category: '',
   city: '',
   phone: '',
+  whatsapp: '',
   address: '',
   description: '',
+  sellMode: 'CONTACT',
+  pixKey: '',
+  pixKeyType: 'CPF',
   isActive: true,
 };
 
@@ -53,8 +65,18 @@ const emptyProductForm: ProductFormState = {
   name: '',
   description: '',
   price: '',
+  category: '',
+  isFeatured: false,
   isAvailable: true,
 };
+
+const SELL_MODE_OPTIONS: { value: SellMode; label: string; hint: string }[] = [
+  { value: 'CONTACT', label: 'Só contato', hint: 'Cliente fala pelo WhatsApp/chat' },
+  { value: 'CART', label: 'Carrinho + PIX', hint: 'Cliente faz pedido pelo app' },
+  { value: 'BOTH', label: 'Ambos', hint: 'Carrinho e contato disponíveis' },
+];
+
+const PIX_KEY_TYPES = ['CPF', 'CNPJ', 'EMAIL', 'PHONE', 'RANDOM'];
 
 export function CompanyManagerPage() {
   const queryClient = useQueryClient();
@@ -97,8 +119,12 @@ export function CompanyManagerPage() {
       category: company.category ?? '',
       city: company.city ?? '',
       phone: company.phone ?? '',
+      whatsapp: company.whatsapp ?? '',
       address: company.address ?? '',
       description: company.description ?? '',
+      sellMode: (company.sellMode as SellMode) ?? 'CONTACT',
+      pixKey: company.pixKey ?? '',
+      pixKeyType: company.pixKeyType ?? 'CPF',
       isActive: company.isActive ?? true,
     });
 
@@ -110,6 +136,8 @@ export function CompanyManagerPage() {
             name: product.name ?? '',
             description: product.description ?? '',
             price: product.price != null ? String(product.price) : '',
+            category: product.category ?? '',
+            isFeatured: product.isFeatured ?? false,
             isAvailable: product.isAvailable ?? true,
           },
         ]),
@@ -182,6 +210,8 @@ export function CompanyManagerPage() {
         name: payload.name,
         description: payload.description || undefined,
         price: payload.price ? Number(payload.price) : undefined,
+        category: payload.category || undefined,
+        isFeatured: payload.isFeatured,
         isAvailable: payload.isAvailable,
       });
       return data as any;
@@ -208,6 +238,8 @@ export function CompanyManagerPage() {
         name: payload.name,
         description: payload.description || undefined,
         price: payload.price ? Number(payload.price) : undefined,
+        category: payload.category || undefined,
+        isFeatured: payload.isFeatured,
         isAvailable: payload.isAvailable,
       });
       return data as any;
@@ -449,9 +481,17 @@ export function CompanyManagerPage() {
                   <Link to={`/companies/${company.slug}`} className="block">
                     <Button fullWidth>
                       <ExternalLink size={16} />
-                      <span className="ml-2">Ver perfil público</span>
+                      <span className="ml-2">Ver loja pública</span>
                     </Button>
                   </Link>
+                  {(company.sellMode === 'CART' || company.sellMode === 'BOTH') && (
+                    <Link to="/companies/manage/orders" className="block">
+                      <Button variant="glass" fullWidth>
+                        <Package2 size={16} />
+                        <span className="ml-2">Ver pedidos recebidos</span>
+                      </Button>
+                    </Link>
+                  )}
                   <div className="grid grid-cols-2 gap-3">
                     <Button
                       variant="glass"
@@ -560,12 +600,67 @@ export function CompanyManagerPage() {
                 />
               </div>
 
-              <Input
-                label="Endereco"
-                value={companyForm.address}
-                onChange={(e) => setCompanyForm((state) => ({ ...state, address: e.target.value }))}
-                maxLength={200}
-              />
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Input
+                  label="Endereco"
+                  value={companyForm.address}
+                  onChange={(e) => setCompanyForm((state) => ({ ...state, address: e.target.value }))}
+                  maxLength={200}
+                />
+                <Input
+                  label="WhatsApp (com DDD)"
+                  value={companyForm.whatsapp}
+                  onChange={(e) => setCompanyForm((state) => ({ ...state, whatsapp: e.target.value }))}
+                  maxLength={40}
+                  placeholder="(00) 00000-0000"
+                />
+              </div>
+
+              {/* Modo de venda */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute">Como sua loja vende</label>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {SELL_MODE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setCompanyForm((state) => ({ ...state, sellMode: opt.value }))}
+                      className={`rounded-2xl border p-3 text-left transition-colors ${
+                        companyForm.sellMode === opt.value
+                          ? 'border-cobalt bg-cobalt/[0.06]'
+                          : 'border-line bg-ink/[0.02] dark:bg-white/[0.04]'
+                      }`}
+                    >
+                      <p className="text-sm font-bold text-ink">{opt.label}</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-mute">{opt.hint}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* PIX (quando vende por carrinho) */}
+              {(companyForm.sellMode === 'CART' || companyForm.sellMode === 'BOTH') && (
+                <div className="grid gap-4 lg:grid-cols-[10rem_1fr]">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">Tipo de chave PIX</label>
+                    <select
+                      value={companyForm.pixKeyType}
+                      onChange={(e) => setCompanyForm((state) => ({ ...state, pixKeyType: e.target.value }))}
+                      className="rounded-2xl border border-line bg-ink/[0.03] px-4 py-3 text-sm text-ink outline-none focus:border-cobalt dark:bg-white/[0.04]"
+                    >
+                      {PIX_KEY_TYPES.map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <Input
+                    label="Chave PIX"
+                    value={companyForm.pixKey}
+                    onChange={(e) => setCompanyForm((state) => ({ ...state, pixKey: e.target.value }))}
+                    placeholder="Chave para receber os pedidos"
+                  />
+                </div>
+              )}
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
@@ -668,7 +763,7 @@ export function CompanyManagerPage() {
                 <PlusCircle size={14} />
                 Novo produto
               </div>
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4 lg:grid-cols-3">
                 <Input
                   label="Nome"
                   value={newProduct.name}
@@ -683,6 +778,13 @@ export function CompanyManagerPage() {
                   value={newProduct.price}
                   onChange={(e) => setNewProduct((state) => ({ ...state, price: e.target.value }))}
                 />
+                <Input
+                  label="Categoria"
+                  value={newProduct.category}
+                  onChange={(e) => setNewProduct((state) => ({ ...state, category: e.target.value }))}
+                  maxLength={60}
+                  placeholder="Ex: Roupas"
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
@@ -695,17 +797,30 @@ export function CompanyManagerPage() {
                   className="rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none placeholder:text-subtle focus:border-coral focus:ring-4 focus:ring-coral/15"
                 />
               </div>
-              <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
-                <input
-                  type="checkbox"
-                  checked={newProduct.isAvailable}
-                  onChange={(e) =>
-                    setNewProduct((state) => ({ ...state, isAvailable: e.target.checked }))
-                  }
-                  className="h-4 w-4 rounded"
-                />
-                Produto disponível para exibição
-              </label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
+                  <input
+                    type="checkbox"
+                    checked={newProduct.isAvailable}
+                    onChange={(e) =>
+                      setNewProduct((state) => ({ ...state, isAvailable: e.target.checked }))
+                    }
+                    className="h-4 w-4 rounded"
+                  />
+                  Disponível
+                </label>
+                <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
+                  <input
+                    type="checkbox"
+                    checked={newProduct.isFeatured}
+                    onChange={(e) =>
+                      setNewProduct((state) => ({ ...state, isFeatured: e.target.checked }))
+                    }
+                    className="h-4 w-4 rounded"
+                  />
+                  Destaque na vitrine
+                </label>
+              </div>
               <Button type="submit" isLoading={createProductMutation.isPending}>
                 Criar produto
               </Button>
@@ -768,7 +883,7 @@ export function CompanyManagerPage() {
                         </div>
                       </div>
 
-                      <div className="grid gap-4 lg:grid-cols-2">
+                      <div className="grid gap-4 lg:grid-cols-3">
                         <Input
                           label="Nome"
                           value={draft.name}
@@ -792,6 +907,17 @@ export function CompanyManagerPage() {
                             }))
                           }
                         />
+                        <Input
+                          label="Categoria"
+                          value={draft.category}
+                          maxLength={60}
+                          onChange={(e) =>
+                            setProductDrafts((state) => ({
+                              ...state,
+                              [product.id]: { ...draft, category: e.target.value },
+                            }))
+                          }
+                        />
                       </div>
 
                       <div className="flex flex-col gap-1.5">
@@ -809,20 +935,36 @@ export function CompanyManagerPage() {
                         />
                       </div>
 
-                      <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
-                        <input
-                          type="checkbox"
-                          checked={draft.isAvailable}
-                          onChange={(e) =>
-                            setProductDrafts((state) => ({
-                              ...state,
-                              [product.id]: { ...draft, isAvailable: e.target.checked },
-                            }))
-                          }
-                          className="h-4 w-4 rounded"
-                        />
-                        Disponível para venda/exibição
-                      </label>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
+                          <input
+                            type="checkbox"
+                            checked={draft.isAvailable}
+                            onChange={(e) =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, isAvailable: e.target.checked },
+                              }))
+                            }
+                            className="h-4 w-4 rounded"
+                          />
+                          Disponível
+                        </label>
+                        <label className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-ink">
+                          <input
+                            type="checkbox"
+                            checked={draft.isFeatured}
+                            onChange={(e) =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, isFeatured: e.target.checked },
+                              }))
+                            }
+                            className="h-4 w-4 rounded"
+                          />
+                          Destaque na vitrine
+                        </label>
+                      </div>
 
                       <div className="flex flex-col gap-2 sm:flex-row">
                         <Button

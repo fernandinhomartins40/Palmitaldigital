@@ -42,10 +42,10 @@ function RideCard({ ride }: { ride: Ride }) {
           <Clock className="w-3 h-3" />
           {new Date(ride.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
         </p>
-        {ride.rating && (
+        {ride.passengerRating && (
           <p className="text-xs text-mute flex items-center gap-1 mt-0.5">
             <Star className="w-3 h-3 fill-amber text-amber" />
-            {ride.rating}
+            {ride.passengerRating}
           </p>
         )}
       </div>

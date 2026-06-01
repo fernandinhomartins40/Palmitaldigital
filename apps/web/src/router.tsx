@@ -17,6 +17,8 @@ const ClassifiedDetailPage = lazy(() => import('./pages/classifieds/ClassifiedDe
 const CompaniesPage = lazy(() => import('./pages/companies/CompaniesPage').then((m) => ({ default: m.CompaniesPage })));
 const CompanyProfilePage = lazy(() => import('./pages/companies/CompanyProfilePage').then((m) => ({ default: m.CompanyProfilePage })));
 const CompanyManagerPage = lazy(() => import('./pages/companies/CompanyManagerPage').then((m) => ({ default: m.CompanyManagerPage })));
+const CompanyOrderTrackPage = lazy(() => import('./pages/companies/CompanyOrderTrackPage').then((m) => ({ default: m.CompanyOrderTrackPage })));
+const CompanyOrdersPage = lazy(() => import('./pages/companies/CompanyOrdersPage').then((m) => ({ default: m.CompanyOrdersPage })));
 const ConversationsPage = lazy(() => import('./pages/chat/ConversationsPage').then((m) => ({ default: m.ConversationsPage })));
 const ChatPage = lazy(() => import('./pages/chat/ChatPage').then((m) => ({ default: m.ChatPage })));
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
@@ -88,6 +90,8 @@ export const router = createBrowserRouter([
       { path: '/classifieds/:id', element: <Page><ClassifiedDetailPage /></Page> },
       { path: '/companies', element: <Page><CompaniesPage /></Page> },
       { path: '/companies/manage', element: <Page><CompanyManagerPage /></Page> },
+      { path: '/companies/manage/orders', element: <Page><CompanyOrdersPage /></Page> },
+      { path: '/companies/order/:id', element: <Page><CompanyOrderTrackPage /></Page> },
       { path: '/companies/:slug', element: <Page><CompanyProfilePage /></Page> },
       { path: '/chat', element: <Page><ConversationsPage /></Page> },
       { path: '/chat/:conversationId', element: <Page><ChatPage /></Page> },

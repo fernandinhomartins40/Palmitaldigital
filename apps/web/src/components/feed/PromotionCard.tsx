@@ -6,12 +6,24 @@ import {
   BadgeCheck,
   BriefcaseBusiness,
   MapPin,
+  MessageCircle,
   Package2,
   Phone,
+  Plus,
   Sparkles,
+  Store,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PostEngagement } from './PostEngagement';
+import { useCompanyCartStore } from '../../store/companyCartStore';
+import { useUIStore } from '../../store/uiStore';
+
+function companyWhatsAppLink(company: any, message: string) {
+  const digits = (company?.whatsapp || company?.phone || '').replace(/\D/g, '');
+  if (!digits) return null;
+  const normalized = digits.length <= 11 ? `55${digits}` : digits;
+  return `https://wa.me/${normalized}?text=${encodeURIComponent(message)}`;
+}
 
 function HighlightList({ highlights }: { highlights?: string[] }) {
   if (!highlights?.length) return null;
@@ -106,6 +118,67 @@ function ProfessionalPromotionCard({ post }: { post: any }) {
   );
 }
 
+function StorefrontProductCard({ product, company }: { product: any; company: any }) {
+  const cart = useCompanyCartStore();
+  const addToast = useUIStore((s) => s.addToast);
+  const canSell = company?.sellMode === 'CART' || company?.sellMode === 'BOTH';
+  const hasPrice = product.price != null;
+
+  const handleAdd = () => {
+    cart.addItem(company.id, company.name, company.slug, product, 1);
+    addToast(`${product.name} adicionado`, 'success');
+  };
+
+  const handleContact = () => {
+    const message = `Olá! Tenho interesse no produto "${product.name}"${
+      hasPrice ? ` (${formatCurrency(Number(product.price))})` : ''
+    } da ${company?.name}.`;
+    const link = companyWhatsAppLink(company, message);
+    if (link) window.open(link, '_blank');
+  };
+
+  return (
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-line bg-ink/[0.02] dark:bg-white/[0.03]">
+      <div className="aspect-[4/3] bg-ink/5 dark:bg-white/5">
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full items-center justify-center text-mute">
+            <Package2 size={28} strokeWidth={1.2} />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <p className="line-clamp-2 font-display text-sm font-bold text-ink">{product.name}</p>
+        <div className="mt-auto pt-1">
+          {hasPrice ? (
+            <p className="font-mono text-sm font-bold text-ink">{formatCurrency(Number(product.price))}</p>
+          ) : (
+            <p className="font-mono text-xs uppercase tracking-wider text-mute">A consultar</p>
+          )}
+          {canSell && hasPrice ? (
+            <button
+              onClick={handleAdd}
+              className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg bg-cobalt px-2 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <Plus size={13} strokeWidth={2.5} />
+              Adicionar
+            </button>
+          ) : (
+            <button
+              onClick={handleContact}
+              className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg border border-line px-2 py-1.5 text-xs font-semibold text-ink transition-colors hover:bg-magenta hover:text-white"
+            >
+              <MessageCircle size={13} strokeWidth={2.2} />
+              Interesse
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CompanyPromotionCard({ post }: { post: any }) {
   const company = post.company;
   const promotion = post.promotion;
@@ -160,35 +233,9 @@ function CompanyPromotionCard({ post }: { post: any }) {
       </div>
 
       {showProducts && (
-        <div className="grid gap-2 border-t border-line px-5 pb-5 pt-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-2 border-t border-line px-5 pb-4 pt-4 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product: any) => (
-            <div
-              key={product.id}
-              className="overflow-hidden rounded-2xl border border-line bg-ink/[0.02] dark:bg-white/[0.03]"
-            >
-              <div className="aspect-[4/3] bg-ink/5 dark:bg-white/5">
-                {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-mute">
-                    <Package2 size={28} strokeWidth={1.2} />
-                  </div>
-                )}
-              </div>
-              <div className="space-y-1.5 p-3">
-                <p className="line-clamp-2 font-display text-sm font-bold text-ink">{product.name}</p>
-                {product.description && (
-                  <p className="line-clamp-2 text-xs leading-4 text-mute">{product.description}</p>
-                )}
-                {product.price ? (
-                  <p className="font-mono text-sm font-bold text-ink">
-                    {formatCurrency(Number(product.price))}
-                  </p>
-                ) : (
-                  <p className="font-mono text-xs uppercase tracking-wider text-mute">A consultar</p>
-                )}
-              </div>
-            </div>
+            <StorefrontProductCard key={product.id} product={product} company={company} />
           ))}
         </div>
       )}
@@ -212,6 +259,20 @@ function CompanyPromotionCard({ post }: { post: any }) {
           </div>
         </div>
       )}
+
+      {/* Ver loja completa */}
+      <div className="px-5 pb-4">
+        <Link
+          to={`/companies/${company?.slug}`}
+          className="flex items-center justify-between rounded-xl border border-line bg-ink/[0.02] px-4 py-3 text-sm font-semibold text-ink transition-colors hover:bg-magenta hover:text-white dark:bg-white/[0.04]"
+        >
+          <span className="inline-flex items-center gap-2">
+            <Store size={16} />
+            Ver loja completa
+          </span>
+          <ArrowUpRight size={16} strokeWidth={2.4} />
+        </Link>
+      </div>
 
       <div className="border-t border-line px-5 py-3">
         <PostEngagement post={post} accent="magenta" compact />

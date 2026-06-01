@@ -7,6 +7,7 @@ import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { CreateCompanyOrderDto, UpdateCompanyOrderStatusDto } from './dto/company-order.dto';
 
 const companyImageInterceptor = FileInterceptor('file', {
   storage: memoryStorage(),
@@ -90,6 +91,37 @@ export class CompaniesController {
   @Delete('me/products/:id')
   removeProductMine(@CurrentUser() user: any, @Param('id') id: string) {
     return this.companiesService.removeProductMine(user.id, id);
+  }
+
+  // ─── Storefront orders ───
+
+  @Post('orders')
+  createOrder(@CurrentUser() user: any, @Body() dto: CreateCompanyOrderDto) {
+    return this.companiesService.createOrder(user.id, dto);
+  }
+
+  @Get('orders/my')
+  myOrders(@CurrentUser() user: any) {
+    return this.companiesService.listMyOrders(user.id);
+  }
+
+  @Get('orders/company')
+  companyOrders(@CurrentUser() user: any) {
+    return this.companiesService.listCompanyOrders(user.id);
+  }
+
+  @Get('orders/:id')
+  getOrder(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.companiesService.getOrder(user.id, id);
+  }
+
+  @Patch('orders/:id/status')
+  updateOrderStatus(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateCompanyOrderStatusDto,
+  ) {
+    return this.companiesService.updateOrderStatus(user.id, id, dto);
   }
 
   @Public()

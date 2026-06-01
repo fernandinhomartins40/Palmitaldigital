@@ -47,6 +47,21 @@ enum OrderType {
   PICKUP
 }
 
+enum StoreSellMode {
+  CONTACT
+  CART
+  BOTH
+}
+
+enum CompanyOrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
 enum ArticleStatus {
   DRAFT
   PENDING_REVIEW
@@ -134,6 +149,7 @@ model User {
   ridesAsPassenger      Ride[]                 @relation("RidesAsPassenger")
   restaurant            Restaurant?
   ordersAsCustomer      Order[]                @relation("OrdersAsCustomer")
+  companyOrders         CompanyOrder[]         @relation("CompanyOrdersAsCustomer")
   articles              Article[]
   articleComments       ArticleComment[]
   journalistApplication JournalistApplication?
@@ -174,25 +190,30 @@ model Profile {
 }
 
 model Company {
-  id          String   @id @default(cuid())
-  ownerId     String   @unique
+  id          String        @id @default(cuid())
+  ownerId     String        @unique
   name        String
-  slug        String   @unique
+  slug        String        @unique
   description String?
   logoUrl     String?
   coverUrl    String?
   phone       String?
+  whatsapp    String?
   address     String?
   city        String?
   category    String?
-  isVerified  Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  sellMode    StoreSellMode @default(CONTACT)
+  pixKey      String?
+  pixKeyType  String?
+  isVerified  Boolean       @default(false)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  owner    User      @relation(fields: [ownerId], references: [id])
+  owner    User           @relation(fields: [ownerId], references: [id])
   posts    Post[]
   products Product[]
+  orders   CompanyOrder[]
 
   @@index([slug])
   @@index([city])
@@ -429,14 +450,60 @@ model Product {
   description String?
   price       Decimal? @db.Decimal(10, 2)
   imageUrl    String?
+  category    String?
+  isFeatured  Boolean  @default(false)
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company        Company            @relation(fields: [companyId], references: [id])
+  company        Company             @relation(fields: [companyId], references: [id])
   promotionItems PromotionProduct[]
+  orderItems     CompanyOrderItem[]
 
   @@index([companyId])
+  @@index([companyId, category])
+}
+
+model CompanyOrder {
+  id            String             @id @default(cuid())
+  companyId     String
+  customerId    String
+  status        CompanyOrderStatus @default(PENDING)
+  subtotal      Decimal            @db.Decimal(10, 2)
+  total         Decimal            @db.Decimal(10, 2)
+  customerName  String
+  customerPhone String?
+  notes         String?
+  paymentMethod String             @default("PIX_MANUAL")
+  cancelReason  String?
+  acceptedAt    DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  company  Company            @relation(fields: [companyId], references: [id])
+  customer User               @relation("CompanyOrdersAsCustomer", fields: [customerId], references: [id])
+  items    CompanyOrderItem[]
+
+  @@index([companyId, status])
+  @@index([customerId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model CompanyOrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String?
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int     @default(1)
+  notes     String?
+
+  order   CompanyOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
 }
 
 model Category {

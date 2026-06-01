@@ -1,15 +1,27 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { slugify } from '@palmital/utils';
+import { Prisma } from '../../../generated/prisma';
 import { UploadStorageService } from '../../common/storage/upload-storage.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { CreateCompanyOrderDto, UpdateCompanyOrderStatusDto } from './dto/company-order.dto';
+
+const COMPANY_ORDER_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ['ACCEPTED', 'CANCELLED'],
+  ACCEPTED: ['PREPARING', 'COMPLETED', 'CANCELLED'],
+  PREPARING: ['READY', 'COMPLETED', 'CANCELLED'],
+  READY: ['COMPLETED', 'CANCELLED'],
+  COMPLETED: [],
+  CANCELLED: [],
+};
 
 @Injectable()
 export class CompaniesService {
@@ -117,7 +129,10 @@ export class CompaniesService {
             products: true,
           },
         },
-        products: { where: { isAvailable: true }, orderBy: { name: 'asc' } },
+        products: {
+          where: { isAvailable: true },
+          orderBy: [{ isFeatured: 'desc' }, { name: 'asc' }],
+        },
         posts: {
           where: { isPublished: true },
           orderBy: { createdAt: 'desc' },
@@ -324,6 +339,147 @@ export class CompaniesService {
     const product = await this.ensureProductOwner(company.id, productId);
     await this.prisma.product.delete({ where: { id: productId } });
     await this.uploadStorage.removeByUrl(product.imageUrl);
+  }
+
+  // ─── Storefront orders ───
+
+  async createOrder(customerId: string, dto: CreateCompanyOrderDto) {
+    const company = await this.prisma.company.findUnique({ where: { id: dto.companyId } });
+    if (!company) throw new NotFoundException('Loja não encontrada');
+    if (!company.isActive) throw new BadRequestException('Loja indisponível no momento');
+    if (company.sellMode === 'CONTACT') {
+      throw new BadRequestException('Esta loja não aceita pedidos pelo app');
+    }
+
+    const productIds = dto.items.map((i) => i.productId);
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: productIds }, companyId: dto.companyId, isAvailable: true },
+    });
+    if (products.length !== productIds.length) {
+      throw new BadRequestException('Algum produto não está disponível');
+    }
+
+    const itemsData = dto.items.map((item) => {
+      const product = products.find((p) => p.id === item.productId)!;
+      if (product.price == null) {
+        throw new BadRequestException(`Produto "${product.name}" não tem preço definido`);
+      }
+      return {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: item.quantity,
+        notes: item.notes,
+      };
+    });
+
+    const subtotal = itemsData.reduce(
+      (acc, item) => acc.add(new Prisma.Decimal(item.price).mul(item.quantity)),
+      new Prisma.Decimal(0),
+    );
+
+    return this.prisma.companyOrder.create({
+      data: {
+        companyId: dto.companyId,
+        customerId,
+        customerName: dto.customerName,
+        customerPhone: dto.customerPhone,
+        notes: dto.notes,
+        subtotal,
+        total: subtotal,
+        items: { create: itemsData },
+      },
+      include: {
+        items: true,
+        company: {
+          select: { id: true, name: true, slug: true, logoUrl: true, pixKey: true, pixKeyType: true, whatsapp: true, phone: true },
+        },
+      },
+    });
+  }
+
+  async listMyOrders(customerId: string) {
+    return this.prisma.companyOrder.findMany({
+      where: { customerId },
+      include: {
+        items: true,
+        company: { select: { id: true, name: true, slug: true, logoUrl: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async listCompanyOrders(ownerId: string) {
+    const company = await this.requireCompanyByOwner(ownerId);
+    return this.prisma.companyOrder.findMany({
+      where: { companyId: company.id },
+      include: {
+        items: true,
+        customer: { include: { profile: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+  }
+
+  async getOrder(userId: string, orderId: string) {
+    const order = await this.prisma.companyOrder.findUnique({
+      where: { id: orderId },
+      include: {
+        items: true,
+        company: {
+          select: { id: true, name: true, slug: true, logoUrl: true, ownerId: true, pixKey: true, pixKeyType: true, whatsapp: true, phone: true },
+        },
+        customer: { include: { profile: true } },
+      },
+    });
+    if (!order) throw new NotFoundException('Pedido não encontrado');
+
+    const isOwner = order.company.ownerId === userId;
+    const isCustomer = order.customerId === userId;
+    if (!isOwner && !isCustomer) throw new ForbiddenException();
+
+    return order;
+  }
+
+  async updateOrderStatus(userId: string, orderId: string, dto: UpdateCompanyOrderStatusDto) {
+    const order = await this.prisma.companyOrder.findUnique({
+      where: { id: orderId },
+      include: { company: true },
+    });
+    if (!order) throw new NotFoundException('Pedido não encontrado');
+
+    const isOwner = order.company.ownerId === userId;
+    const isCustomer = order.customerId === userId;
+
+    if (dto.status === 'CANCELLED') {
+      if (!isOwner && !isCustomer) throw new ForbiddenException();
+    } else if (!isOwner) {
+      throw new ForbiddenException('Apenas a loja atualiza o status');
+    }
+
+    const allowed = COMPANY_ORDER_TRANSITIONS[order.status] ?? [];
+    if (!allowed.includes(dto.status)) {
+      throw new BadRequestException(`Não pode mudar de ${order.status} para ${dto.status}`);
+    }
+
+    const data: Prisma.CompanyOrderUpdateInput = { status: dto.status as any };
+    if (dto.status === 'ACCEPTED') data.acceptedAt = new Date();
+    if (dto.status === 'COMPLETED') data.completedAt = new Date();
+    if (dto.status === 'CANCELLED') {
+      data.cancelledAt = new Date();
+      data.cancelReason = dto.cancelReason;
+    }
+
+    return this.prisma.companyOrder.update({
+      where: { id: orderId },
+      data,
+      include: {
+        items: true,
+        customer: { include: { profile: true } },
+      },
+    });
   }
 
   private async requireCompanyByOwner(ownerId: string) {

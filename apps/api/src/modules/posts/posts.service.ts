@@ -20,7 +20,20 @@ export class PostsService {
   private buildPostInclude(viewerId?: string) {
     return Prisma.validator<Prisma.PostInclude>()({
       author: { include: { profile: true } },
-      company: { select: { id: true, name: true, slug: true, logoUrl: true, isVerified: true } },
+      company: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          logoUrl: true,
+          isVerified: true,
+          sellMode: true,
+          whatsapp: true,
+          phone: true,
+          category: true,
+          city: true,
+        },
+      },
       classified: { include: { category: true } },
       promotion: {
         include: {
