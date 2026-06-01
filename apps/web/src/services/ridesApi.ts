@@ -34,6 +34,13 @@ export interface Ride {
   locations?: { lat: number; lng: number; recordedAt: string }[];
 }
 
+// Maps a target ride status to the backend's dedicated transition route.
+const RIDE_STATUS_ROUTE: Record<string, string> = {
+  DRIVER_ARRIVED: 'arrived',
+  IN_PROGRESS: 'start',
+  COMPLETED: 'complete',
+};
+
 export const ridesApi = {
   requestRide: (data: {
     originLabel: string;
@@ -44,19 +51,19 @@ export const ridesApi = {
     destinationLng: number;
     distanceMeters?: number;
     notes?: string;
-  }) => api.post<Ride>('/rides/request', data),
+  }) => api.post<Ride>('/rides', data),
 
   getRide: (id: string) =>
     api.get<Ride>(`/rides/${id}`),
 
   listMyRides: () =>
-    api.get<Ride[]>('/rides/mine'),
+    api.get<Ride[]>('/rides/my'),
 
   cancelRide: (id: string, reason?: string) =>
-    api.post(`/rides/${id}/cancel`, { reason }),
+    api.delete(`/rides/${id}`, { data: { reason } }),
 
   rateRide: (id: string, rating: number, comment?: string) =>
-    api.post(`/rides/${id}/rate`, { rating, comment }),
+    api.post(`/rides/${id}/rating`, { rating, comment }),
 
   registerDriver: (data: {
     licensePlate: string;
@@ -64,20 +71,25 @@ export const ridesApi = {
     vehicleColor?: string;
     vehicleYear?: number;
     documentUrl?: string;
-  }) => api.post<Driver>('/rides/driver/register', data),
+  }) => api.post<Driver>('/rides/drivers', data),
 
   getDriverProfile: () =>
-    api.get<Driver>('/rides/driver/me'),
+    api.get<Driver>('/rides/drivers/me'),
 
   setDriverStatus: (status: 'ONLINE' | 'OFFLINE') =>
-    api.patch('/rides/driver/status', { status }),
+    api.patch('/rides/drivers/me/status', { status }),
 
   acceptRide: (rideId: string) =>
     api.post(`/rides/${rideId}/accept`),
 
-  updateRideStatus: (rideId: string, status: string) =>
-    api.patch(`/rides/${rideId}/status`, { status }),
+  updateRideStatus: (rideId: string, status: string) => {
+    const route = RIDE_STATUS_ROUTE[status];
+    if (!route) {
+      return Promise.reject(new Error(`Unsupported ride status transition: ${status}`));
+    }
+    return api.patch(`/rides/${rideId}/${route}`);
+  },
 
   listAvailableRides: () =>
-    api.get<Ride[]>('/rides/driver/nearby'),
+    api.get<Ride[]>('/rides/drivers/available'),
 };

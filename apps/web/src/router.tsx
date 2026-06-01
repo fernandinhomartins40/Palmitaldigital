@@ -1,9 +1,10 @@
 import { Navigate, createBrowserRouter, useLocation } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Spinner } from '@palmital/ui';
 import { AppLayout } from './components/layout/AppLayout';
 import { AuthGuard } from './components/layout/AuthGuard';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
+import { lazyWithRetry as lazy } from './utils/lazyWithRetry';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { LandingPage } from './pages/LandingPage';
