@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, ToggleLeft, ToggleRight, Package, Store, RefreshCw } from 'lucide-react';
 import { deliveryApi, type Restaurant, type MenuItem, type Order } from '../../services/deliveryApi';
-import { useAuthStore } from '../../store/authStore';
 
 const ORDER_STATUS_NEXT: Record<string, { label: string; next: string }> = {
   PENDING: { label: 'Aceitar', next: 'ACCEPTED' },
@@ -21,6 +20,13 @@ const ORDER_STATUS_LABEL: Record<string, string> = {
   DELIVERED: 'Entregue',
   CANCELLED: 'Cancelado',
 };
+
+// Flatten backend sections + loose menu into a single item list for management.
+function allItems(restaurant: Restaurant | null): MenuItem[] {
+  if (!restaurant) return [];
+  const fromSections = (restaurant.sections ?? []).flatMap((s) => s.items ?? []);
+  return [...fromSections, ...(restaurant.menu ?? [])];
+}
 
 function OrderCard({ order, onUpdate }: { order: Order; onUpdate: () => void }) {
   const [updating, setUpdating] = useState(false);
@@ -45,7 +51,7 @@ function OrderCard({ order, onUpdate }: { order: Order; onUpdate: () => void }) 
           <p className="text-xs text-mute">{order.type === 'DELIVERY' ? '🛵 Entrega' : '🏪 Retirada'}</p>
         </div>
         <div className="text-right">
-          <p className="font-bold text-ink">R$ {Number(order.totalAmount).toFixed(2)}</p>
+          <p className="font-bold text-ink">R$ {Number(order.total).toFixed(2)}</p>
           <span
             className="chip text-xs"
             style={
@@ -64,7 +70,7 @@ function OrderCard({ order, onUpdate }: { order: Order; onUpdate: () => void }) 
       <div className="space-y-1 text-sm">
         {order.items.map((item) => (
           <div key={item.id} className="flex justify-between text-mute">
-            <span>{item.quantity}× {item.menuItem.name}</span>
+            <span>{item.quantity}× {item.name}</span>
             {item.notes && <span className="text-xs italic">{item.notes}</span>}
           </div>
         ))}
@@ -88,7 +94,6 @@ function OrderCard({ order, onUpdate }: { order: Order; onUpdate: () => void }) 
 }
 
 export function RestaurantManagerPage() {
-  const user = useAuthStore((s) => s.user);
   const [tab, setTab] = useState<'orders' | 'menu' | 'settings'>('orders');
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -97,37 +102,33 @@ export function RestaurantManagerPage() {
 
   // New restaurant form
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
+  const [cuisine, setCuisine] = useState('');
   const [address, setAddress] = useState('');
   const [minOrder, setMinOrder] = useState('20');
   const [deliveryFee, setDeliveryFee] = useState('5');
   const [estTime, setEstTime] = useState('30');
-  const [pixKey, setPixKey] = useState('');
-  const [pixType, setPixType] = useState('CPF');
   const [creating, setCreating] = useState(false);
 
   // New menu item form
   const [itemName, setItemName] = useState('');
   const [itemDesc, setItemDesc] = useState('');
   const [itemPrice, setItemPrice] = useState('');
-  const [itemCat, setItemCat] = useState('');
   const [addingItem, setAddingItem] = useState(false);
 
   const loadRestaurant = async () => {
     setLoading(true);
     try {
-      // Try to get user's restaurant from the API
-      // Backend returns first restaurant owned by user
-      const r = await deliveryApi.listRestaurants();
-      const mine = r.data.find((rest) => rest.slug); // placeholder — real impl filters by owner
-      if (mine) {
-        setRestaurant(mine);
-        setIsOpen(mine.isOpen);
-        const ordersRes = await deliveryApi.managerListOrders(mine.id);
+      const r = await deliveryApi.getMyRestaurant();
+      setRestaurant(r.data);
+      setIsOpen(r.data.isOpen);
+      try {
+        const ordersRes = await deliveryApi.listRestaurantOrders();
         setOrders(ordersRes.data);
+      } catch {
+        setOrders([]);
       }
     } catch {
-      // no restaurant yet
+      setRestaurant(null);
     } finally {
       setLoading(false);
     }
@@ -139,13 +140,15 @@ export function RestaurantManagerPage() {
     setCreating(true);
     try {
       const r = await deliveryApi.createRestaurant({
-        name, category, address,
-        minOrderValue: parseFloat(minOrder),
+        name,
+        cuisine: cuisine || undefined,
+        address: address || undefined,
+        minOrder: parseFloat(minOrder),
         deliveryFee: parseFloat(deliveryFee),
-        estimatedTime: parseInt(estTime),
-        pixKey, pixKeyType: pixType,
+        avgPrepMinutes: parseInt(estTime),
       });
       setRestaurant(r.data);
+      setIsOpen(r.data.isOpen);
     } finally {
       setCreating(false);
     }
@@ -154,22 +157,25 @@ export function RestaurantManagerPage() {
   const toggleOpen = async () => {
     if (!restaurant) return;
     const next = !isOpen;
-    await deliveryApi.updateRestaurant(restaurant.id, { isOpen: next });
     setIsOpen(next);
+    try {
+      await deliveryApi.updateMyRestaurant({ isOpen: next });
+    } catch {
+      setIsOpen(!next);
+    }
   };
 
   const addMenuItem = async () => {
     if (!restaurant || !itemName || !itemPrice) return;
     setAddingItem(true);
     try {
-      const item = await deliveryApi.createMenuItem(restaurant.id, {
+      await deliveryApi.createMenuItem({
         name: itemName,
         description: itemDesc || undefined,
         price: parseFloat(itemPrice),
-        categoryName: itemCat || undefined,
       });
-      setRestaurant((r) => r ? { ...r, menuItems: [...(r.menuItems ?? []), item.data] } : r);
-      setItemName(''); setItemDesc(''); setItemPrice(''); setItemCat('');
+      await loadRestaurant();
+      setItemName(''); setItemDesc(''); setItemPrice('');
     } finally {
       setAddingItem(false);
     }
@@ -177,7 +183,7 @@ export function RestaurantManagerPage() {
 
   const removeMenuItem = async (itemId: string) => {
     await deliveryApi.deleteMenuItem(itemId);
-    setRestaurant((r) => r ? { ...r, menuItems: r.menuItems?.filter((i) => i.id !== itemId) } : r);
+    await loadRestaurant();
   };
 
   if (loading) {
@@ -206,7 +212,7 @@ export function RestaurantManagerPage() {
         <div className="glass rounded-3xl p-5 space-y-3">
           {[
             { label: 'Nome do restaurante', value: name, set: setName, placeholder: 'Ex: Hamburgeria do João' },
-            { label: 'Categoria', value: category, set: setCategory, placeholder: 'Ex: Lanches, Pizza, Japonês...' },
+            { label: 'Categoria', value: cuisine, set: setCuisine, placeholder: 'Ex: Lanches, Pizza, Japonês...' },
             { label: 'Endereço', value: address, set: setAddress, placeholder: 'Endereço completo' },
           ].map(({ label, value, set, placeholder }) => (
             <div key={label} className="space-y-1">
@@ -238,30 +244,13 @@ export function RestaurantManagerPage() {
             ))}
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-mono uppercase tracking-wider text-mute">Chave PIX</label>
-            <div className="flex gap-2">
-              <select
-                className="glass-strong rounded-2xl px-3 py-2.5 text-sm text-ink outline-none border border-line focus:border-coral/50 bg-transparent"
-                value={pixType}
-                onChange={(e) => setPixType(e.target.value)}
-              >
-                {['CPF', 'CNPJ', 'EMAIL', 'PHONE', 'RANDOM'].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-              <input
-                className="flex-1 glass-strong rounded-2xl px-4 py-2.5 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-coral/50"
-                placeholder="Sua chave PIX..."
-                value={pixKey}
-                onChange={(e) => setPixKey(e.target.value)}
-              />
-            </div>
-          </div>
+          <p className="text-xs text-mute">
+            Configure sua chave PIX no seu perfil para receber pagamentos dos pedidos.
+          </p>
 
           <button
             onClick={createRestaurant}
-            disabled={creating || !name || !category || !address || !pixKey}
+            disabled={creating || !name}
             className="w-full btn-ink py-3 font-semibold disabled:opacity-50"
           >
             {creating ? 'Cadastrando...' : 'Cadastrar restaurante'}
@@ -271,6 +260,7 @@ export function RestaurantManagerPage() {
     );
   }
 
+  const items = allItems(restaurant);
   const activeOrders = orders.filter((o) => !['DELIVERED', 'CANCELLED'].includes(o.status));
   const doneOrders = orders.filter((o) => ['DELIVERED', 'CANCELLED'].includes(o.status));
 
@@ -286,7 +276,7 @@ export function RestaurantManagerPage() {
         <Store className="w-10 h-10 text-coral flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="font-bold text-ink">{restaurant.name}</p>
-          <p className="text-xs text-mute">{restaurant.category} · {restaurant.address}</p>
+          <p className="text-xs text-mute">{restaurant.cuisine ?? 'Restaurante'} · {restaurant.address ?? ''}</p>
         </div>
         <button
           onClick={toggleOpen}
@@ -367,13 +357,7 @@ export function RestaurantManagerPage() {
                 onChange={(e) => setItemPrice(e.target.value)}
               />
               <input
-                className="glass-strong rounded-2xl px-3 py-2 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-coral/50"
-                placeholder="Seção (ex: Pratos)"
-                value={itemCat}
-                onChange={(e) => setItemCat(e.target.value)}
-              />
-              <input
-                className="glass-strong rounded-2xl px-3 py-2 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-coral/50"
+                className="glass-strong rounded-2xl px-3 py-2 text-sm text-ink placeholder:text-mute outline-none border border-line focus:border-coral/50 col-span-2"
                 placeholder="Descrição"
                 value={itemDesc}
                 onChange={(e) => setItemDesc(e.target.value)}
@@ -391,7 +375,7 @@ export function RestaurantManagerPage() {
 
           {/* Items list */}
           <div className="space-y-2">
-            {(restaurant.menuItems ?? []).map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="glass rounded-2xl px-4 py-3 flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-ink text-sm">{item.name}</p>
@@ -408,7 +392,7 @@ export function RestaurantManagerPage() {
                 </button>
               </div>
             ))}
-            {(restaurant.menuItems ?? []).length === 0 && (
+            {items.length === 0 && (
               <div className="glass rounded-2xl p-6 text-center">
                 <p className="text-mute text-sm">Nenhum item ainda</p>
               </div>
@@ -428,27 +412,23 @@ export function RestaurantManagerPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Categoria</span>
-              <span className="text-ink">{restaurant.category}</span>
+              <span className="text-ink">{restaurant.cuisine ?? '—'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Endereço</span>
-              <span className="text-ink text-right max-w-[60%]">{restaurant.address}</span>
+              <span className="text-ink text-right max-w-[60%]">{restaurant.address ?? '—'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Pedido mínimo</span>
-              <span className="text-ink">R$ {Number(restaurant.minOrderValue).toFixed(2)}</span>
+              <span className="text-ink">R$ {Number(restaurant.minOrder ?? 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Taxa de entrega</span>
-              <span className="text-ink">R$ {Number(restaurant.deliveryFee).toFixed(2)}</span>
+              <span className="text-ink">R$ {Number(restaurant.deliveryFee ?? 0).toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-mute">Tempo estimado</span>
-              <span className="text-ink">{restaurant.estimatedTime} min</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-mute">Chave PIX</span>
-              <span className="text-ink font-mono text-xs">{restaurant.pixKey}</span>
+              <span className="text-ink">{restaurant.avgPrepMinutes} min</span>
             </div>
           </div>
         </div>

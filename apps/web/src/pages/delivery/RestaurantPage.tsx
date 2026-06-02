@@ -1,34 +1,43 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, ShoppingCart, Plus, Minus, Trash2, Store, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Clock, Plus, Minus, Trash2, Store, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRestaurant } from '../../hooks/useDelivery';
 import { useCartStore } from '../../store/cartStore';
-import { deliveryApi, type MenuItem } from '../../services/deliveryApi';
-import type { MenuCategory } from '../../services/deliveryApi';
+import { deliveryApi, type MenuItem, type MenuSection, type Restaurant } from '../../services/deliveryApi';
 
-function groupByCategory(items: MenuItem[]): MenuCategory[] {
-  const map = new Map<string, MenuCategory>();
-  for (const item of items) {
-    const catName = item.menuCategory?.name ?? 'Outros';
-    if (!map.has(catName)) {
-      map.set(catName, { id: catName, name: catName, sortOrder: 0, items: [] });
-    }
-    map.get(catName)!.items.push(item);
-  }
-  return Array.from(map.values());
+interface MenuGroup {
+  id: string;
+  name: string;
+  items: MenuItem[];
 }
 
-function MenuItemCard({ item, restaurantId, restaurantName }: {
+// Build menu groups from backend shape: named sections plus loose `menu` items.
+function buildMenuGroups(restaurant: Restaurant): MenuGroup[] {
+  const groups: MenuGroup[] = [];
+  for (const section of restaurant.sections ?? []) {
+    if (section.items?.length) {
+      groups.push({ id: section.id, name: section.name, items: section.items });
+    }
+  }
+  const loose = restaurant.menu ?? [];
+  if (loose.length) {
+    groups.push({ id: '__loose__', name: groups.length ? 'Outros' : 'Cardápio', items: loose });
+  }
+  return groups;
+}
+
+function MenuItemCard({ item, restaurantId, restaurantName, restaurantSlug }: {
   item: MenuItem;
   restaurantId: string;
   restaurantName: string;
+  restaurantSlug: string;
 }) {
   const { addItem, updateQuantity, items: cartItems } = useCartStore();
   const cartItem = cartItems.find((i) => i.menuItem.id === item.id);
   const qty = cartItem?.quantity ?? 0;
 
   return (
-    <div className={`glass rounded-2xl p-3 flex gap-3 ${!item.available ? 'opacity-50' : ''}`}>
+    <div className={`glass rounded-2xl p-3 flex gap-3 ${!item.isAvailable ? 'opacity-50' : ''}`}>
       {item.imageUrl ? (
         <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
           <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -52,9 +61,9 @@ function MenuItemCard({ item, restaurantId, restaurantName }: {
       <div className="flex flex-col items-end justify-end flex-shrink-0">
         {qty === 0 ? (
           <button
-            disabled={!item.available}
-            onClick={() => addItem(restaurantId, restaurantName, item)}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+            disabled={!item.isAvailable}
+            onClick={() => addItem(restaurantId, restaurantName, restaurantSlug, item)}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-40"
             style={{ background: 'var(--coral)', color: '#fff' }}
           >
             <Plus className="w-4 h-4" />
@@ -69,7 +78,7 @@ function MenuItemCard({ item, restaurantId, restaurantName }: {
             </button>
             <span className="w-5 text-center font-bold text-sm text-ink">{qty}</span>
             <button
-              onClick={() => addItem(restaurantId, restaurantName, item)}
+              onClick={() => addItem(restaurantId, restaurantName, restaurantSlug, item)}
               className="w-7 h-7 rounded-full flex items-center justify-center transition-all"
               style={{ background: 'var(--coral)', color: '#fff' }}
             >
@@ -82,7 +91,7 @@ function MenuItemCard({ item, restaurantId, restaurantName }: {
   );
 }
 
-function CartSheet({ restaurant }: { restaurant: { id: string; name: string; deliveryFee: number; minOrderValue: number; pixKey?: string | null } }) {
+function CartSheet({ restaurant }: { restaurant: Restaurant }) {
   const { items, total, itemCount, clearCart } = useCartStore();
   const navigate = useNavigate();
   const [type, setType] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
@@ -94,9 +103,9 @@ function CartSheet({ restaurant }: { restaurant: { id: string; name: string; del
   if (count === 0) return null;
 
   const subtotal = total();
-  const fee = type === 'DELIVERY' ? Number(restaurant.deliveryFee) : 0;
+  const fee = type === 'DELIVERY' ? Number(restaurant.deliveryFee ?? 0) : 0;
   const grandTotal = subtotal + fee;
-  const meetsMin = subtotal >= Number(restaurant.minOrderValue);
+  const meetsMin = subtotal >= Number(restaurant.minOrder ?? 0);
 
   const placeOrder = async () => {
     if (!meetsMin) return;
@@ -185,7 +194,7 @@ function CartSheet({ restaurant }: { restaurant: { id: string; name: string; del
 
             {!meetsMin && (
               <p className="text-xs text-coral text-center">
-                Pedido mínimo: R$ {Number(restaurant.minOrderValue).toFixed(2)}
+                Pedido mínimo: R$ {Number(restaurant.minOrder ?? 0).toFixed(2)}
               </p>
             )}
 
@@ -233,7 +242,7 @@ export function RestaurantPage() {
     );
   }
 
-  const sections = groupByCategory(restaurant.menuItems ?? []);
+  const sections = buildMenuGroups(restaurant);
 
   return (
     <div className="max-w-2xl mx-auto pb-40">
@@ -265,7 +274,7 @@ export function RestaurantPage() {
             )}
             <div>
               <h1 className="font-bold text-xl text-ink">{restaurant.name}</h1>
-              <p className="text-mute text-sm">{restaurant.category}</p>
+              <p className="text-mute text-sm">{restaurant.cuisine ?? 'Restaurante'}</p>
             </div>
             <div
               className="ml-auto chip text-xs"
@@ -285,7 +294,7 @@ export function RestaurantPage() {
 
           <div className="flex items-center gap-4 text-xs text-mute">
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {restaurant.estimatedTime} min
+              <Clock className="w-3 h-3" /> {restaurant.avgPrepMinutes} min
             </span>
             <span>
               Entrega:{' '}
@@ -295,7 +304,7 @@ export function RestaurantPage() {
                 `R$ ${Number(restaurant.deliveryFee).toFixed(2)}`
               )}
             </span>
-            <span>Mín. R$ {Number(restaurant.minOrderValue).toFixed(2)}</span>
+            <span>Mín. R$ {Number(restaurant.minOrder ?? 0).toFixed(2)}</span>
           </div>
         </div>
 
@@ -342,6 +351,7 @@ export function RestaurantPage() {
                   item={item}
                   restaurantId={restaurant.id}
                   restaurantName={restaurant.name}
+                  restaurantSlug={restaurant.slug}
                 />
               ))}
             </div>

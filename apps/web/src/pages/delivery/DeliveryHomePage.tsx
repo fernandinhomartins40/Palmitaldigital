@@ -47,22 +47,22 @@ function RestaurantCard({ r }: { r: Restaurant }) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="font-semibold text-ink text-sm">{r.name}</h3>
-            <p className="text-xs text-mute">{r.category}</p>
+            <p className="text-xs text-mute">{r.cuisine ?? 'Restaurante'}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 mt-2 text-xs text-mute">
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            {r.estimatedTime} min
+            {r.avgPrepMinutes} min
           </span>
           <span>
-            {Number(r.deliveryFee) === 0 ? (
+            {Number(r.deliveryFee ?? 0) === 0 ? (
               <span style={{ color: 'var(--mint)' }}>Grátis</span>
             ) : (
               `R$ ${Number(r.deliveryFee).toFixed(2)}`
             )}
           </span>
-          <span>Mín. R$ {Number(r.minOrderValue).toFixed(2)}</span>
+          <span>Mín. R$ {Number(r.minOrder ?? 0).toFixed(2)}</span>
         </div>
       </div>
     </Link>
@@ -70,15 +70,14 @@ function RestaurantCard({ r }: { r: Restaurant }) {
 }
 
 function CartBar() {
-  const { items, total, itemCount, restaurantName } = useCartStore();
+  const { total, itemCount, restaurantName, restaurantSlug } = useCartStore();
   const count = itemCount();
-  if (count === 0) return null;
-  const orderId = items[0]?.menuItem?.id;
+  if (count === 0 || !restaurantSlug) return null;
 
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50">
       <Link
-        to={`/delivery/restaurant/${restaurantName?.toLowerCase().replace(/\s+/g, '-')}`}
+        to={`/delivery/restaurant/${restaurantSlug}`}
         className="halo halo-coral bg-coral text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-xl"
         style={{ borderRadius: '20px 20px 8px 20px' }}
       >
@@ -159,9 +158,8 @@ export function DeliveryHomePage() {
 
       {/* My orders shortcut */}
       <Link
-        to="/delivery"
+        to="/delivery/orders"
         className="glass rounded-2xl px-4 py-3 flex items-center gap-3 hover:shadow transition-all"
-        onClick={(e) => e.preventDefault()}
       >
         <ShoppingBag className="w-5 h-5 text-coral" />
         <span className="text-sm font-medium text-ink flex-1">Meus pedidos</span>

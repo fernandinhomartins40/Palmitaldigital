@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { deliveryApi, type Restaurant, type Order } from '../services/deliveryApi';
 
 export function useRestaurants(category?: string, q?: string) {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [all, setAll] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -10,16 +10,27 @@ export function useRestaurants(category?: string, q?: string) {
     setLoading(true);
     setError(null);
     try {
-      const r = await deliveryApi.listRestaurants({ category, q });
-      setRestaurants(r.data);
+      const r = await deliveryApi.listRestaurants();
+      setAll(r.data);
     } catch {
       setError('Erro ao carregar restaurantes');
     } finally {
       setLoading(false);
     }
-  }, [category, q]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Backend lists all restaurants; category/search are filtered client-side.
+  const term = (q ?? '').trim().toLowerCase();
+  const restaurants = all.filter((r) => {
+    const matchCat = !category || (r.cuisine ?? '').toLowerCase() === category.toLowerCase();
+    const matchQ =
+      !term ||
+      r.name.toLowerCase().includes(term) ||
+      (r.cuisine ?? '').toLowerCase().includes(term);
+    return matchCat && matchQ;
+  });
 
   return { restaurants, loading, error, reload: load };
 }

@@ -73,13 +73,13 @@ export function OrderTrackPage() {
       {/* Header */}
       <div className="halo halo-coral glass rounded-3xl p-5">
         <div className="flex items-center gap-3 mb-3">
-          {order.restaurant.logoUrl && (
+          {order.restaurant?.logoUrl && (
             <div className="w-12 h-12 rounded-2xl overflow-hidden">
               <img src={order.restaurant.logoUrl} alt="" className="w-full h-full object-cover" />
             </div>
           )}
           <div>
-            <p className="font-bold text-ink">{order.restaurant.name}</p>
+            <p className="font-bold text-ink">{order.restaurant?.name ?? 'Restaurante'}</p>
             <p className="text-xs text-mute">
               {order.type === 'DELIVERY' ? '🛵 Entrega' : '🏪 Retirada'} · #{id?.slice(-6).toUpperCase()}
             </p>
@@ -135,18 +135,18 @@ export function OrderTrackPage() {
         )}
       </div>
 
-      {/* PIX QR */}
-      {order.pixQrCode && order.status === 'PENDING' && (
+      {/* PIX */}
+      {order.restaurant?.owner?.pixKey && order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && (
         <div className="glass rounded-3xl p-5 space-y-3 text-center">
           <div className="flex items-center gap-2 justify-center text-ink font-semibold">
             <QrCode className="w-5 h-5 text-coral" />
             Pague com PIX
           </div>
-          <p className="text-mute text-xs">Escaneie o QR abaixo ou copie a chave</p>
+          <p className="text-mute text-xs">Copie a chave e envie o comprovante ao restaurante</p>
           <div className="glass-strong rounded-2xl p-3 font-mono text-xs text-ink break-all select-all">
-            {order.pixQrCode}
+            {order.restaurant.owner.pixKey}
           </div>
-          <p className="text-xs text-mute">Total: <strong className="text-ink">R$ {Number(order.totalAmount).toFixed(2)}</strong></p>
+          <p className="text-xs text-mute">Total: <strong className="text-ink">R$ {Number(order.total).toFixed(2)}</strong></p>
         </div>
       )}
 
@@ -155,18 +155,13 @@ export function OrderTrackPage() {
         <h3 className="font-semibold text-ink text-sm">Itens do pedido</h3>
         {order.items.map((item) => (
           <div key={item.id} className="flex items-center gap-3">
-            {item.menuItem.imageUrl && (
-              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                <img src={item.menuItem.imageUrl} alt="" className="w-full h-full object-cover" />
-              </div>
-            )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-ink">{item.menuItem.name}</p>
+              <p className="text-sm font-medium text-ink">{item.name}</p>
               {item.notes && <p className="text-xs text-mute">{item.notes}</p>}
             </div>
             <div className="text-right flex-shrink-0">
               <p className="text-xs text-mute">×{item.quantity}</p>
-              <p className="text-sm font-semibold text-ink">R$ {(Number(item.unitPrice) * item.quantity).toFixed(2)}</p>
+              <p className="text-sm font-semibold text-ink">R$ {(Number(item.price) * item.quantity).toFixed(2)}</p>
             </div>
           </div>
         ))}
@@ -174,7 +169,7 @@ export function OrderTrackPage() {
         <div className="border-t border-line pt-3 space-y-1 text-sm">
           <div className="flex justify-between text-mute">
             <span>Subtotal</span>
-            <span>R$ {(Number(order.totalAmount) - Number(order.deliveryFee)).toFixed(2)}</span>
+            <span>R$ {Number(order.subtotal).toFixed(2)}</span>
           </div>
           {Number(order.deliveryFee) > 0 && (
             <div className="flex justify-between text-mute">
@@ -184,7 +179,7 @@ export function OrderTrackPage() {
           )}
           <div className="flex justify-between font-bold text-ink">
             <span>Total</span>
-            <span>R$ {Number(order.totalAmount).toFixed(2)}</span>
+            <span>R$ {Number(order.total).toFixed(2)}</span>
           </div>
         </div>
       </div>

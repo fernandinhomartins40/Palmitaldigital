@@ -41,6 +41,7 @@ const DriverRegisterPage = lazy(() => import('./pages/rides/DriverRegisterPage')
 const DeliveryHomePage = lazy(() => import('./pages/delivery/DeliveryHomePage').then((m) => ({ default: m.DeliveryHomePage })));
 const RestaurantPage = lazy(() => import('./pages/delivery/RestaurantPage').then((m) => ({ default: m.RestaurantPage })));
 const OrderTrackPage = lazy(() => import('./pages/delivery/OrderTrackPage').then((m) => ({ default: m.OrderTrackPage })));
+const DeliveryOrdersPage = lazy(() => import('./pages/delivery/DeliveryOrdersPage').then((m) => ({ default: m.DeliveryOrdersPage })));
 const RestaurantManagerPage = lazy(() => import('./pages/delivery/RestaurantManagerPage').then((m) => ({ default: m.RestaurantManagerPage })));
 
 // News
@@ -114,6 +115,7 @@ export const router = createBrowserRouter([
 
       // Delivery
       { path: '/delivery', element: <Page><DeliveryHomePage /></Page> },
+      { path: '/delivery/orders', element: <Page><DeliveryOrdersPage /></Page> },
       { path: '/delivery/restaurant/:slug', element: <Page><RestaurantPage /></Page> },
       { path: '/delivery/order/:id', element: <Page><OrderTrackPage /></Page> },
       { path: '/delivery/manage', element: <Page><RestaurantManagerPage /></Page> },
