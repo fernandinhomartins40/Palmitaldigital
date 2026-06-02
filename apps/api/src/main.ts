@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { RequestMethod } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { globalValidationPipe } from './common/pipes/validation.pipe';
+import { SanitizeInterceptor } from './common/interceptors/sanitize.interceptor';
 import { join } from 'path';
 import { mkdirSync } from 'fs';
 
@@ -22,6 +23,7 @@ async function bootstrap() {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
   app.useGlobalPipes(globalValidationPipe);
+  app.useGlobalInterceptors(new SanitizeInterceptor());
 
   app.enableCors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
