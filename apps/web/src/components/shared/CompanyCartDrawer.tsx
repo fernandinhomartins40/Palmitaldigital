@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '@palmital/utils';
 import { Minus, Package2, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
@@ -30,13 +29,11 @@ function buildWhatsAppUrl(phone: string, companyName: string, items: Array<{ nam
 export function CompanyCartDrawer() {
   const cart = useCompanyCartStore();
   const addToast = useUIStore((s) => s.addToast);
-  const [open, setOpen] = useState(false);
+  const open = useUIStore((s) => s.cartDrawerOpen);
+  const setOpen = useUIStore((s) => s.setCartDrawerOpen);
 
   const count = cart.itemCount();
   const total = cart.total();
-
-  // Don't render when cart is empty
-  if (count === 0) return null;
 
   const handleCheckout = () => {
     const phone = cart.companyPhone;
@@ -61,25 +58,27 @@ export function CompanyCartDrawer() {
 
   return (
     <>
-      {/* Floating cart bar */}
-      <div className="fixed inset-x-0 bottom-[4.5rem] z-40 flex justify-center px-4 lg:bottom-4 lg:right-6 lg:left-auto lg:w-80 lg:px-0">
-        <button
-          onClick={() => setOpen(true)}
-          className="w-full flex items-center justify-between rounded-2xl px-4 py-3 text-white shadow-xl transition-transform hover:scale-[1.01]"
-          style={{ background: 'var(--cobalt)' }}
-        >
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-sm font-bold">
-              {count}
-            </span>
-            <span className="text-sm font-semibold">{cart.companyName}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-display font-bold">{formatCurrency(total)}</span>
-            <ShoppingBag size={16} />
-          </div>
-        </button>
-      </div>
+      {/* Floating cart bar — only when cart has items */}
+      {count > 0 && (
+        <div className="fixed inset-x-0 bottom-[4.5rem] z-40 flex justify-center px-4 lg:bottom-4 lg:right-6 lg:left-auto lg:w-80 lg:px-0">
+          <button
+            onClick={() => setOpen(true)}
+            className="w-full flex items-center justify-between rounded-2xl px-4 py-3 text-white shadow-xl transition-transform hover:scale-[1.01]"
+            style={{ background: 'var(--cobalt)' }}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-sm font-bold">
+                {count}
+              </span>
+              <span className="text-sm font-semibold">{cart.companyName}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-display font-bold">{formatCurrency(total)}</span>
+              <ShoppingBag size={16} />
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Drawer */}
       {open && (

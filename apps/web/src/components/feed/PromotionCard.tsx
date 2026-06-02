@@ -19,6 +19,7 @@ import { PostEngagement } from './PostEngagement';
 import { useCompanyCartStore } from '../../store/companyCartStore';
 import { useUIStore } from '../../store/uiStore';
 
+
 function companyWhatsAppLink(company: any, message: string) {
   const digits = (company?.whatsapp || company?.phone || '').replace(/\D/g, '');
   if (!digits) return null;
@@ -122,6 +123,7 @@ function ProfessionalPromotionCard({ post }: { post: any }) {
 function StorefrontProductCard({ product, company }: { product: any; company: any }) {
   const cart = useCompanyCartStore();
   const addToast = useUIStore((s) => s.addToast);
+  const setCartDrawerOpen = useUIStore((s) => s.setCartDrawerOpen);
   const canSell = company?.sellMode === 'CART' || company?.sellMode === 'BOTH';
   const hasPrice = product.price != null;
 
@@ -129,14 +131,15 @@ function StorefrontProductCard({ product, company }: { product: any; company: an
     const phone = company?.whatsapp || company?.phone || null;
     cart.addItem(company.id, company.name, company.slug, phone, product, 1);
     addToast(`${product.name} adicionado`, 'success');
+    setCartDrawerOpen(true);
   };
 
-  const handleContact = () => {
-    const message = `Olá! Tenho interesse no produto "${product.name}"${
-      hasPrice ? ` (${formatCurrency(Number(product.price))})` : ''
-    } da ${company?.name}.`;
-    const link = companyWhatsAppLink(company, message);
-    if (link) window.open(link, '_blank');
+  // "Interesse" sem preço configurado: adiciona ao carrinho e abre drawer p/ ver detalhes e pedir via WhatsApp
+  const handleInterest = () => {
+    const phone = company?.whatsapp || company?.phone || null;
+    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
+    addToast(`${product.name} adicionado`, 'success');
+    setCartDrawerOpen(true);
   };
 
   return (
@@ -165,7 +168,7 @@ function StorefrontProductCard({ product, company }: { product: any; company: an
           </button>
         ) : (
           <button
-            onClick={handleContact}
+            onClick={handleInterest}
             className="flex w-full items-center justify-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] font-semibold text-ink transition-colors hover:bg-magenta hover:text-white"
           >
             <MessageCircle size={11} strokeWidth={2.2} />

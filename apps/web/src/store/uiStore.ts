@@ -10,6 +10,8 @@ interface UIState {
   toasts: Toast[];
   addToast: (message: string, type?: Toast['type']) => void;
   removeToast: (id: string) => void;
+  cartDrawerOpen: boolean;
+  setCartDrawerOpen: (open: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -20,4 +22,6 @@ export const useUIStore = create<UIState>((set) => ({
     setTimeout(() => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })), 4500);
   },
   removeToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
+  cartDrawerOpen: false,
+  setCartDrawerOpen: (open) => set({ cartDrawerOpen: open }),
 }));
