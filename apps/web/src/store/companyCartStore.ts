@@ -5,21 +5,21 @@ import type { StoreProduct } from '../services/companiesApi';
 interface CartItem {
   product: StoreProduct;
   quantity: number;
-  notes?: string;
 }
 
 interface CompanyCartState {
   companyId: string | null;
   companyName: string | null;
   companySlug: string | null;
+  companyPhone: string | null; // whatsapp or phone for checkout URL
   items: CartItem[];
   addItem: (
     companyId: string,
     companyName: string,
     companySlug: string,
+    companyPhone: string | null,
     product: StoreProduct,
     quantity?: number,
-    notes?: string,
   ) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -34,13 +34,14 @@ export const useCompanyCartStore = create<CompanyCartState>()(
       companyId: null,
       companyName: null,
       companySlug: null,
+      companyPhone: null,
       items: [],
 
-      addItem: (companyId, companyName, companySlug, product, quantity = 1, notes) => {
-        const { items, companyId: currentCompanyId } = get();
-        // Switching stores resets the cart
-        if (currentCompanyId && currentCompanyId !== companyId) {
-          set({ companyId, companyName, companySlug, items: [{ product, quantity, notes }] });
+      addItem: (companyId, companyName, companySlug, companyPhone, product, quantity = 1) => {
+        const { items, companyId: currentId } = get();
+        // Switching stores clears the cart automatically
+        if (currentId && currentId !== companyId) {
+          set({ companyId, companyName, companySlug, companyPhone, items: [{ product, quantity }] });
           return;
         }
         const existing = items.find((i) => i.product.id === product.id);
@@ -51,12 +52,7 @@ export const useCompanyCartStore = create<CompanyCartState>()(
             ),
           });
         } else {
-          set({
-            companyId,
-            companyName,
-            companySlug,
-            items: [...items, { product, quantity, notes }],
-          });
+          set({ companyId, companyName, companySlug, companyPhone, items: [...items, { product, quantity }] });
         }
       },
 
@@ -66,7 +62,7 @@ export const useCompanyCartStore = create<CompanyCartState>()(
           return {
             items: remaining,
             ...(remaining.length === 0
-              ? { companyId: null, companyName: null, companySlug: null }
+              ? { companyId: null, companyName: null, companySlug: null, companyPhone: null }
               : {}),
           };
         }),
@@ -79,10 +75,11 @@ export const useCompanyCartStore = create<CompanyCartState>()(
               : s.items.map((i) => (i.product.id === productId ? { ...i, quantity } : i)),
         })),
 
-      clearCart: () => set({ companyId: null, companyName: null, companySlug: null, items: [] }),
+      clearCart: () =>
+        set({ companyId: null, companyName: null, companySlug: null, companyPhone: null, items: [] }),
 
       total: () =>
-        get().items.reduce((sum, i) => sum + (i.product.price ?? 0) * i.quantity, 0),
+        get().items.reduce((sum, i) => sum + Number(i.product.price ?? 0) * i.quantity, 0),
 
       itemCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
     }),

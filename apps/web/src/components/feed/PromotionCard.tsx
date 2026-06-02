@@ -126,7 +126,8 @@ function StorefrontProductCard({ product, company }: { product: any; company: an
   const hasPrice = product.price != null;
 
   const handleAdd = () => {
-    cart.addItem(company.id, company.name, company.slug, product, 1);
+    const phone = company?.whatsapp || company?.phone || null;
+    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
     addToast(`${product.name} adicionado`, 'success');
   };
 

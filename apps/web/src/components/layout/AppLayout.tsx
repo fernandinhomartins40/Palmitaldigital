@@ -4,6 +4,7 @@ import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { DesktopSidebar } from './DesktopSidebar';
 import { ToastContainer } from '../shared/Toast';
+import { CompanyCartDrawer } from '../shared/CompanyCartDrawer';
 import { useAuthStore } from '../../store/authStore';
 import { connectSocket, disconnectSocket } from '../../services/socket';
 
@@ -67,6 +68,7 @@ export function AppLayout() {
       </main>
 
       <BottomNav />
+      <CompanyCartDrawer />
       <ToastContainer />
     </div>
   );

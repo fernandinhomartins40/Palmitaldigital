@@ -110,150 +110,8 @@ function ProductCard({
   );
 }
 
-function CheckoutSheet({
-  company,
-  onClose,
-}: {
-  company: any;
-  onClose: () => void;
-}) {
-  const navigate = useNavigate();
-  const addToast = useUIStore((s) => s.addToast);
-  const currentUser = useAuthStore((s) => s.user);
-  const cart = useCompanyCartStore();
-  const [name, setName] = useState(currentUser?.profile?.displayName ?? '');
-  const [phone, setPhone] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const checkout = useMutation({
-    mutationFn: () =>
-      companiesApi.createOrder({
-        companyId: company.id,
-        items: cart.items.map((i) => ({
-          productId: i.product.id,
-          quantity: i.quantity,
-          notes: i.notes,
-        })),
-        customerName: name.trim(),
-        customerPhone: phone.trim() || undefined,
-        notes: notes.trim() || undefined,
-      }),
-    onSuccess: (res) => {
-      cart.clearCart();
-      onClose();
-      navigate(`/companies/order/${res.data.id}`);
-    },
-    onError: () => addToast('Erro ao enviar pedido', 'error'),
-  });
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center">
-      <div className="glass-strong max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-3xl p-5 sm:rounded-3xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-display text-lg font-bold text-ink">Seu pedido</h3>
-          <button onClick={onClose} className="text-mute hover:text-ink">
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          {cart.items.map((item) => (
-            <div key={item.product.id} className="flex items-center gap-3 rounded-2xl border border-line p-2.5">
-              <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-ink/5 dark:bg-white/5">
-                {item.product.imageUrl ? (
-                  <img src={item.product.imageUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-mute">
-                    <Package2 size={18} />
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-ink">{item.product.name}</p>
-                <p className="font-mono text-xs text-mute">
-                  {formatCurrency((item.product.price ?? 0) * item.quantity)}
-                </p>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => cart.updateQuantity(item.product.id, item.quantity - 1)}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-line text-ink"
-                >
-                  {item.quantity === 1 ? <Trash2 size={13} /> : <Minus size={13} />}
-                </button>
-                <span className="w-5 text-center font-mono text-sm font-bold text-ink">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() => cart.updateQuantity(item.product.id, item.quantity + 1)}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-line text-ink"
-                >
-                  <Plus size={13} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-mute">Total</span>
-          <span className="font-display text-xl font-bold text-ink">{formatCurrency(cart.total())}</span>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          <div>
-            <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-mute">
-              Seu nome *
-            </label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-line bg-ink/[0.02] px-3 py-2.5 text-sm text-ink outline-none focus:border-cobalt dark:bg-white/[0.04]"
-              placeholder="Como a loja deve te chamar"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-mute">
-              Telefone / WhatsApp
-            </label>
-            <input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-xl border border-line bg-ink/[0.02] px-3 py-2.5 text-sm text-ink outline-none focus:border-cobalt dark:bg-white/[0.04]"
-              placeholder="(00) 00000-0000"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-mute">
-              Observações
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={2}
-              className="w-full resize-none rounded-xl border border-line bg-ink/[0.02] px-3 py-2.5 text-sm text-ink outline-none focus:border-cobalt dark:bg-white/[0.04]"
-              placeholder="Tamanho, cor, ponto de entrega..."
-            />
-          </div>
-        </div>
-
-        <Button
-          fullWidth
-          className="mt-4"
-          disabled={!name.trim() || cart.items.length === 0}
-          isLoading={checkout.isPending}
-          onClick={() => checkout.mutate()}
-        >
-          <ShoppingBag size={16} />
-          <span className="ml-2">Enviar pedido</span>
-        </Button>
-        <p className="mt-2 text-center font-mono text-[10px] uppercase tracking-wider text-mute">
-          Pagamento via PIX combinado com a loja
-        </p>
-      </div>
-    </div>
-  );
-}
+// CheckoutSheet now delegates to the global CompanyCartDrawer (in AppLayout).
+// This component is intentionally empty — the floating cart bar handles checkout.
 
 export function CompanyProfilePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -327,7 +185,8 @@ export function CompanyProfilePage() {
   };
 
   const addProduct = (product: StoreProduct) => {
-    cart.addItem(company.id, company.name, company.slug, product, 1);
+    const phone = company.whatsapp || company.phone || null;
+    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
     addToast(`${product.name} adicionado`, 'success');
   };
 
@@ -577,23 +436,6 @@ export function CompanyProfilePage() {
         </div>
       )}
 
-      {/* ─── Floating cart bar ─── */}
-      {cartActiveHere && !showCheckout && (
-        <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:left-auto sm:right-6 sm:w-96">
-          <button
-            onClick={() => setShowCheckout(true)}
-            className="flex w-full items-center justify-between rounded-2xl bg-cobalt px-5 py-3.5 text-white shadow-lg transition-opacity hover:opacity-95"
-          >
-            <span className="flex items-center gap-2 font-semibold">
-              <ShoppingBag size={18} />
-              {cart.itemCount()} {cart.itemCount() === 1 ? 'item' : 'itens'}
-            </span>
-            <span className="font-display font-bold">{formatCurrency(cart.total())}</span>
-          </button>
-        </div>
-      )}
-
-      {showCheckout && <CheckoutSheet company={company} onClose={() => setShowCheckout(false)} />}
     </div>
   );
 }
