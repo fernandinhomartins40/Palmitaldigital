@@ -6,7 +6,6 @@ import {
   BadgeCheck,
   BriefcaseBusiness,
   MapPin,
-  MessageCircle,
   Package2,
   Phone,
   Plus,
@@ -14,11 +13,11 @@ import {
   Store,
 } from 'lucide-react';
 // MapPin and Phone kept for ProfessionalPromotionCard
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PostEngagement } from './PostEngagement';
 import { useCompanyCartStore } from '../../store/companyCartStore';
 import { useUIStore } from '../../store/uiStore';
-
 
 function companyWhatsAppLink(company: any, message: string) {
   const digits = (company?.whatsapp || company?.phone || '').replace(/\D/g, '');
@@ -124,59 +123,97 @@ function StorefrontProductCard({ product, company }: { product: any; company: an
   const cart = useCompanyCartStore();
   const addToast = useUIStore((s) => s.addToast);
   const setCartDrawerOpen = useUIStore((s) => s.setCartDrawerOpen);
-  const canSell = company?.sellMode === 'CART' || company?.sellMode === 'BOTH';
-  const hasPrice = product.price != null;
+  const [confirmSwitch, setConfirmSwitch] = useState(false);
 
-  const handleAdd = () => {
+  const hasPrice = product.price != null || product.promoPrice != null;
+  const displayPrice = product.promoPrice != null ? Number(product.promoPrice) : product.price != null ? Number(product.price) : null;
+
+  const doAdd = () => {
     const phone = company?.whatsapp || company?.phone || null;
     cart.addItem(company.id, company.name, company.slug, phone, product, 1);
-    addToast(`${product.name} adicionado`, 'success');
+    addToast(`${product.name} adicionado ao carrinho`, 'success');
     setCartDrawerOpen(true);
   };
 
-  // "Interesse" sem preço configurado: adiciona ao carrinho e abre drawer p/ ver detalhes e pedir via WhatsApp
-  const handleInterest = () => {
-    const phone = company?.whatsapp || company?.phone || null;
-    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
-    addToast(`${product.name} adicionado`, 'success');
-    setCartDrawerOpen(true);
+  const handleAdd = () => {
+    if (!cart.canAddFromCompany(company.id)) {
+      setConfirmSwitch(true);
+      return;
+    }
+    doAdd();
+  };
+
+  const handleConfirmSwitch = () => {
+    cart.clearCart();
+    setConfirmSwitch(false);
+    doAdd();
   };
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-line bg-ink/[0.02] dark:bg-white/[0.03]">
-      <div className="aspect-square bg-ink/5 dark:bg-white/5">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-mute">
-            <Package2 size={20} strokeWidth={1.2} />
+    <>
+      {/* Confirm switch dialog */}
+      {confirmSwitch && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+          onClick={() => setConfirmSwitch(false)}
+        >
+          <div
+            className="glass-strong w-full max-w-sm rounded-3xl p-6 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-display text-base font-bold text-ink">Trocar de loja?</p>
+            <p className="text-sm text-mute leading-relaxed">
+              Você já tem itens de <span className="font-semibold text-ink">{cart.companyName}</span> no carrinho.
+              Ao adicionar este produto o carrinho atual será esvaziado.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmSwitch(false)}
+                className="flex-1 rounded-2xl border border-line py-2.5 text-sm font-semibold text-ink hover:bg-ink/5 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmSwitch}
+                className="flex-1 rounded-2xl bg-coral py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity"
+              >
+                Trocar
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-      <div className="p-2 space-y-1.5">
-        <p className="line-clamp-1 text-xs font-semibold text-ink leading-tight">{product.name}</p>
-        {hasPrice && (
-          <p className="font-mono text-xs font-bold text-ink">{formatCurrency(Number(product.price))}</p>
-        )}
-        {canSell && hasPrice ? (
+        </div>
+      )}
+
+      <div className="flex flex-col overflow-hidden rounded-xl border border-line bg-ink/[0.02] dark:bg-white/[0.03]">
+        <div className="aspect-square bg-ink/5 dark:bg-white/5">
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center text-mute">
+              <Package2 size={20} strokeWidth={1.2} />
+            </div>
+          )}
+        </div>
+        <div className="p-2 space-y-1.5">
+          <p className="line-clamp-1 text-xs font-semibold text-ink leading-tight">{product.name}</p>
+          {displayPrice != null && (
+            <div className="flex items-baseline gap-1.5">
+              <p className="font-mono text-xs font-bold text-ink">{formatCurrency(displayPrice)}</p>
+              {product.promoPrice != null && product.price != null && (
+                <p className="font-mono text-[10px] text-mute line-through">{formatCurrency(Number(product.price))}</p>
+              )}
+            </div>
+          )}
           <button
             onClick={handleAdd}
             className="flex w-full items-center justify-center gap-1 rounded-lg bg-cobalt px-2 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
           >
             <Plus size={11} strokeWidth={2.5} />
-            Adicionar
+            {hasPrice ? 'Adicionar' : 'Tenho interesse'}
           </button>
-        ) : (
-          <button
-            onClick={handleInterest}
-            className="flex w-full items-center justify-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] font-semibold text-ink transition-colors hover:bg-magenta hover:text-white"
-          >
-            <MessageCircle size={11} strokeWidth={2.2} />
-            Interesse
-          </button>
-        )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

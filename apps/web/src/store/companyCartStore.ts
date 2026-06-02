@@ -11,7 +11,7 @@ interface CompanyCartState {
   companyId: string | null;
   companyName: string | null;
   companySlug: string | null;
-  companyPhone: string | null; // whatsapp or phone for checkout URL
+  companyPhone: string | null;
   items: CartItem[];
   addItem: (
     companyId: string,
@@ -21,6 +21,7 @@ interface CompanyCartState {
     product: StoreProduct,
     quantity?: number,
   ) => void;
+  canAddFromCompany: (companyId: string) => boolean;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -39,8 +40,9 @@ export const useCompanyCartStore = create<CompanyCartState>()(
 
       addItem: (companyId, companyName, companySlug, companyPhone, product, quantity = 1) => {
         const { items, companyId: currentId } = get();
-        // Switching stores clears the cart automatically
         if (currentId && currentId !== companyId) {
+          // Different store — caller must handle confirmation before calling addItem
+          // If called anyway, replace cart (should not happen in normal flow)
           set({ companyId, companyName, companySlug, companyPhone, items: [{ product, quantity }] });
           return;
         }
@@ -54,6 +56,11 @@ export const useCompanyCartStore = create<CompanyCartState>()(
         } else {
           set({ companyId, companyName, companySlug, companyPhone, items: [...items, { product, quantity }] });
         }
+      },
+
+      canAddFromCompany: (companyId: string) => {
+        const { companyId: currentId, items } = get();
+        return !currentId || items.length === 0 || currentId === companyId;
       },
 
       removeItem: (productId) =>
