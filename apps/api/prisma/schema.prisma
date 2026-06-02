@@ -443,18 +443,27 @@ model Classified {
   @@index([city])
 }
 
+enum ProductType {
+  FIXED
+  PROMO
+}
+
 model Product {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   companyId   String
   name        String
   description String?
-  price       Decimal? @db.Decimal(10, 2)
+  price       Decimal?    @db.Decimal(10, 2)
+  promoPrice  Decimal?    @db.Decimal(10, 2)  // set only when productType = PROMO
   imageUrl    String?
   category    String?
-  isFeatured  Boolean  @default(false)
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  productType ProductType @default(FIXED)
+  isFeatured  Boolean     @default(false)
+  isAvailable Boolean     @default(true)
+  stock       Int?                              // null = unlimited; 0 = out of stock
+  promoEndsAt DateTime?                         // null = no expiry
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   company        Company             @relation(fields: [companyId], references: [id])
   promotionItems PromotionProduct[]
@@ -462,6 +471,8 @@ model Product {
 
   @@index([companyId])
   @@index([companyId, category])
+  @@index([companyId, productType])
+  @@index([promoEndsAt])
 }
 
 model CompanyOrder {

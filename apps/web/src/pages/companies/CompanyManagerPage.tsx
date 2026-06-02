@@ -43,6 +43,10 @@ type ProductFormState = {
   description: string;
   price: string;
   category: string;
+  productType: 'FIXED' | 'PROMO';
+  promoPrice: string;
+  stock: string;
+  promoEndsAt: string;
   isFeatured: boolean;
   isAvailable: boolean;
 };
@@ -66,6 +70,10 @@ const emptyProductForm: ProductFormState = {
   description: '',
   price: '',
   category: '',
+  productType: 'FIXED',
+  promoPrice: '',
+  stock: '',
+  promoEndsAt: '',
   isFeatured: false,
   isAvailable: true,
 };
@@ -137,6 +145,12 @@ export function CompanyManagerPage() {
             description: product.description ?? '',
             price: product.price != null ? String(product.price) : '',
             category: product.category ?? '',
+            productType: (product.productType as 'FIXED' | 'PROMO') ?? 'FIXED',
+            promoPrice: product.promoPrice != null ? String(product.promoPrice) : '',
+            stock: product.stock != null ? String(product.stock) : '',
+            promoEndsAt: product.promoEndsAt
+              ? new Date(product.promoEndsAt).toISOString().slice(0, 16)
+              : '',
             isFeatured: product.isFeatured ?? false,
             isAvailable: product.isAvailable ?? true,
           },
@@ -211,6 +225,10 @@ export function CompanyManagerPage() {
         description: payload.description || undefined,
         price: payload.price ? Number(payload.price) : undefined,
         category: payload.category || undefined,
+        productType: payload.productType,
+        promoPrice: payload.productType === 'PROMO' && payload.promoPrice ? Number(payload.promoPrice) : undefined,
+        stock: payload.productType === 'PROMO' && payload.stock !== '' ? Number(payload.stock) : undefined,
+        promoEndsAt: payload.productType === 'PROMO' && payload.promoEndsAt ? payload.promoEndsAt : undefined,
         isFeatured: payload.isFeatured,
         isAvailable: payload.isAvailable,
       });
@@ -239,6 +257,10 @@ export function CompanyManagerPage() {
         description: payload.description || undefined,
         price: payload.price ? Number(payload.price) : undefined,
         category: payload.category || undefined,
+        productType: payload.productType,
+        promoPrice: payload.productType === 'PROMO' && payload.promoPrice ? Number(payload.promoPrice) : undefined,
+        stock: payload.productType === 'PROMO' && payload.stock !== '' ? Number(payload.stock) : undefined,
+        promoEndsAt: payload.productType === 'PROMO' && payload.promoEndsAt ? payload.promoEndsAt : undefined,
         isFeatured: payload.isFeatured,
         isAvailable: payload.isAvailable,
       });
@@ -763,6 +785,27 @@ export function CompanyManagerPage() {
                 <PlusCircle size={14} />
                 Novo produto
               </div>
+
+              {/* Tipo: FIXED ou PROMO */}
+              <div className="flex gap-2">
+                {(['FIXED', 'PROMO'] as const).map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setNewProduct((s) => ({ ...s, productType: t }))}
+                    className={`flex-1 rounded-2xl border px-3 py-2 text-sm font-semibold transition-colors ${
+                      newProduct.productType === t
+                        ? t === 'PROMO'
+                          ? 'border-amber bg-amber/10 text-amber'
+                          : 'border-cobalt bg-cobalt/10 text-cobalt'
+                        : 'border-line text-mute hover:border-line/80'
+                    }`}
+                  >
+                    {t === 'FIXED' ? '🏷️ Catálogo fixo' : '🔥 Promoção com prazo'}
+                  </button>
+                ))}
+              </div>
+
               <div className="grid gap-4 lg:grid-cols-3">
                 <Input
                   label="Nome"
@@ -771,7 +814,7 @@ export function CompanyManagerPage() {
                   required
                 />
                 <Input
-                  label="Preco"
+                  label={newProduct.productType === 'PROMO' ? 'Preço normal (riscado)' : 'Preço (R$)'}
                   type="number"
                   min="0"
                   step="0.01"
@@ -786,6 +829,41 @@ export function CompanyManagerPage() {
                   placeholder="Ex: Roupas"
                 />
               </div>
+
+              {/* Campos exclusivos de PROMO */}
+              {newProduct.productType === 'PROMO' && (
+                <div className="grid gap-4 rounded-2xl border border-amber/30 bg-amber/[0.04] p-3 lg:grid-cols-3">
+                  <Input
+                    label="Preço promocional (R$)"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={newProduct.promoPrice}
+                    onChange={(e) => setNewProduct((s) => ({ ...s, promoPrice: e.target.value }))}
+                  />
+                  <Input
+                    label="Estoque (unidades)"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Deixe vazio = ilimitado"
+                    value={newProduct.stock}
+                    onChange={(e) => setNewProduct((s) => ({ ...s, stock: e.target.value }))}
+                  />
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                      Promoção válida até
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={newProduct.promoEndsAt}
+                      onChange={(e) => setNewProduct((s) => ({ ...s, promoEndsAt: e.target.value }))}
+                      className="rounded-2xl border border-line bg-surface px-3 py-2.5 text-sm text-ink outline-none focus:border-amber focus:ring-2 focus:ring-amber/20"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>
                 <textarea
@@ -883,6 +961,44 @@ export function CompanyManagerPage() {
                         </div>
                       </div>
 
+                      {/* Tipo: FIXED / PROMO */}
+                      <div className="flex gap-2">
+                        {(['FIXED', 'PROMO'] as const).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, productType: t },
+                              }))
+                            }
+                            className={`rounded-xl border px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+                              (draft.productType ?? 'FIXED') === t
+                                ? t === 'PROMO'
+                                  ? 'border-amber-400 bg-amber-400/10 text-amber-600 dark:text-amber-400'
+                                  : 'border-cobalt bg-cobalt/10 text-cobalt'
+                                : 'border-line bg-surface text-mute hover:bg-ink/5'
+                            }`}
+                          >
+                            {t === 'FIXED' ? 'Fixo' : 'Promoção'}
+                          </button>
+                        ))}
+                        {(draft.productType ?? product.productType) === 'PROMO' && (() => {
+                          const expired = product.promoEndsAt && new Date(product.promoEndsAt) < new Date();
+                          const outOfStock = product.stock !== null && product.stock !== undefined && product.stock <= 0;
+                          return (expired || outOfStock) ? (
+                            <span className="ml-auto rounded-xl border border-red-300 bg-red-50 px-3 py-1 text-xs font-bold text-red-600 dark:border-red-700 dark:bg-red-900/20 dark:text-red-400">
+                              {outOfStock ? 'Sem estoque' : 'Expirado'}
+                            </span>
+                          ) : (
+                            <span className="ml-auto rounded-xl border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-600 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+                              Em promoção
+                            </span>
+                          );
+                        })()}
+                      </div>
+
                       <div className="grid gap-4 lg:grid-cols-3">
                         <Input
                           label="Nome"
@@ -895,7 +1011,7 @@ export function CompanyManagerPage() {
                           }
                         />
                         <Input
-                          label="Preco"
+                          label={(draft.productType ?? 'FIXED') === 'PROMO' ? 'Preço normal' : 'Preço'}
                           type="number"
                           min="0"
                           step="0.01"
@@ -919,6 +1035,48 @@ export function CompanyManagerPage() {
                           }
                         />
                       </div>
+
+                      {(draft.productType ?? 'FIXED') === 'PROMO' && (
+                        <div className="grid gap-4 rounded-2xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800 dark:bg-amber-900/10 sm:grid-cols-3">
+                          <Input
+                            label="Preço promocional"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={draft.promoPrice ?? ''}
+                            onChange={(e) =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, promoPrice: e.target.value },
+                              }))
+                            }
+                          />
+                          <Input
+                            label="Estoque (vazio = ilimitado)"
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={draft.stock ?? ''}
+                            onChange={(e) =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, stock: e.target.value },
+                              }))
+                            }
+                          />
+                          <Input
+                            label="Validade da promoção"
+                            type="datetime-local"
+                            value={draft.promoEndsAt ? draft.promoEndsAt.slice(0, 16) : ''}
+                            onChange={(e) =>
+                              setProductDrafts((state) => ({
+                                ...state,
+                                [product.id]: { ...draft, promoEndsAt: e.target.value },
+                              }))
+                            }
+                          />
+                        </div>
+                      )}
 
                       <div className="flex flex-col gap-1.5">
                         <label className="text-xs font-semibold uppercase tracking-wider text-mute">Descrição</label>

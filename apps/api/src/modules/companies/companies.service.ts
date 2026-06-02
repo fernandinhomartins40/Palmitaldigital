@@ -130,8 +130,22 @@ export class CompaniesService {
           },
         },
         products: {
-          where: { isAvailable: true },
-          orderBy: [{ isFeatured: 'desc' }, { name: 'asc' }],
+          where: {
+            isAvailable: true,
+            // Exclude PROMO products that have expired or run out of stock.
+            OR: [
+              { productType: 'FIXED' },
+              {
+                productType: 'PROMO',
+                stock: { not: 0 },
+                OR: [
+                  { promoEndsAt: null },
+                  { promoEndsAt: { gt: new Date() } },
+                ],
+              },
+            ],
+          },
+          orderBy: [{ productType: 'asc' }, { isFeatured: 'desc' }, { name: 'asc' }],
         },
         posts: {
           where: { isPublished: true },
@@ -359,15 +373,32 @@ export class CompaniesService {
       throw new BadRequestException('Algum produto não está disponível');
     }
 
+    // Validate promo-specific constraints.
+    const now = new Date();
+    for (const product of products) {
+      if (product.productType === 'PROMO') {
+        if (product.stock !== null && product.stock <= 0) {
+          throw new BadRequestException(`Produto "${product.name}" está esgotado`);
+        }
+        if (product.promoEndsAt && product.promoEndsAt <= now) {
+          throw new BadRequestException(`Promoção de "${product.name}" já encerrou`);
+        }
+      }
+    }
+
     const itemsData = dto.items.map((item) => {
       const product = products.find((p) => p.id === item.productId)!;
-      if (product.price == null) {
+      // Use promoPrice when the product is a PROMO and promoPrice is set; fall back to price.
+      const effectivePrice = product.productType === 'PROMO' && product.promoPrice != null
+        ? product.promoPrice
+        : product.price;
+      if (effectivePrice == null) {
         throw new BadRequestException(`Produto "${product.name}" não tem preço definido`);
       }
       return {
         productId: product.id,
         name: product.name,
-        price: product.price,
+        price: effectivePrice,
         quantity: item.quantity,
         notes: item.notes,
       };
@@ -378,7 +409,7 @@ export class CompaniesService {
       new Prisma.Decimal(0),
     );
 
-    return this.prisma.companyOrder.create({
+    const order = await this.prisma.companyOrder.create({
       data: {
         companyId: dto.companyId,
         customerId,
@@ -396,6 +427,24 @@ export class CompaniesService {
         },
       },
     });
+
+    // Decrement stock for PROMO products with finite stock.
+    const promoItems = dto.items.filter((item) => {
+      const p = products.find((pr) => pr.id === item.productId);
+      return p?.productType === 'PROMO' && p.stock !== null;
+    });
+    if (promoItems.length) {
+      await Promise.all(
+        promoItems.map((item) =>
+          this.prisma.product.update({
+            where: { id: item.productId },
+            data: { stock: { decrement: item.quantity } },
+          }),
+        ),
+      );
+    }
+
+    return order;
   }
 
   async listMyOrders(customerId: string) {

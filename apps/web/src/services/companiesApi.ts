@@ -2,16 +2,22 @@ import { api } from './api';
 
 export type StoreSellMode = 'CONTACT' | 'CART' | 'BOTH';
 
+export type ProductType = 'FIXED' | 'PROMO';
+
 export interface StoreProduct {
   id: string;
   companyId: string;
   name: string;
   description?: string | null;
-  price?: number | null;
+  price?: string | number | null;
+  promoPrice?: string | number | null;
   imageUrl?: string | null;
   category?: string | null;
+  productType: ProductType;
   isFeatured: boolean;
   isAvailable: boolean;
+  stock?: number | null;
+  promoEndsAt?: string | null;
 }
 
 export interface CompanyOrderItem {
