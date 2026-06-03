@@ -238,6 +238,14 @@ docker volume create palmital-logs >/dev/null
 docker volume inspect palmital-postgres-data palmital-uploads palmital-logs >/dev/null
 echo "Persistent volumes ready: postgres=palmital-postgres-data uploads=palmital-uploads logs=palmital-logs"
 
+# Pre-build cleanup: remove stopped containers and dangling images to free RAM/disk
+# Scoped to palmital project only — never touches other projects on this host
+echo "Pre-build cleanup..."
+docker compose -p palmital ps -aq --filter status=exited 2>/dev/null \
+  | xargs -r docker rm -f 2>/dev/null || true
+docker builder prune -af --filter 'until=1h' >/dev/null 2>&1 || true
+echo "Pre-build cleanup done"
+
 sync_release_env
 
 cd "$RELEASE_DIR"
@@ -270,7 +278,24 @@ trap - ERR
 trap - HUP INT TERM
 
 cleanup_old_releases || true
-docker image prune -af >/dev/null 2>&1 || true
-docker builder prune -af --filter 'until=24h' >/dev/null 2>&1 || true
+
+# Post-deploy cleanup: remove only OLD palmital images (api/web/migrator) not tagged with current release.
+# Volumes and images from other projects on this host are never touched.
+echo "Post-deploy image cleanup (palmital only)..."
+docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
+  | grep -E '^palmital-(api|web|migrator):' \
+  | grep -v ":${RELEASE}" \
+  | awk '{print $2}' \
+  | xargs -r docker rmi -f 2>/dev/null || true
+
+# Remove stopped containers scoped to palmital project
+docker compose -p palmital ps -aq --filter status=exited 2>/dev/null \
+  | xargs -r docker rm -f 2>/dev/null || true
+
+# Remove dangling images (no tag, no reference) — safe on any host
+docker image prune -f >/dev/null 2>&1 || true
+
+# Remove build cache older than 1 hour
+docker builder prune -af --filter 'until=1h' >/dev/null 2>&1 || true
 
 echo "Deploy completed successfully for $RELEASE"

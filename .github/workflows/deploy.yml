@@ -40,6 +40,36 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
+      - name: Pre-deploy VPS cleanup
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
+            set -euo pipefail
+
+            echo "=== memory before cleanup ==="
+            free -h
+
+            # Remove stopped containers from palmital project only
+            docker compose -p palmital ps -aq --filter status=exited 2>/dev/null \
+              | xargs -r docker rm -f 2>/dev/null || true
+
+            # Remove dangling images (untagged/unreferenced) — safe on shared host
+            docker image prune -f >/dev/null 2>&1 || true
+
+            # Clear ALL build cache — it is always reproducible and often stale
+            docker builder prune -af >/dev/null 2>&1 || true
+
+            # Drop Linux page cache to reclaim RAM before heavy Docker build
+            sync && echo 1 > /proc/sys/vm/drop_caches
+
+            echo "=== memory after cleanup ==="
+            free -h
+
+            echo "=== disk after cleanup ==="
+            df -h /
+          ENDSSH
+
       - name: Upload source to VPS
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
