@@ -23,7 +23,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
 
     environment:
       name: production
@@ -258,10 +258,11 @@ jobs:
           ENDSSH
 
       - name: Deploy on VPS
+        timeout-minutes: 75
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=30 -o ServerAliveCountMax=6"
           sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh'"
 
