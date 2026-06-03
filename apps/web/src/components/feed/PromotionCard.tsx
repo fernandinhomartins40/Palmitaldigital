@@ -13,7 +13,6 @@ import {
   Store,
 } from 'lucide-react';
 // MapPin and Phone kept for ProfessionalPromotionCard
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PostEngagement } from './PostEngagement';
 import { useCompanyCartStore } from '../../store/companyCartStore';
@@ -120,70 +119,22 @@ function ProfessionalPromotionCard({ post }: { post: any }) {
 }
 
 function StorefrontProductCard({ product, company }: { product: any; company: any }) {
-  const cart = useCompanyCartStore();
+  const addItem = useCompanyCartStore((s) => s.addItem);
   const addToast = useUIStore((s) => s.addToast);
   const setCartDrawerOpen = useUIStore((s) => s.setCartDrawerOpen);
-  const [confirmSwitch, setConfirmSwitch] = useState(false);
 
   const hasPrice = product.price != null || product.promoPrice != null;
   const displayPrice = product.promoPrice != null ? Number(product.promoPrice) : product.price != null ? Number(product.price) : null;
 
-  const doAdd = () => {
-    const phone = company?.whatsapp || company?.phone || null;
-    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
-    addToast(`${product.name} adicionado ao carrinho`, 'success');
-    setCartDrawerOpen(true);
-  };
-
   const handleAdd = () => {
-    if (!cart.canAddFromCompany(company.id)) {
-      setConfirmSwitch(true);
-      return;
-    }
-    doAdd();
-  };
-
-  const handleConfirmSwitch = () => {
-    cart.clearCart();
-    setConfirmSwitch(false);
-    doAdd();
+    const phone = company?.whatsapp || company?.phone || null;
+    addItem(company.id, company.name, company.slug, phone, product, 1);
+    addToast(`${product.name} adicionado`, 'success');
+    setCartDrawerOpen(true);
   };
 
   return (
     <>
-      {/* Confirm switch dialog */}
-      {confirmSwitch && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
-          onClick={() => setConfirmSwitch(false)}
-        >
-          <div
-            className="glass-strong w-full max-w-sm rounded-3xl p-6 space-y-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="font-display text-base font-bold text-ink">Trocar de loja?</p>
-            <p className="text-sm text-mute leading-relaxed">
-              Você já tem itens de <span className="font-semibold text-ink">{cart.companyName}</span> no carrinho.
-              Ao adicionar este produto o carrinho atual será esvaziado.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmSwitch(false)}
-                className="flex-1 rounded-2xl border border-line py-2.5 text-sm font-semibold text-ink hover:bg-ink/5 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmSwitch}
-                className="flex-1 rounded-2xl bg-coral py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity"
-              >
-                Trocar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="flex flex-col overflow-hidden rounded-xl border border-line bg-ink/[0.02] dark:bg-white/[0.03]">
         <div className="aspect-square bg-ink/5 dark:bg-white/5">
           {product.imageUrl ? (

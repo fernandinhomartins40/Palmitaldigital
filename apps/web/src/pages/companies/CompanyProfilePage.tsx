@@ -119,6 +119,8 @@ export function CompanyProfilePage() {
   const addToast = useUIStore((s) => s.addToast);
   const currentUser = useAuthStore((s) => s.user);
   const cart = useCompanyCartStore();
+  const addItem = useCompanyCartStore((s) => s.addItem);
+  const companyCart = useCompanyCartStore((s) => s.carts[company?.id ?? '']);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
   const [showCheckout, setShowCheckout] = useState(false);
@@ -168,7 +170,7 @@ export function CompanyProfilePage() {
   const isOwner = currentUser?.id === company.ownerId;
   const canSell = (company.sellMode === 'CART' || company.sellMode === 'BOTH') && !isOwner;
   const totalProducts = company._count?.products ?? products.length;
-  const cartActiveHere = cart.companyId === company.id && cart.items.length > 0;
+  const cartActiveHere = (companyCart?.items.length ?? 0) > 0;
 
   const contactProduct = (product: StoreProduct) => {
     const message = `Olá! Tenho interesse no produto "${product.name}"${
@@ -186,7 +188,7 @@ export function CompanyProfilePage() {
 
   const addProduct = (product: StoreProduct) => {
     const phone = company.whatsapp || company.phone || null;
-    cart.addItem(company.id, company.name, company.slug, phone, product, 1);
+    addItem(company.id, company.name, company.slug, phone, product, 1);
     addToast(`${product.name} adicionado`, 'success');
   };
 

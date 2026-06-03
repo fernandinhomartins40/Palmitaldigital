@@ -2,17 +2,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { StoreProduct } from '../services/companiesApi';
 
-interface CartItem {
+export interface CartItem {
   product: StoreProduct;
   quantity: number;
 }
 
-interface CompanyCartState {
-  companyId: string | null;
-  companyName: string | null;
-  companySlug: string | null;
+export interface CompanyCart {
+  companyId: string;
+  companyName: string;
+  companySlug: string;
   companyPhone: string | null;
   items: CartItem[];
+}
+
+interface CompanyCartState {
+  carts: Record<string, CompanyCart>; // keyed by companyId
   addItem: (
     companyId: string,
     companyName: string,
@@ -21,75 +25,105 @@ interface CompanyCartState {
     product: StoreProduct,
     quantity?: number,
   ) => void;
-  canAddFromCompany: (companyId: string) => boolean;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  total: () => number;
-  itemCount: () => number;
+  removeItem: (companyId: string, productId: string) => void;
+  updateQuantity: (companyId: string, productId: string, quantity: number) => void;
+  clearCompanyCart: (companyId: string) => void;
+  clearAllCarts: () => void;
+  totalForCompany: (companyId: string) => number;
+  totalItemCount: () => number;
 }
 
 export const useCompanyCartStore = create<CompanyCartState>()(
   persist(
     (set, get) => ({
-      companyId: null,
-      companyName: null,
-      companySlug: null,
-      companyPhone: null,
-      items: [],
+      carts: {},
 
       addItem: (companyId, companyName, companySlug, companyPhone, product, quantity = 1) => {
-        const { items, companyId: currentId } = get();
-        if (currentId && currentId !== companyId) {
-          // Different store — caller must handle confirmation before calling addItem
-          // If called anyway, replace cart (should not happen in normal flow)
-          set({ companyId, companyName, companySlug, companyPhone, items: [{ product, quantity }] });
-          return;
-        }
-        const existing = items.find((i) => i.product.id === product.id);
-        if (existing) {
-          set({
-            items: items.map((i) =>
-              i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
-            ),
-          });
-        } else {
-          set({ companyId, companyName, companySlug, companyPhone, items: [...items, { product, quantity }] });
-        }
-      },
-
-      canAddFromCompany: (companyId: string) => {
-        const { companyId: currentId, items } = get();
-        return !currentId || items.length === 0 || currentId === companyId;
-      },
-
-      removeItem: (productId) =>
         set((s) => {
-          const remaining = s.items.filter((i) => i.product.id !== productId);
+          const existing = s.carts[companyId];
+          if (existing) {
+            const existingItem = existing.items.find((i) => i.product.id === product.id);
+            return {
+              carts: {
+                ...s.carts,
+                [companyId]: {
+                  ...existing,
+                  items: existingItem
+                    ? existing.items.map((i) =>
+                        i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
+                      )
+                    : [...existing.items, { product, quantity }],
+                },
+              },
+            };
+          }
           return {
-            items: remaining,
-            ...(remaining.length === 0
-              ? { companyId: null, companyName: null, companySlug: null, companyPhone: null }
-              : {}),
+            carts: {
+              ...s.carts,
+              [companyId]: { companyId, companyName, companySlug, companyPhone, items: [{ product, quantity }] },
+            },
           };
-        }),
+        });
+      },
 
-      updateQuantity: (productId, quantity) =>
-        set((s) => ({
-          items:
-            quantity <= 0
-              ? s.items.filter((i) => i.product.id !== productId)
-              : s.items.map((i) => (i.product.id === productId ? { ...i, quantity } : i)),
-        })),
+      removeItem: (companyId, productId) => {
+        set((s) => {
+          const cart = s.carts[companyId];
+          if (!cart) return s;
+          const items = cart.items.filter((i) => i.product.id !== productId);
+          if (items.length === 0) {
+            const { [companyId]: _, ...rest } = s.carts;
+            return { carts: rest };
+          }
+          return { carts: { ...s.carts, [companyId]: { ...cart, items } } };
+        });
+      },
 
-      clearCart: () =>
-        set({ companyId: null, companyName: null, companySlug: null, companyPhone: null, items: [] }),
+      updateQuantity: (companyId, productId, quantity) => {
+        set((s) => {
+          const cart = s.carts[companyId];
+          if (!cart) return s;
+          if (quantity <= 0) {
+            const items = cart.items.filter((i) => i.product.id !== productId);
+            if (items.length === 0) {
+              const { [companyId]: _, ...rest } = s.carts;
+              return { carts: rest };
+            }
+            return { carts: { ...s.carts, [companyId]: { ...cart, items } } };
+          }
+          return {
+            carts: {
+              ...s.carts,
+              [companyId]: {
+                ...cart,
+                items: cart.items.map((i) => (i.product.id === productId ? { ...i, quantity } : i)),
+              },
+            },
+          };
+        });
+      },
 
-      total: () =>
-        get().items.reduce((sum, i) => sum + Number(i.product.price ?? 0) * i.quantity, 0),
+      clearCompanyCart: (companyId) => {
+        set((s) => {
+          const { [companyId]: _, ...rest } = s.carts;
+          return { carts: rest };
+        });
+      },
 
-      itemCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
+      clearAllCarts: () => set({ carts: {} }),
+
+      totalForCompany: (companyId) => {
+        const cart = get().carts[companyId];
+        if (!cart) return 0;
+        return cart.items.reduce((sum, i) => {
+          const price = i.product.promoPrice != null ? Number(i.product.promoPrice) : Number(i.product.price ?? 0);
+          return sum + price * i.quantity;
+        }, 0);
+      },
+
+      totalItemCount: () =>
+        Object.values(get().carts).reduce((sum, cart) => sum + cart.items.reduce((s, i) => s + i.quantity, 0), 0),
     }),
-    { name: 'palmital-company-cart' },
+    { name: 'palmital-company-cart-v2' },
   ),
 );
