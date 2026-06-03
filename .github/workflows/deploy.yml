@@ -40,11 +40,29 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
+      - name: Wait for SSH connectivity
+        env:
+          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          for attempt in 1 2 3 4 5; do
+            echo "SSH connectivity check attempt $attempt/5..."
+            if sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "echo ok" 2>&1; then
+              echo "SSH connection established"
+              exit 0
+            fi
+            echo "Attempt $attempt failed, waiting 15s..."
+            sleep 15
+          done
+          echo "ERROR: Could not connect to VPS after 5 attempts" >&2
+          exit 1
+
       - name: Pre-deploy VPS cleanup
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
             set -euo pipefail
 
             echo "=== memory before cleanup ==="
@@ -57,7 +75,7 @@ jobs:
             # Remove dangling images (untagged/unreferenced) — safe on shared host
             docker image prune -f >/dev/null 2>&1 || true
 
-            # Clear ALL build cache — it is always reproducible and often stale
+            # Clear ALL build cache — always reproducible
             docker builder prune -af >/dev/null 2>&1 || true
 
             # Drop Linux page cache to reclaim RAM before heavy Docker build
@@ -74,8 +92,9 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
           RELEASE_DIR="${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}"
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "mkdir -p '$RELEASE_DIR'"
 
           tar \
@@ -88,14 +107,15 @@ jobs:
             --exclude=apps/web/dist \
             --exclude=apps/api/tsconfig.tsbuildinfo \
             -czf - . | \
-            sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+            sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
               "tar -xzf - -C '$RELEASE_DIR'"
 
       - name: Prepare VPS runtime
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
             set -euo pipefail
 
             if ! command -v apt-get >/dev/null 2>&1; then
@@ -155,7 +175,8 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' CANONICAL_URL='${{ env.CANONICAL_URL }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
@@ -240,14 +261,16 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh'"
 
       - name: Configure Nginx (HTTP)
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "DEPLOY_PORT='${{ env.DEPLOY_PORT }}' PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
@@ -285,7 +308,8 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' SSL_EMAIL='${{ env.SSL_EMAIL }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
@@ -312,7 +336,8 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "DEPLOY_PORT='${{ env.DEPLOY_PORT }}' PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' CANONICAL_URL='${{ env.CANONICAL_URL }}' bash -s" <<'ENDSSH'
             set -euo pipefail
 
@@ -361,7 +386,8 @@ jobs:
         env:
           SSHPASS: ${{ secrets.VPS_PASSWORD }}
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
+          SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+          sshpass -e ssh $SSH_OPTS ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
             "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-health-check.sh'"
 
       - name: Notify success
