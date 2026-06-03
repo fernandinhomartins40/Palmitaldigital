@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { MessageCircle, Moon, Sun } from 'lucide-react';
+import { MessageCircle, Moon, ShoppingBag, Sun } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import { useThemeStore } from '../../store/themeStore';
+import { useCompanyCartStore } from '../../store/companyCartStore';
+import { useUIStore } from '../../store/uiStore';
 
 const titles: Record<string, string> = {
   '/feed': 'Feed',
@@ -22,6 +24,8 @@ export function TopBar() {
   const accessToken = useAuthStore((s) => s.accessToken);
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggle);
+  const cartCount = useCompanyCartStore((s) => s.totalItemCount());
+  const setCartOpen = useUIStore((s) => s.setCartDrawerOpen);
 
   const title =
     titles[pathname] ??
@@ -75,6 +79,20 @@ export function TopBar() {
         </Link>
 
         <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            aria-label="Carrinho"
+            className="relative flex h-10 w-10 items-center justify-center rounded-xl text-ink transition-colors hover:bg-ink/5 dark:hover:bg-white/5"
+          >
+            <ShoppingBag size={20} />
+            {cartCount > 0 && (
+              <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-cobalt px-1 text-[10px] font-bold text-white">
+                {cartCount > 9 ? '9+' : cartCount}
+              </span>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={toggleTheme}
