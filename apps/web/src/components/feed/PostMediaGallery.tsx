@@ -96,8 +96,8 @@ export function PostMediaGallery({ media }: PostMediaGalleryProps) {
   }
 
   return (
-    <div className="mt-3 space-y-2">
-      <div className="group relative overflow-hidden rounded-2xl bg-ink/5 dark:bg-white/5">
+    <div className="space-y-2">
+      <div className="group relative overflow-hidden bg-ink/5 dark:bg-white/5">
         <div
           className="w-full cursor-zoom-in"
           role="button"

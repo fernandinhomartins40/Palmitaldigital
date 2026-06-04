@@ -50,7 +50,7 @@ export function SocialCard({ post }: { post: any }) {
 
       {/* Mídia largura total */}
       {hasMedia && (
-        <div className="mt-3">
+        <div className="mt-3 overflow-hidden">
           <PostMediaGallery media={post.media ?? []} />
         </div>
       )}

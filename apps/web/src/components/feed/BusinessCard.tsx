@@ -9,7 +9,7 @@ export function BusinessCard({ post }: { post: any }) {
   const company = post.company;
 
   return (
-    <article className="glass shape-signature relative overflow-hidden border-l-4 border-cobalt">
+    <article className="glass shape-signature relative overflow-hidden">
 
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-4 pb-0">
@@ -53,7 +53,7 @@ export function BusinessCard({ post }: { post: any }) {
 
       {/* Mídia largura total */}
       {post.media?.length > 0 && (
-        <div className="mt-3">
+        <div className="mt-3 overflow-hidden">
           <PostMediaGallery media={post.media ?? []} />
         </div>
       )}
