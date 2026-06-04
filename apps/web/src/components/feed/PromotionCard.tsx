@@ -44,75 +44,107 @@ function HighlightList({ highlights }: { highlights?: string[] }) {
 function ProfessionalPromotionCard({ post }: { post: any }) {
   const profile = post.author?.profile;
   const headline = post.promotion?.headline ?? profile?.displayName ?? 'Profissional local';
-  const subtitle = post.promotion?.subtitle ?? post.content;
+  const specialty = post.promotion?.subtitle ?? post.promotion?.category ?? null;
+  const highlights: string[] = post.promotion?.highlights ?? [];
+  const city: string | null = post.promotion?.city ?? null;
+  const phone: string | null = post.author?.phone ?? post.author?.whatsapp ?? null;
+
+  const waLink = phone
+    ? `https://wa.me/${phone.replace(/\D/g, '').replace(/^(\d{10,11})$/, '55$1')}?text=${encodeURIComponent(`Olá ${headline}, vi seu perfil na Palmital Digital e gostaria de um orçamento.`)}`
+    : null;
 
   return (
-    <article className="glass shape-signature halo halo-magenta relative overflow-hidden p-5">
-      {/* Selo de impulsionado */}
-      <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-magenta opacity-[0.12] blur-2xl" />
+    <article className="glass shape-signature relative overflow-hidden">
+      {/* Faixa de cor no topo */}
+      <div className="h-1.5 w-full rounded-t-[inherit]" style={{ background: 'var(--magenta)' }} />
 
-      <div className="relative flex items-start gap-4">
-        <Link to={`/profile/${post.authorId}`} className="shrink-0">
-          <Avatar
-            src={profile?.avatarUrl}
-            name={headline}
-            size="lg"
-            accent="magenta"
-          />
-        </Link>
+      <div className="p-4 sm:p-5">
+        {/* Header: avatar + nome + especialidade */}
+        <div className="flex items-center gap-3.5">
+          <Link to={`/profile/${post.authorId}`} className="shrink-0">
+            <Avatar src={profile?.avatarUrl} name={headline} size="lg" accent="magenta" />
+          </Link>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <div className="chip chip-magenta">
-              <Sparkles size={10} strokeWidth={2.5} />
-              IMPULSIONADO
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                to={`/profile/${post.authorId}`}
+                className="font-display text-lg font-bold leading-tight text-ink hover:text-magenta transition-colors"
+              >
+                {headline}
+              </Link>
+              <span className="chip chip-magenta shrink-0">
+                <Sparkles size={9} strokeWidth={2.5} />
+                DESTAQUE
+              </span>
             </div>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-mute">
-              {formatRelativeTime(post.createdAt)}
-            </span>
-          </div>
 
-          <Link
-            to={`/profile/${post.authorId}`}
-            className="mt-2 block font-display text-xl font-bold tracking-tight text-ink hover:text-magenta"
-          >
-            {headline}
-          </Link>
-
-          <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-magenta">
-            <BriefcaseBusiness size={10} className="mr-1 inline" />
-            Profissional liberal
-          </p>
-
-          {subtitle && <p className="mt-3 text-sm leading-6 text-ink">{subtitle}</p>}
-
-          <HighlightList highlights={post.promotion?.highlights} />
-
-          <div className="mt-4 flex flex-wrap gap-3 text-xs font-mono uppercase tracking-wider text-mute">
-            {post.promotion?.city && (
-              <span className="inline-flex items-center gap-1">
-                <MapPin size={11} />
-                {post.promotion.city}
-              </span>
+            {specialty && (
+              <p className="mt-0.5 text-sm text-mute leading-snug">{specialty}</p>
             )}
-            {post.author?.phone && (
+
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-mute">
               <span className="inline-flex items-center gap-1">
-                <Phone size={11} />
-                {post.author.phone}
+                <BriefcaseBusiness size={11} />
+                Profissional liberal
               </span>
-            )}
+              {city && (
+                <span className="inline-flex items-center gap-1">
+                  <MapPin size={11} />
+                  {city}
+                </span>
+              )}
+            </div>
           </div>
-
-          <Link
-            to={`/profile/${post.authorId}`}
-            className="mt-4 flex items-center justify-between rounded-xl border border-line bg-ink/[0.02] px-4 py-3 text-sm font-semibold text-ink transition-colors hover:bg-magenta hover:text-white dark:bg-white/[0.04]"
-          >
-            <span>Ver perfil profissional</span>
-            <ArrowUpRight size={16} strokeWidth={2.4} />
-          </Link>
-
-          <PostEngagement post={post} accent="magenta" />
         </div>
+
+        {/* Destaques / tags */}
+        {highlights.length > 0 && (
+          <div className="mt-3.5 flex flex-wrap gap-1.5">
+            {highlights.map((h) => (
+              <span key={h} className="chip border border-line text-mute">
+                {h}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* CTAs */}
+        <div className="mt-4 flex gap-2.5">
+          <Link
+            to={`/profile/${post.authorId}`}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-line bg-ink/[0.02] px-3 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink/5 dark:bg-white/[0.03]"
+          >
+            Ver perfil
+            <ArrowUpRight size={14} strokeWidth={2.4} />
+          </Link>
+
+          {waLink ? (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              style={{ background: '#25D366' }}
+            >
+              <Phone size={14} />
+              Contato
+            </a>
+          ) : (
+            <Link
+              to={`/profile/${post.authorId}`}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-magenta px-3 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            >
+              <Phone size={14} />
+              Contato
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* Engajamento compacto no rodapé */}
+      <div className="border-t border-line px-4 py-2">
+        <PostEngagement post={post} accent="magenta" compact />
       </div>
     </article>
   );
