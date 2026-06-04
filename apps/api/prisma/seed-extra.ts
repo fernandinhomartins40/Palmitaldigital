@@ -481,7 +481,6 @@ async function seedRestaurants(testPassword: string) {
         ratingCount: 12 + Math.floor(Math.random() * 80),
         logoUrl: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(r.name)}`,
         coverUrl: imageUrl(`restaurant-${r.slug}`, 1200, 400),
-        target: 'seed',
       },
     });
 
