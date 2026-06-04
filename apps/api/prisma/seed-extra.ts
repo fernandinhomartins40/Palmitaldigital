@@ -4,7 +4,6 @@
  */
 import {
   ArticleStatus,
-  MediaType,
   OrderStatus,
   OrderType,
   PrismaClient,
@@ -15,7 +14,8 @@ import {
 } from '../generated/prisma';
 import * as bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+// Uses the prisma instance passed from seed.ts — no second connection
+let prisma: PrismaClient;
 
 function imageUrl(seed: string, w = 800, h = 600) {
   return `https://picsum.photos/seed/${encodeURIComponent(seed)}/${w}/${h}`;
@@ -796,7 +796,9 @@ export async function runExtraSeeds(
   testPassword: string,
   companiesBySlug: Map<string, { id: string }>,
   customerIds: string[],
+  prismaInstance: PrismaClient,
 ) {
+  prisma = prismaInstance;
   console.log('\nRunning extra seeds: delivery, news, products, orders...');
 
   const restaurantMap = await seedRestaurants(testPassword);

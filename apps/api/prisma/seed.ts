@@ -2042,7 +2042,7 @@ async function main() {
   const customerIds = regularUsers
     .map(u => usersByEmail.get(u.email)?.id)
     .filter((id): id is string => Boolean(id));
-  await runExtraSeeds(testPassword, companiesBySlug, customerIds);
+  await runExtraSeeds(testPassword, companiesBySlug, customerIds, prisma);
 
   const classifiedEntries = classifiedCatalog.reduce(
     (total, group) => total + group.items.length,
