@@ -8,6 +8,7 @@ import {
   PrismaClient,
   UserRole,
 } from '../generated/prisma';
+import { runExtraSeeds } from './seed-extra';
 import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -2036,6 +2037,12 @@ async function main() {
   await createPostInteractions(usersByEmail);
   await createFollowsAndStories(usersByEmail);
   await createConversations(usersByEmail);
+
+  // Extra seeds: delivery, news, more products and orders
+  const customerIds = regularUsers
+    .map(u => usersByEmail.get(u.email)?.id)
+    .filter((id): id is string => Boolean(id));
+  await runExtraSeeds(testPassword, companiesBySlug, customerIds);
 
   const classifiedEntries = classifiedCatalog.reduce(
     (total, group) => total + group.items.length,
