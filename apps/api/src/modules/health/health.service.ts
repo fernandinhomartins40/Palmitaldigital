@@ -11,9 +11,9 @@ export class HealthService {
         this.prisma.$queryRaw`SELECT 1`,
         new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
       ]);
-      return { status: 'ok', db: 'ok' };
+      return { status: 'ok', db: 'ok', version: process.env.RELEASE_VERSION ?? 'dev' };
     } catch {
-      return { status: 'ok', db: 'degraded' };
+      return { status: 'ok', db: 'degraded', version: process.env.RELEASE_VERSION ?? 'dev' };
     }
   }
 }
