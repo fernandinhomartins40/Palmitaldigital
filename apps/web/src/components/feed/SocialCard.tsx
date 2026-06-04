@@ -10,8 +10,9 @@ export function SocialCard({ post }: { post: any }) {
   const hasMedia = Boolean(post.media?.length);
 
   return (
-    <article className="glass shape-signature halo halo-coral relative p-5">
-      <div className="flex items-start gap-3">
+    <article className="glass shape-signature halo halo-coral relative overflow-hidden">
+      {/* Header: avatar + nome + hora */}
+      <div className="flex items-center gap-3 px-5 pt-5">
         <Link to={`/profile/${post.authorId}`} className="shrink-0">
           <Avatar src={profile?.avatarUrl} name={name} size="md" accent="coral" />
         </Link>
@@ -24,30 +25,39 @@ export function SocialCard({ post }: { post: any }) {
             >
               {name}
             </Link>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-mute">
+            <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-mute">
               {formatRelativeTime(post.createdAt)}
             </span>
           </div>
-
           {profile?.city && (
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-mute">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-mute">
               {profile.city}
             </p>
           )}
-
-          {post.content && (
-            <p
-              className={`mt-3 whitespace-pre-wrap break-words text-ink ${
-                hasMedia ? 'text-[15px] leading-6' : 'text-[16px] leading-7'
-              }`}
-            >
-              {post.content}
-            </p>
-          )}
-
-          <PostMediaGallery media={post.media ?? []} />
-          <PostEngagement post={post} accent="coral" />
         </div>
+      </div>
+
+      {/* Conteúdo texto */}
+      {post.content && (
+        <p
+          className={`px-5 whitespace-pre-wrap break-words text-ink ${
+            hasMedia ? 'mt-3 text-[15px] leading-6' : 'mt-3 text-[16px] leading-7'
+          }`}
+        >
+          {post.content}
+        </p>
+      )}
+
+      {/* Mídia em largura total */}
+      {hasMedia && (
+        <div className="mt-3">
+          <PostMediaGallery media={post.media ?? []} />
+        </div>
+      )}
+
+      {/* Engajamento */}
+      <div className="px-5 pb-1">
+        <PostEngagement post={post} accent="coral" />
       </div>
     </article>
   );

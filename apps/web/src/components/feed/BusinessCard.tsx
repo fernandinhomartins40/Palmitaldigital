@@ -10,53 +10,59 @@ export function BusinessCard({ post }: { post: any }) {
 
   return (
     <article className="glass shape-signature halo halo-cobalt relative overflow-hidden">
-      {/* Faixa vertical de cor à esquerda como assinatura */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-cobalt" />
+      {/* Faixa superior de cor */}
+      <div className="h-1 w-full bg-cobalt" />
 
-      <div className="p-5 pl-6">
-        <div className="flex items-start gap-3">
-          <Link to={`/companies/${company?.slug}`} className="shrink-0">
-            <Avatar
-              src={company?.logoUrl}
-              name={company?.name ?? 'Empresa'}
-              size="md"
-              accent="cobalt"
-            />
-          </Link>
+      {/* Header: avatar + nome + hora */}
+      <div className="flex items-center gap-3 px-5 pt-4">
+        <Link to={`/companies/${company?.slug}`} className="shrink-0">
+          <Avatar
+            src={company?.logoUrl}
+            name={company?.name ?? 'Empresa'}
+            size="md"
+            accent="cobalt"
+          />
+        </Link>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="chip chip-cobalt">
-                  <Building2 size={10} strokeWidth={2.5} />
-                  EMPRESA
-                </div>
-                <Link
-                  to={`/companies/${company?.slug}`}
-                  className="mt-2 flex items-center gap-1.5 font-display text-base font-bold tracking-tight text-ink hover:text-cobalt"
-                >
-                  <span className="truncate">{company?.name}</span>
-                  {company?.isVerified && (
-                    <BadgeCheck size={16} className="shrink-0 fill-cobalt text-surface" />
-                  )}
-                </Link>
-              </div>
-
-              <span className="font-mono text-[10px] uppercase tracking-wider text-mute">
-                {formatRelativeTime(post.createdAt)}
-              </span>
-            </div>
-
-            {post.content && (
-              <p className="mt-3 whitespace-pre-wrap text-[15px] leading-6 text-ink">
-                {post.content}
-              </p>
-            )}
-
-            <PostMediaGallery media={post.media ?? []} />
-            <PostEngagement post={post} accent="cobalt" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <Link
+              to={`/companies/${company?.slug}`}
+              className="flex items-center gap-1.5 font-display text-base font-bold tracking-tight text-ink hover:text-cobalt"
+            >
+              <span className="truncate">{company?.name}</span>
+              {company?.isVerified && (
+                <BadgeCheck size={15} className="shrink-0 fill-cobalt text-surface" />
+              )}
+            </Link>
+            <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-mute">
+              {formatRelativeTime(post.createdAt)}
+            </span>
+          </div>
+          <div className="chip chip-cobalt mt-0.5 w-fit">
+            <Building2 size={9} strokeWidth={2.5} />
+            EMPRESA
           </div>
         </div>
+      </div>
+
+      {/* Texto do post */}
+      {post.content && (
+        <p className="mt-3 px-5 whitespace-pre-wrap text-[15px] leading-6 text-ink">
+          {post.content}
+        </p>
+      )}
+
+      {/* Mídia em largura total */}
+      {post.media?.length > 0 && (
+        <div className="mt-3">
+          <PostMediaGallery media={post.media ?? []} />
+        </div>
+      )}
+
+      {/* Engajamento */}
+      <div className="px-5 pb-1">
+        <PostEngagement post={post} accent="cobalt" />
       </div>
     </article>
   );
