@@ -10,8 +10,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  VPS_HOST: 72.60.10.112
-  VPS_USER: root
   APP_ROOT: /opt/palmital
   DEPLOY_PORT: "7000"
   PRIMARY_DOMAIN: palmitaldigital.com.br
@@ -22,8 +20,8 @@ env:
 jobs:
   deploy:
     name: Deploy to VPS
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
+    runs-on: self-hosted
+    timeout-minutes: 90
 
     environment:
       name: production
@@ -37,304 +35,109 @@ jobs:
         id: release
         run: echo "version=$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
 
-      - name: Install sshpass
-        run: sudo apt-get install -y sshpass
+      - name: Pre-deploy cleanup
+        run: |
+          docker compose -p palmital ps -aq --filter status=exited 2>/dev/null \
+            | xargs -r docker rm -f 2>/dev/null || true
+          docker image prune -f >/dev/null 2>&1 || true
+          docker builder prune -af >/dev/null 2>&1 || true
+          sync && echo 1 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+          free -h
+          df -h /
 
-      - name: Upload source to VPS
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      - name: Copy source to release dir
         run: |
           RELEASE_DIR="${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}"
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "mkdir -p '$RELEASE_DIR'"
+          mkdir -p "$RELEASE_DIR"
+          rsync -a --exclude=.git "$GITHUB_WORKSPACE/" "$RELEASE_DIR/"
 
-          tar \
-            --exclude=.git \
-            --exclude=.claude \
-            --exclude=node_modules \
-            --exclude=apps/api/node_modules \
-            --exclude=apps/web/node_modules \
-            --exclude=apps/api/dist \
-            --exclude=apps/web/dist \
-            --exclude=apps/api/tsconfig.tsbuildinfo \
-            -czf - . | \
-            sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-              "tar -xzf - -C '$RELEASE_DIR'"
-
-      - name: Prepare VPS runtime
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      - name: Ensure .env exists
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "bash -s" <<'ENDSSH'
-            set -euo pipefail
+          ENV_FILE="${{ env.APP_ROOT }}/.env"
+          touch "$ENV_FILE" && chmod 600 "$ENV_FILE"
 
-            if ! command -v apt-get >/dev/null 2>&1; then
-              echo "Unsupported VPS distribution: apt-get is required" >&2
-              exit 1
-            fi
+          get_env()   { awk -F= -v k="$1" '$1==k{sub(/^[^=]*=/,"");print;exit}' "$ENV_FILE"; }
+          upsert_env() {
+            local tmp; tmp="$(mktemp)"
+            awk -v k="$1" -v v="$2" 'BEGIN{u=0} index($0,k"=")==1{print k"="v;u=1;next}{print} END{if(!u)print k"="v}' "$ENV_FILE" > "$tmp"
+            mv "$tmp" "$ENV_FILE"
+          }
+          ensure_env()  { [ -z "$(get_env "$1"|tr -d '\r')" ] && upsert_env "$1" "$2" || true; }
+          ensure_hex()  { [ -z "$(get_env "$1"|tr -d '\r')" ] && upsert_env "$1" "$(openssl rand -hex "$2")" || true; }
+          ensure_alnum(){ [ -z "$(get_env "$1"|tr -d '\r')" ] && upsert_env "$1" "$(openssl rand -hex 32|cut -c1-"$2")" || true; }
 
-            export DEBIAN_FRONTEND=noninteractive
-            APT_UPDATED=0
+          ensure_env   "POSTGRES_USER"          "palmital"
+          ensure_env   "POSTGRES_DB"            "palmital"
+          ensure_hex   "POSTGRES_PASSWORD"      32
+          ensure_hex   "JWT_SECRET"             32
+          ensure_hex   "JWT_REFRESH_SECRET"     32
+          ensure_env   "JWT_EXPIRES_IN"         "15m"
+          ensure_env   "JWT_REFRESH_EXPIRES_IN" "30d"
+          ensure_alnum "SEED_ADMIN_PASSWORD"    20
+          ensure_env   "SEED_TEST_PASSWORD"     "Teste123456"
+          upsert_env   "NODE_ENV"               "production"
+          upsert_env   "PORT"                   "3001"
+          upsert_env   "DEPLOY_PORT"            "${{ env.DEPLOY_PORT }}"
+          upsert_env   "FRONTEND_URL"           "${{ env.CANONICAL_URL }}"
 
-            apt_update_once() {
-              if [ "$APT_UPDATED" -eq 0 ]; then
-                apt-get update
-                APT_UPDATED=1
-              fi
-            }
+          PG_USER="$(get_env POSTGRES_USER|tr -d '\r')"
+          PG_PASS="$(get_env POSTGRES_PASSWORD|tr -d '\r')"
+          PG_DB="$(get_env POSTGRES_DB|tr -d '\r')"
+          upsert_env "DATABASE_URL" "postgresql://${PG_USER}:${PG_PASS}@postgres:5432/${PG_DB}"
+          chmod 600 "$ENV_FILE"
 
-            ensure_apt_packages() {
-              local missing=0
-              local package_name
-
-              for package_name in "$@"; do
-                if ! dpkg-query -W -f='${Status}' "$package_name" 2>/dev/null | grep -q 'install ok installed'; then
-                  missing=1
-                  break
-                fi
-              done
-
-              if [ "$missing" -eq 1 ]; then
-                apt_update_once
-                apt-get install -y --no-install-recommends "$@"
-              fi
-            }
-
-            ensure_apt_packages ca-certificates certbot curl nginx openssl tar util-linux
-
-            if ! command -v docker >/dev/null 2>&1; then
-              apt_update_once
-              apt-get install -y --no-install-recommends docker.io
-            fi
-
-            if ! docker compose version >/dev/null 2>&1; then
-              apt_update_once
-              apt-get install -y --no-install-recommends docker-compose-v2 || \
-              apt-get install -y --no-install-recommends docker-compose-plugin
-            fi
-
-            systemctl enable --now docker
-            systemctl enable --now nginx
-
-            docker compose version >/dev/null
-            nginx -v >/dev/null 2>&1
-            certbot --version >/dev/null
-          ENDSSH
-
-      - name: Ensure .env exists on VPS
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      - name: Deploy
+        timeout-minutes: 75
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' CANONICAL_URL='${{ env.CANONICAL_URL }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
+          APP_ROOT="${{ env.APP_ROOT }}" \
+          RELEASE="${{ steps.release.outputs.version }}" \
+          DEPLOY_PORT="${{ env.DEPLOY_PORT }}" \
+          bash "${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh"
 
-            ENV_FILE="$APP_ROOT/.env"
-            mkdir -p "$APP_ROOT"
-            touch "$ENV_FILE"
-            chmod 600 "$ENV_FILE"
-
-            get_env() {
-              local key="$1"
-              awk -F= -v key="$key" '$1 == key { sub(/^[^=]*=/, "", $0); print $0; exit }' "$ENV_FILE"
-            }
-
-            upsert_env() {
-              local key="$1"
-              local value="$2"
-              local tmp_file
-              tmp_file="$(mktemp)"
-              awk -v key="$key" -v value="$value" '
-                BEGIN { updated = 0 }
-                index($0, key "=") == 1 { print key "=" value; updated = 1; next }
-                { print }
-                END { if (!updated) print key "=" value }
-              ' "$ENV_FILE" > "$tmp_file"
-              mv "$tmp_file" "$ENV_FILE"
-            }
-
-            ensure_env() {
-              local key="$1"
-              local default_value="$2"
-              local current_value
-              current_value="$(get_env "$key" | tr -d '\r')"
-              if [ -z "$current_value" ]; then
-                upsert_env "$key" "$default_value"
-              fi
-            }
-
-            ensure_random_hex() {
-              local key="$1"
-              local bytes="$2"
-              local current_value
-              current_value="$(get_env "$key" | tr -d '\r')"
-              if [ -z "$current_value" ]; then
-                upsert_env "$key" "$(openssl rand -hex "$bytes")"
-              fi
-            }
-
-            ensure_random_alnum() {
-              local key="$1"
-              local length="$2"
-              local current_value
-              current_value="$(get_env "$key" | tr -d '\r')"
-              if [ -z "$current_value" ]; then
-                upsert_env "$key" "$(openssl rand -hex 32 | cut -c1-"$length")"
-              fi
-            }
-
-            ensure_env "POSTGRES_USER" "palmital"
-            ensure_env "POSTGRES_DB" "palmital"
-            ensure_random_hex "POSTGRES_PASSWORD" 32
-            ensure_random_hex "JWT_SECRET" 32
-            ensure_random_hex "JWT_REFRESH_SECRET" 32
-            ensure_env "JWT_EXPIRES_IN" "15m"
-            ensure_env "JWT_REFRESH_EXPIRES_IN" "30d"
-            ensure_random_alnum "SEED_ADMIN_PASSWORD" 20
-            ensure_env "SEED_TEST_PASSWORD" "Teste123456"
-
-            upsert_env "NODE_ENV" "production"
-            upsert_env "PORT" "3001"
-            upsert_env "DEPLOY_PORT" "$DEPLOY_PORT"
-            upsert_env "FRONTEND_URL" "$CANONICAL_URL"
-
-            POSTGRES_USER_VALUE="$(get_env "POSTGRES_USER" | tr -d '\r')"
-            POSTGRES_PASSWORD_VALUE="$(get_env "POSTGRES_PASSWORD" | tr -d '\r')"
-            POSTGRES_DB_VALUE="$(get_env "POSTGRES_DB" | tr -d '\r')"
-            upsert_env "DATABASE_URL" "postgresql://${POSTGRES_USER_VALUE}:${POSTGRES_PASSWORD_VALUE}@postgres:5432/${POSTGRES_DB_VALUE}"
-
-            chmod 600 "$ENV_FILE"
-          ENDSSH
-
-      - name: Deploy on VPS
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      - name: Configure Nginx
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' RELEASE='${{ steps.release.outputs.version }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh'"
-
-      - name: Configure Nginx (HTTP)
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
-        run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "DEPLOY_PORT='${{ env.DEPLOY_PORT }}' PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
-
-            mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+          D="${{ env.PRIMARY_DOMAIN }}"
+          SD="${{ env.SECONDARY_DOMAIN }}"
+          CU="${{ env.CANONICAL_URL }}"
+          DP="${{ env.DEPLOY_PORT }}"
+          mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+          if [ -f "/etc/letsencrypt/live/${D}/fullchain.pem" ]; then
             {
-              printf '%s\n' 'server {'
-              printf '%s\n' '    listen 80;'
-              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
-              printf '%s\n' '    client_max_body_size 32m;'
-              printf '%s\n' ''
-              printf '%s\n' '    location /.well-known/acme-challenge/ {'
-              printf '%s\n' '        root /var/www/certbot;'
-              printf '%s\n' '    }'
-              printf '%s\n' ''
-              printf '%s\n' '    location / {'
-              printf '%s\n' "        proxy_pass http://127.0.0.1:${DEPLOY_PORT};"
-              printf '%s\n' '        proxy_http_version 1.1;'
-              printf '%s\n' '        proxy_set_header Upgrade $http_upgrade;'
-              printf '%s\n' '        proxy_set_header Connection "upgrade";'
-              printf '%s\n' '        proxy_set_header Host $host;'
-              printf '%s\n' '        proxy_set_header X-Real-IP $remote_addr;'
-              printf '%s\n' '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'
-              printf '%s\n' '        proxy_set_header X-Forwarded-Proto $scheme;'
-              printf '%s\n' '        proxy_read_timeout 86400;'
-              printf '%s\n' '    }'
-              printf '%s\n' '}'
-            } > /etc/nginx/sites-available/palmital
+              printf 'server {\n    listen 80;\n    server_name %s %s;\n    client_max_body_size 32m;\n    return 301 %s$request_uri;\n}\n' "$D" "$SD" "$CU"
+              printf 'server {\n    listen 443 ssl http2;\n    server_name %s %s;\n    client_max_body_size 32m;\n' "$D" "$SD"
+              printf '    ssl_certificate /etc/letsencrypt/live/%s/fullchain.pem;\n' "$D"
+              printf '    ssl_certificate_key /etc/letsencrypt/live/%s/privkey.pem;\n' "$D"
+              printf '    ssl_protocols TLSv1.2 TLSv1.3;\n    ssl_ciphers HIGH:!aNULL:!MD5;\n'
+              printf '    location / {\n        proxy_pass http://127.0.0.1:%s;\n' "$DP"
+              printf '        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n'
+              printf '        proxy_set_header Connection "upgrade";\n        proxy_set_header Host $host;\n'
+              printf '        proxy_set_header X-Real-IP $remote_addr;\n'
+              printf '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n'
+              printf '        proxy_set_header X-Forwarded-Proto $scheme;\n        proxy_read_timeout 86400;\n    }\n}\n'
+            } | sudo tee /etc/nginx/sites-available/palmital > /dev/null
+          else
+            {
+              printf 'server {\n    listen 80;\n    server_name %s %s;\n    client_max_body_size 32m;\n' "$D" "$SD"
+              printf '    location /.well-known/acme-challenge/ { root /var/www/certbot; }\n'
+              printf '    location / {\n        proxy_pass http://127.0.0.1:%s;\n' "$DP"
+              printf '        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n'
+              printf '        proxy_set_header X-Real-IP $remote_addr;\n        proxy_read_timeout 86400;\n    }\n}\n'
+            } | sudo tee /etc/nginx/sites-available/palmital > /dev/null
+          fi
+          sudo ln -sf /etc/nginx/sites-available/palmital /etc/nginx/sites-enabled/palmital
+          sudo nginx -t && sudo systemctl reload nginx
 
-            ln -sf /etc/nginx/sites-available/palmital /etc/nginx/sites-enabled/palmital
-            nginx -t
-            systemctl reload nginx
-          ENDSSH
-
-      - name: Obtain SSL certificate
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
+      - name: Health check
         run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' SSL_EMAIL='${{ env.SSL_EMAIL }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
-
-            mkdir -p /var/www/certbot
-            pkill -f certbot 2>/dev/null || true
-            sleep 2
-
-            if [ ! -f "/etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem" ]; then
-              if ! certbot certonly --webroot \
-                -w /var/www/certbot \
-                -d "$PRIMARY_DOMAIN" \
-                -d "$SECONDARY_DOMAIN" \
-                --email "$SSL_EMAIL" \
-                --agree-tos \
-                --non-interactive; then
-                echo "Warning: certbot failed, keeping HTTP-only config for this deploy" >&2
-              fi
-            else
-              echo "Certificate already exists, skipping renewal"
-            fi
-          ENDSSH
-
-      - name: Configure Nginx (HTTPS)
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
-        run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "DEPLOY_PORT='${{ env.DEPLOY_PORT }}' PRIMARY_DOMAIN='${{ env.PRIMARY_DOMAIN }}' SECONDARY_DOMAIN='${{ env.SECONDARY_DOMAIN }}' CANONICAL_URL='${{ env.CANONICAL_URL }}' bash -s" <<'ENDSSH'
-            set -euo pipefail
-
-            if [ ! -f "/etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem" ]; then
-              echo "SSL cert not found, keeping HTTP-only config"
+          for i in $(seq 1 18); do
+            if curl -fsS --max-time 5 "http://127.0.0.1:${{ env.DEPLOY_PORT }}/health" | grep -q '"status":"ok"'; then
+              echo "OK"
               exit 0
             fi
-
-            {
-              printf '%s\n' 'server {'
-              printf '%s\n' '    listen 80;'
-              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
-              printf '%s\n' '    client_max_body_size 32m;'
-              printf '%s\n' "    return 301 ${CANONICAL_URL}\$request_uri;"
-              printf '%s\n' '}'
-              printf '%s\n' ''
-              printf '%s\n' 'server {'
-              printf '%s\n' '    listen 443 ssl http2;'
-              printf '%s\n' "    server_name ${PRIMARY_DOMAIN} ${SECONDARY_DOMAIN};"
-              printf '%s\n' '    client_max_body_size 32m;'
-              printf '%s\n' ''
-              printf '%s\n' "    ssl_certificate /etc/letsencrypt/live/${PRIMARY_DOMAIN}/fullchain.pem;"
-              printf '%s\n' "    ssl_certificate_key /etc/letsencrypt/live/${PRIMARY_DOMAIN}/privkey.pem;"
-              printf '%s\n' '    ssl_protocols TLSv1.2 TLSv1.3;'
-              printf '%s\n' '    ssl_ciphers HIGH:!aNULL:!MD5;'
-              printf '%s\n' ''
-              printf '%s\n' '    location / {'
-              printf '%s\n' "        proxy_pass http://127.0.0.1:${DEPLOY_PORT};"
-              printf '%s\n' '        proxy_http_version 1.1;'
-              printf '%s\n' '        proxy_set_header Upgrade $http_upgrade;'
-              printf '%s\n' '        proxy_set_header Connection "upgrade";'
-              printf '%s\n' '        proxy_set_header Host $host;'
-              printf '%s\n' '        proxy_set_header X-Real-IP $remote_addr;'
-              printf '%s\n' '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'
-              printf '%s\n' '        proxy_set_header X-Forwarded-Proto $scheme;'
-              printf '%s\n' '        proxy_read_timeout 86400;'
-              printf '%s\n' '    }'
-              printf '%s\n' '}'
-            } > /etc/nginx/sites-available/palmital
-
-            nginx -t
-            systemctl reload nginx
-          ENDSSH
-
-      - name: Post-deploy health check
-        env:
-          SSHPASS: ${{ secrets.VPS_PASSWORD }}
-        run: |
-          sshpass -e ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "APP_ROOT='${{ env.APP_ROOT }}' DEPLOY_PORT='${{ env.DEPLOY_PORT }}' RELEASE='${{ steps.release.outputs.version }}' bash '${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-health-check.sh'"
+            echo "Attempt $i/18..."
+            sleep 5
+          done
+          exit 1
 
       - name: Notify success
-        run: |
-          echo "Deployment ${{ steps.release.outputs.version }} completed successfully"
-          echo "URL: ${{ env.CANONICAL_URL }}"
+        run: echo "Deployment ${{ steps.release.outputs.version }} done — ${{ env.CANONICAL_URL }}"
