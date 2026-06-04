@@ -94,39 +94,6 @@ jobs:
           DEPLOY_PORT="${{ env.DEPLOY_PORT }}" \
           bash "${{ env.APP_ROOT }}/releases/${{ steps.release.outputs.version }}/.github/scripts/remote-deploy.sh"
 
-      - name: Configure Nginx
-        run: |
-          D="${{ env.PRIMARY_DOMAIN }}"
-          SD="${{ env.SECONDARY_DOMAIN }}"
-          CU="${{ env.CANONICAL_URL }}"
-          DP="${{ env.DEPLOY_PORT }}"
-          mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
-          if [ -f "/etc/letsencrypt/live/${D}/fullchain.pem" ]; then
-            {
-              printf 'server {\n    listen 80;\n    server_name %s %s;\n    client_max_body_size 32m;\n    return 301 %s$request_uri;\n}\n' "$D" "$SD" "$CU"
-              printf 'server {\n    listen 443 ssl http2;\n    server_name %s %s;\n    client_max_body_size 32m;\n' "$D" "$SD"
-              printf '    ssl_certificate /etc/letsencrypt/live/%s/fullchain.pem;\n' "$D"
-              printf '    ssl_certificate_key /etc/letsencrypt/live/%s/privkey.pem;\n' "$D"
-              printf '    ssl_protocols TLSv1.2 TLSv1.3;\n    ssl_ciphers HIGH:!aNULL:!MD5;\n'
-              printf '    location / {\n        proxy_pass http://127.0.0.1:%s;\n' "$DP"
-              printf '        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n'
-              printf '        proxy_set_header Connection "upgrade";\n        proxy_set_header Host $host;\n'
-              printf '        proxy_set_header X-Real-IP $remote_addr;\n'
-              printf '        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n'
-              printf '        proxy_set_header X-Forwarded-Proto $scheme;\n        proxy_read_timeout 86400;\n    }\n}\n'
-            } | sudo tee /etc/nginx/sites-available/palmital > /dev/null
-          else
-            {
-              printf 'server {\n    listen 80;\n    server_name %s %s;\n    client_max_body_size 32m;\n' "$D" "$SD"
-              printf '    location /.well-known/acme-challenge/ { root /var/www/certbot; }\n'
-              printf '    location / {\n        proxy_pass http://127.0.0.1:%s;\n' "$DP"
-              printf '        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n'
-              printf '        proxy_set_header X-Real-IP $remote_addr;\n        proxy_read_timeout 86400;\n    }\n}\n'
-            } | sudo tee /etc/nginx/sites-available/palmital > /dev/null
-          fi
-          sudo ln -sf /etc/nginx/sites-available/palmital /etc/nginx/sites-enabled/palmital
-          sudo nginx -t && sudo systemctl reload nginx
-
       - name: Health check
         run: |
           for i in $(seq 1 18); do
