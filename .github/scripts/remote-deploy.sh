@@ -257,7 +257,20 @@ wait_for_container_state "$POSTGRES_CONTAINER" running 24 5
 wait_for_container_health "$POSTGRES_CONTAINER" 36 5
 
 echo "Running migrations..."
-compose run --rm migrator
+# Load env vars to read POSTGRES_USER / POSTGRES_DB
+set -o allexport; source "$ENV_FILE"; set +o allexport 2>/dev/null || true
+# Run seed automatically on first deploy (empty database) or when FORCE_SEED=true
+USER_COUNT=$(docker exec "$POSTGRES_CONTAINER" psql \
+  -U "${POSTGRES_USER:-palmital}" -d "${POSTGRES_DB:-palmital}" \
+  -t -c 'SELECT COUNT(*) FROM "User"' 2>/dev/null | tr -d ' \n' || echo "0")
+
+if [ "${FORCE_SEED:-false}" = "true" ] || [ "${USER_COUNT:-0}" -le 1 ]; then
+  echo "Database is empty or FORCE_SEED=true — running migrations + seed..."
+  compose run --rm -e RUN_SEED=true migrator
+else
+  echo "Database has $USER_COUNT users — running migrations only (skipping seed)..."
+  compose run --rm migrator
+fi
 
 echo "Starting application services..."
 compose rm -sf api web || true
