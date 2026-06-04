@@ -454,7 +454,6 @@ async function seedRestaurants(testPassword: string) {
             city: r.city,
             bio: r.description,
             avatarUrl: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(r.name)}`,
-            target: 'seed',
           },
         },
       },
@@ -605,7 +604,7 @@ async function seedDeliveryOrders(
           paymentMethod: 'PIX_MANUAL',
           createdAt,
           updatedAt: createdAt,
-          acceptedAt: [OrderStatus.ACCEPTED, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.ON_THE_WAY, OrderStatus.DELIVERED].includes(o.status) ? createdAt : null,
+          acceptedAt: o.status !== OrderStatus.PENDING && o.status !== OrderStatus.CANCELLED ? createdAt : null,
           deliveredAt: o.status === OrderStatus.DELIVERED ? new Date(createdAt.getTime() + 45 * 60000) : null,
           items: {
             create: itemsData.map(item => ({
@@ -663,7 +662,6 @@ async function seedNewsArticles(testPassword: string) {
             city: 'Palmital',
             bio: `Jornalista local cobrindo as principais notícias de Palmital e região.`,
             avatarUrl: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(j.name)}`,
-            target: 'seed',
           },
         },
       },
