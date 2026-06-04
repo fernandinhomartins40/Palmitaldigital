@@ -446,7 +446,6 @@ async function seedRestaurants(testPassword: string) {
         passwordHash: hash,
         phone: `+55${r.phone}`,
         role: UserRole.RESTAURANT_OWNER,
-        target: 'seed',
         profile: {
           create: {
             displayName: r.name,
@@ -604,7 +603,7 @@ async function seedDeliveryOrders(
           paymentMethod: 'PIX_MANUAL',
           createdAt,
           updatedAt: createdAt,
-          acceptedAt: o.status !== OrderStatus.PENDING && o.status !== OrderStatus.CANCELLED ? createdAt : null,
+          acceptedAt: o.status !== OrderStatus.PENDING ? createdAt : null,
           deliveredAt: o.status === OrderStatus.DELIVERED ? new Date(createdAt.getTime() + 45 * 60000) : null,
           items: {
             create: itemsData.map(item => ({
@@ -654,7 +653,6 @@ async function seedNewsArticles(testPassword: string) {
         passwordHash: hash,
         phone: `+5518997${Math.floor(300000 + Math.random() * 99999)}`,
         role: UserRole.JOURNALIST,
-        target: 'seed',
         profile: {
           create: {
             displayName: j.name,
