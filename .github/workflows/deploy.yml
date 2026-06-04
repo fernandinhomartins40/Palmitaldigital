@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  WEBHOOK_URL: http://72.60.10.108:8109/deploy
+  WEBHOOK_URL: https://www.palmitaldigital.com.br/webhook-deploy
   HEALTH_URL: https://www.palmitaldigital.com.br/health
 
 jobs:
