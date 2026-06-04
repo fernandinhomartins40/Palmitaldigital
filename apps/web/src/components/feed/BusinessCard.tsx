@@ -11,8 +11,8 @@ export function BusinessCard({ post }: { post: any }) {
   return (
     <article className="glass shape-signature relative overflow-hidden border-l-4 border-cobalt">
 
-      {/* Header compacto */}
-      <div className="flex items-center gap-3 px-4 pt-3 pb-0">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 pt-4 pb-0">
         <Link to={`/companies/${company?.slug}`} className="shrink-0">
           <Avatar
             src={company?.logoUrl}
@@ -46,7 +46,7 @@ export function BusinessCard({ post }: { post: any }) {
 
       {/* Texto */}
       {post.content && (
-        <p className="mt-2.5 px-4 whitespace-pre-wrap text-[15px] leading-6 text-ink">
+        <p className="mt-3 px-5 whitespace-pre-wrap text-[15px] leading-6 text-ink">
           {post.content}
         </p>
       )}
@@ -58,12 +58,12 @@ export function BusinessCard({ post }: { post: any }) {
         </div>
       )}
 
-      {/* Footer: engajamento + link para a loja */}
-      <div className="flex items-center justify-between px-4 pb-1">
+      {/* Engajamento + link loja */}
+      <div className="flex items-center justify-between px-5 pb-1 pt-0">
         <PostEngagement post={post} accent="cobalt" />
         <Link
           to={`/companies/${company?.slug}`}
-          className="shrink-0 flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-mute hover:text-cobalt transition-colors ml-2"
+          className="shrink-0 flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-mute hover:text-cobalt transition-colors ml-3"
         >
           <ExternalLink size={11} />
           Ver loja
