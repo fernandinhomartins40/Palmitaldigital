@@ -124,7 +124,11 @@
       "Bash(git -C \"c:\\\\Projetos Cursor\\\\Palmitaldigital\" add \"apps/web/src/pages/news/NewsPortalPage.tsx\" \"apps/web/src/pages/news/ArticlePage.tsx\" \"apps/web/src/services/newsApi.ts\")",
       "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\api\\\\src\\\\modules\" -Directory | ForEach-Object { $_.Name })",
       "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\api\\\\src\\\\modules\\\\delivery\" | ForEach-Object { $_.Name })",
-      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\web\\\\src\\\\pages\" -Directory | ForEach-Object { $_.Name })"
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\web\\\\src\\\\pages\" -Directory | ForEach-Object { $_.Name })",
+      "Bash(git -C \"c:/Projetos Cursor/Palmitaldigital\" status --short)",
+      "Bash(git -C \"c:/Projetos Cursor/Palmitaldigital\" add .claude/settings.local.json)",
+      "Bash(git -C 'c:/Projetos Cursor/Palmitaldigital' commit -m ' *)",
+      "Bash(git -C \"c:/Projetos Cursor/Palmitaldigital\" push origin main)"
     ],
     "additionalDirectories": [
       "C:\\Projetos Cursor\\Palmitaldigital\\apps\\api\\prisma\\migrations"
