@@ -120,7 +120,11 @@
       "Bash(git -C \"c:\\\\Projetos Cursor\\\\Palmitaldigital\" commit -m \"fix\\(news\\): corrigir endpoints /news/articles -> /news e /news/articles/:slug -> /news/:slug\")",
       "Bash(powershell -Command \"Get-ChildItem -Path 'c:\\\\Projetos Cursor\\\\Palmitaldigital' -Filter 'schema.prisma' -Recurse\")",
       "Bash(powershell -Command \"Get-Content 'c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\api\\\\prisma\\\\schema.prisma' | Select-String -Pattern '^model Article' -Context 0, 30\")",
-      "Bash(git -C \"c:\\\\Projetos Cursor\\\\Palmitaldigital\" add -A)"
+      "Bash(git -C \"c:\\\\Projetos Cursor\\\\Palmitaldigital\" add -A)",
+      "Bash(git -C \"c:\\\\Projetos Cursor\\\\Palmitaldigital\" add \"apps/web/src/pages/news/NewsPortalPage.tsx\" \"apps/web/src/pages/news/ArticlePage.tsx\" \"apps/web/src/services/newsApi.ts\")",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\api\\\\src\\\\modules\" -Directory | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\api\\\\src\\\\modules\\\\delivery\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Projetos Cursor\\\\Palmitaldigital\\\\apps\\\\web\\\\src\\\\pages\" -Directory | ForEach-Object { $_.Name })"
     ],
     "additionalDirectories": [
       "C:\\Projetos Cursor\\Palmitaldigital\\apps\\api\\prisma\\migrations"

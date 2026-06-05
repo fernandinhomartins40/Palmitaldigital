@@ -1,5 +1,5 @@
 import { Avatar } from '@palmital/ui';
-import { ArrowUpRight, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { desktopNavItems, isNavItemActive } from './navigation';
@@ -100,6 +100,18 @@ export function DesktopSidebar() {
           </div>
         </div>
       </Link>
+
+      {/* Link admin — só para ADMIN */}
+      {user?.role === 'ADMIN' && (
+        <Link
+          to="/admin"
+          className="flex items-center gap-3 rounded-2xl border border-cobalt/30 bg-cobalt/5 px-4 py-3 text-sm font-semibold text-cobalt hover:bg-cobalt/10 transition-colors"
+        >
+          <ShieldCheck size={16} />
+          Painel Admin
+          <ArrowUpRight size={14} className="ml-auto" />
+        </Link>
+      )}
     </div>
   );
 }

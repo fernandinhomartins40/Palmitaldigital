@@ -50,6 +50,7 @@ const ArticlePage = lazy(() => import('./pages/news/ArticlePage').then((m) => ({
 const WriteArticlePage = lazy(() => import('./pages/news/WriteArticlePage').then((m) => ({ default: m.WriteArticlePage })));
 const JournalistApplyPage = lazy(() => import('./pages/news/JournalistApplyPage').then((m) => ({ default: m.JournalistApplyPage })));
 const JournalistPortalPage = lazy(() => import('./pages/news/JournalistPortalPage').then((m) => ({ default: m.JournalistPortalPage })));
+const AdminPanel = lazy(() => import('./pages/admin/AdminPanel').then((m) => ({ default: m.AdminPanel })));
 
 const Loader = () => (
   <div className="flex h-screen items-center justify-center">
@@ -76,6 +77,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 }
 
 export const router = createBrowserRouter([
+  { path: '/admin', element: <Suspense fallback={<Loader />}><AdminPanel /></Suspense> },
   { path: '/', element: <PublicRoute><LandingPage /></PublicRoute> },
   { path: '/landing', element: <Navigate to="/" replace /> },
   { path: '/login', element: <PublicRoute><LoginPage /></PublicRoute> },

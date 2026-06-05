@@ -16,6 +16,7 @@ import { HealthModule } from './modules/health/health.module';
 import { RidesModule } from './modules/rides/rides.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { NewsModule } from './modules/news/news.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 
@@ -37,6 +38,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
     RidesModule,
     DeliveryModule,
     NewsModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
