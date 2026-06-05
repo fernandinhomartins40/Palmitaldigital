@@ -341,6 +341,14 @@ export function LandingPage() {
             <a href="#" className="hover:text-ink">Privacidade</a>
             <a href="#" className="hover:text-ink">Termos</a>
             <a href="#" className="hover:text-ink">Suporte</a>
+            <a
+              href="http://localhost:3010"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-ink opacity-40 hover:opacity-100 transition-opacity"
+            >
+              Admin
+            </a>
           </div>
         </div>
       </footer>
