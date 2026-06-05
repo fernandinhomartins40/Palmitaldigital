@@ -1,0 +1,14 @@
+[Unit]
+Description=Palmital Deploy Webhook
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/palmital/webhook.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/opt/palmital/webhook.log
+StandardError=append:/opt/palmital/webhook.log
+
+[Install]
+WantedBy=multi-user.target

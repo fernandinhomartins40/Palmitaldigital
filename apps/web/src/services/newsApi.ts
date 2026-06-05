@@ -48,6 +48,12 @@ export const newsApi = {
   listPublic: (params?: { categoryId?: string; q?: string; page?: number }) =>
     api.get<Article[]>('/news', { params }),
 
+  listFeedArticles: (limit = 6) =>
+    api.get<Article[]>('/news', { params: { limit } }),
+
+  listByAuthor: (authorId: string) =>
+    api.get<Article[]>('/news', { params: { authorId } }),
+
   getCategories: () =>
     api.get<NewsCategory[]>('/news/categories'),
 

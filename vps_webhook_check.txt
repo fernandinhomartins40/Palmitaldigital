@@ -1,0 +1,13 @@
+=== git disponivel ===
+/usr/bin/git
+git version 2.34.1
+
+=== repo palmital na VPS ===
+sem repo
+
+=== porta 8109 (ja liberada no ufw) ===
+nada na 8109
+
+=== processos node na porta 8109 ===
+LISTEN 0      4096                                       0.0.0.0:3090       0.0.0.0:*    users:(("docker-proxy",pid=5917,fd=7))                                                                                                             
+LISTEN 0      4096                                          [::]:3090          [::]:*    users:(("docker-proxy",pid=5923,fd=7))

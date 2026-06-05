@@ -1,0 +1,52 @@
+=== fail2ban-client status sshd ===
+Status for the jail: sshd
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	1017
+|  `- Journal matches:	_SYSTEMD_UNIT=sshd.service + _COMM=sshd
+`- Actions
+   |- Currently banned:	0
+   |- Total banned:	91
+   `- Banned IP list:
+
+=== fail2ban jails ===
+Status
+|- Number of jail:	1
+`- Jail list:	sshd
+
+=== IPs banidos (f2b-sshd chain) ===
+Chain f2b-sshd (1 references)
+num  target     prot opt source               destination         
+1    RETURN     all  --  0.0.0.0/0            0.0.0.0/0
+
+=== Checar se IPs do GitHub estao banidos ===
+|- Currently banned:	0
+   |- Total banned:	91
+   `- Banned IP list:
+
+=== fail2ban jail.local / jail.conf ===
+# [sshd]
+# enabled = true
+#
+# See jail.conf(5) man page for more information
+
+
+
+# Comments: use '#' for comment lines and ';' (following a space) for inline comments
+
+
+[INCLUDES]
+
+#before = paths-distro.conf
+before = paths-debian.conf
+
+# The DEFAULT allows a global definition of the options. They can be overridden
+# in each jail afterwards.
+
+[DEFAULT]
+
+#
+--
+[sshd]
+
+# To use more aggressive sshd modes set filter parameter "mode" in jail.local:

@@ -1,0 +1,54 @@
+=== TOP 20 PROCESSOS POR MEMORIA (RSS) ===
+
+[STDERR] awk: cmd. line:1: NR<=21{printf "%-10s %-8s %-8s %s
+awk: cmd. line:1:               ^ unterminated string
+awk: cmd. line:1: NR<=21{printf "%-10s %-8s %-8s %s
+awk: cmd. line:1:               ^ syntax error
+
+=== MEMORIA POR CONTAINER DOCKER (top 20) ===
+56184f7-20260531143115-postgres-1    21.16MiB / 15.61GiB   0.13%
+7914c1c-20260509111806-postgres-1    9.539MiB / 15.61GiB   0.06%
+289cb5b-20260509114459-postgres-1    8.371MiB / 15.61GiB   0.05%
+25f0505-20260509115257-postgres-1    8.988MiB / 15.61GiB   0.06%
+8c1dc40-20260509113805-postgres-1    8.41MiB / 15.61GiB    0.05%
+8c1dc40-20260509113805-api-1         7.203MiB / 15.61GiB   0.05%
+8c1dc40-20260509113600-postgres-1    8.527MiB / 15.61GiB   0.05%
+8c1dc40-20260509113600-api-1         7.453MiB / 15.61GiB   0.05%
+vox_web                              22.09MiB / 15.61GiB   0.14%
+vox_nginx                            3.699MiB / 15.61GiB   0.02%
+vox_db                               14.78MiB / 15.61GiB   0.09%
+vox_api                              33.07MiB / 15.61GiB   0.21%
+vigiaescolar-web-1                   26.56MiB / 15.61GiB   0.17%
+vigiaescolar-retention-worker-1      17.66MiB / 15.61GiB   0.11%
+vigiaescolar-notification-worker-1   22.88MiB / 15.61GiB   0.14%
+vigiaescolar-nginx-1                 4.934MiB / 15.61GiB   0.03%
+vigiaescolar-mediamtx-1              13.11MiB / 15.61GiB   0.08%
+vigiaescolar-face-server-1           43.27MiB / 15.61GiB   0.27%
+vigiaescolar-face-db-1               19.81MiB / 15.61GiB   0.12%
+vigiaescolar-db-1                    44.5MiB / 15.61GiB    0.28%
+vigiaescolar-camera-gateway-1        29.76MiB / 15.61GiB   0.19%
+vigiaescolar-api-1                   47.41MiB / 15.61GiB   0.30%
+vigiaescolar-absence-worker-1        34.98MiB / 15.61GiB   0.22%
+ultrazend-smtp                       54.5MiB / 15.61GiB    0.34%
+ultrazend-postgres                   49.61MiB / 15.61GiB   0.31%
+
+=== TOTAL POR PROJETO (agrupado) ===
+
+[STDERR] awk: cmd. line:8:   END { for (k in mem) printf "%-30s %.0f MiB
+awk: cmd. line:8:                               ^ unterminated string
+awk: cmd. line:8:   END { for (k in mem) printf "%-30s %.0f MiB
+awk: cmd. line:8:                               ^ syntax error
+
+=== SWAP USAGE ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       244Mi       397Mi       3.2Gi       2.6Gi
+Swap:          4.0Gi       4.0Gi       2.0Mi
+NAME      TYPE SIZE USED PRIO
+/swapfile file   4G   4G   -2
+
+=== PROCESSOS FORA DO DOCKER (top RAM) ===
+
+[STDERR] awk: cmd. line:1: NR>1 && $4>0.5 {printf "%-10s %5s%% %s
+awk: cmd. line:1:                        ^ unterminated string
+awk: cmd. line:1: NR>1 && $4>0.5 {printf "%-10s %5s%% %s
+awk: cmd. line:1:                        ^ syntax error

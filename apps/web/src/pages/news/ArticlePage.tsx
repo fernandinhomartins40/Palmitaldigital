@@ -165,18 +165,18 @@ export function ArticlePage() {
         )}
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to={`/news/portal/${article.author.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-9 h-9 rounded-full bg-magenta/20 flex items-center justify-center text-sm font-bold text-magenta">
               {article.author.profile.displayName[0].toUpperCase()}
             </div>
             <div>
-              <p className="text-sm font-medium text-ink">{article.author.profile.displayName}</p>
+              <p className="text-sm font-medium text-ink hover:text-magenta transition-colors">{article.author.profile.displayName}</p>
               <p className="text-xs text-mute flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {formatDate(article.publishedAt || article.createdAt)}
               </p>
             </div>
-          </div>
+          </Link>
           <button onClick={share} className="btn-glass flex items-center gap-2 text-sm">
             <Share2 className="w-4 h-4" />
             Compartilhar

@@ -1,0 +1,123 @@
+=== journalctl sshd nas ultimas 3h ===
+-- No entries --
+
+=== conntrack / drops recentes ===
+[3524275.955590] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=165.73.139.247 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=38 ID=12067 PROTO=TCP SPT=40756 DPT=23 WINDOW=57668 RES=0x00 SYN URGP=0 
+[3524314.816511] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=71.6.233.162 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=234 ID=54321 PROTO=TCP SPT=179 DPT=179 WINDOW=65535 RES=0x00 SYN URGP=0 
+[3524386.338413] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=45.55.83.120 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=244 ID=33977 PROTO=TCP SPT=46940 DPT=8091 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524534.627784] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=147.185.133.136 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=63741 PROTO=TCP SPT=49779 DPT=35518 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524623.873941] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:86:dd SRC=2a06:4880:a000:0000:0000:0000:0000:00cd DST=2a02:4780:0066:e31c:0000:0000:0000:0001 LEN=64 TC=0 HOPLIMIT=242 FLOWLBL=792021 PROTO=TCP SPT=43389 DPT=4444 WINDOW=14600 RES=0x00 SYN URGP=0 
+[3524670.129245] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=167.94.145.18 DST=72.60.10.108 LEN=60 TOS=0x00 PREC=0x00 TTL=50 ID=44962 PROTO=TCP SPT=13792 DPT=623 WINDOW=42340 RES=0x00 SYN URGP=0 
+[3524747.691645] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=147.185.133.203 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=17337 PROTO=TCP SPT=55632 DPT=53978 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524756.797997] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=35.203.211.243 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=60991 PROTO=TCP SPT=53691 DPT=30526 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524765.844769] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=71.6.134.229 DST=72.60.10.108 LEN=52 TOS=0x00 PREC=0x00 TTL=44 ID=61736 PROTO=TCP SPT=54691 DPT=9922 WINDOW=65535 RES=0x00 SYN URGP=0 
+[3524800.806629] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=45.55.83.120 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=244 ID=37602 PROTO=TCP SPT=46940 DPT=4050 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524829.897019] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=146.190.77.70 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=244 ID=47989 PROTO=TCP SPT=53298 DPT=32151 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3524891.276368] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.150.103 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=34797 PROTO=TCP SPT=52822 DPT=7750 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3525136.519709] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=177.192.163.11 DST=72.60.10.108 LEN=61 TOS=0x00 PREC=0x00 TTL=51 ID=59960 DF PROTO=UDP SPT=59880 DPT=43490 LEN=41 
+[3525179.242781] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=194.238.57.127 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x20 TTL=238 ID=32713 PROTO=TCP SPT=61234 DPT=5951 WINDOW=1025 RES=0x00 SYN URGP=0 
+[3525207.847587] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:86:dd SRC=2a06:4880:4000:0000:0000:0000:0000:004c DST=2a02:4780:0066:e31c:0000:0000:0000:0001 LEN=61 TC=0 HOPLIMIT=51 FLOWLBL=45105 PROTO=UDP SPT=20053 DPT=49894 LEN=21 
+[3525320.625953] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=112.161.53.247 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=237 ID=16187 PROTO=TCP SPT=56887 DPT=557 WINDOW=1300 RES=0x00 SYN URGP=0 
+[3525369.799870] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.150.30 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=4362 PROTO=TCP SPT=54932 DPT=47998 WINDOW=1024 RES=0x00 SYN URGP=0 
+[3525373.954979] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=103.152.199.218 DST=72.60.10.108 LEN=52 TOS=0x00 PREC=0x00 TTL=112 ID=61853 DF PROTO=TCP SPT=39066 DPT=1433 WINDOW=64240 RES=0x00 SYN URGP=0 
+[3525374.941503] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=103.152.199.218 DST=72.60.10.108 LEN=52 TOS=0x00 PREC=0x00 TTL=112 ID=61854 DF PROTO=TCP SPT=39066 DPT=1433 WINDOW=64240 RES=0x00 SYN URGP=0 
+[3525433.007522] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=194.238.57.127 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x20 TTL=237 ID=51973 PROTO=TCP SPT=61234 DPT=5925 WINDOW=1025 RES=0x00 SYN URGP=0
+
+=== sshd_config MaxStartups/MaxSessions ===
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+#MaxAuthTries 6
+#MaxSessions 10
+#MaxStartups 10:30:100
+
+=== vmstat (pressao de memoria) ===
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 1  0 4194300 248148 195808 3185296    0    1   158   195    1    3 22 13 46  0 19
+ 5  0 4194300 237732 195808 3185480    0    0     0   292 5776 12540 21 16 32  0 31
+ 9  0 4194300 244272 195808 3185472    0    0     0   152 5473 11073 19 12 38  0 31
+
+=== OOM killer recente ===
+
+
+=== remote-deploy.sh ===
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${APP_ROOT:?APP_ROOT is required}"
+: "${RELEASE:?RELEASE is required}"
+: "${DEPLOY_PORT:?DEPLOY_PORT is required}"
+
+RELEASE_DIR="$APP_ROOT/releases/$RELEASE"
+CURRENT_DIR="$APP_ROOT/current"
+ROOT_ENV_FILE="$APP_ROOT/.env"
+ENV_FILE="$RELEASE_DIR/.env"
+COMPOSE_FILE="$RELEASE_DIR/docker-compose.production.yml"
+LOCK_FILE="$APP_ROOT/deploy.lock"
+STATE_DIR="$APP_ROOT/.deploy-state"
+POSTGRES_CONTAINER="palmital-postgres-1"
+API_CONTAINER="palmital-api-1"
+WEB_CONTAINER="palmital-web-1"
+DEPLOY_SUCCEEDED=0
+PREVIOUS_RELEASE_DIR="$(readlink -f "$CURRENT_DIR" 2>/dev/null || true)"
+
+mkdir -p "$STATE_DIR"
+exec 9>"$LOCK_FILE"
+flock 9
+
+echo "$RELEASE" > "$STATE_DIR/in-progress"
+
+compose_release() {
+  local release_dir="$1"
+  local release_env="$release_dir/.env"
+  local release_compose="$release_dir/docker-compose.production.yml"
+  docker compose -p palmital -f "$release_compose" --env-file "$release_env" "${@:2}"
+}
+
+compose() {
+  compose_release "$RELEASE_DIR" "$@"
+}
+
+container_state() {
+  docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || echo "not_found"
+}
+
+container_health() {
+  docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no_healthcheck{{end}}' "$1" 2>/dev/null || echo "not_found"
+}
+
+container_image() {
+  docker inspect --format '{{.Config.Image}}' "$1" 2>/dev/null || echo ""
+}
+
+dump_service_logs() {
+  local container_name="$1"
+  echo "--- logs: $container_name ---" >&2
+  docker logs --tail=100 "$container_name" >&2 || true
+}
+
+sync_release_env() {
+  cp "$ROOT_ENV_FILE" "$ENV_FILE"
+  if grep -q '^RELEASE_VERSION=' "$ENV_FILE"; then
+    sed -i "s/^RELEASE_VERSION=.*/RELEASE_VERSION=$RELEASE/" "$ENV_FILE"
+  else
+    printf 'RELEASE_VERSION=%s\n' "$RELEASE" >> "$ENV_FILE"
+  fi
+  chmod 600 "$ENV_FILE"
+}
+
+wait_for_container_state() {
+  local container_name="$1"
+  local desired_state="$2"
+  local attempts="$3"
+  local delay_seconds="$4"
+  local i
+  local state
+
+  for i in $(seq 1 "$attempts"); do
+    state="$(container_state "$container_name")"
+    echo "  $container_name[$i/$attempts]: state=$state"
+    if [ "$state" = "$desired_state" ]; then
+      return 0
+    fi
+    if [ "$state" = "exited" ] || [ "$state" = "dead" ]; then

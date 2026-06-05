@@ -1,0 +1,72 @@
+=== sshd_config (nao comentado) ===
+Include /etc/ssh/sshd_config.d/*.conf
+KbdInteractiveAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*
+Subsystem	sftp	/usr/lib/openssh/sftp-server
+PermitRootLogin yes
+
+=== sshd allow/deny rules ===
+#Match User anoncvs
+
+=== /etc/hosts.deny ===
+vazio
+
+=== /etc/hosts.allow ===
+vazio
+
+=== journald storage ===
+default
+
+=== auth.log ultimas entradas SSH ===
+Jun  2 21:38:33 mail sshd[1506567]: Received disconnect from 20.109.87.114 port 42014:11: disconnected by user
+Jun  2 21:38:33 mail sshd[1506567]: Disconnected from user root 20.109.87.114 port 42014
+Jun  2 21:38:33 mail sshd[1506567]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:49:40 mail sshd[1616718]: error: kex_exchange_identification: read: Connection reset by peer
+Jun  2 21:49:40 mail sshd[1616718]: Connection reset by 151.61.231.131 port 53182
+Jun  3 01:18:21 mail sshd[3691193]: error: kex_exchange_identification: Connection closed by remote host
+Jun  3 01:18:21 mail sshd[3691193]: Connection closed by 2607:8500:faca:de::117 port 57566
+Jun  3 01:45:52 mail sshd[3977654]: Accepted password for root from 45.228.120.239 port 43269 ssh2
+Jun  3 01:45:52 mail sshd[3977654]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:45:56 mail sshd[3977654]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:46:18 mail sshd[3981720]: Accepted password for root from 45.228.120.239 port 43508 ssh2
+Jun  3 01:46:18 mail sshd[3981720]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:46:21 mail sshd[3981720]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:46:50 mail sshd[3987474]: Accepted password for root from 45.228.120.239 port 43822 ssh2
+Jun  3 01:46:50 mail sshd[3987474]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:46:51 mail sshd[3987474]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:47:17 mail sshd[3992026]: Accepted password for root from 45.228.120.239 port 44198 ssh2
+Jun  3 01:47:17 mail sshd[3992026]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:47:21 mail sshd[3992026]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:47:56 mail sshd[3999152]: Accepted password for root from 45.228.120.239 port 44592 ssh2
+Jun  3 01:47:56 mail sshd[3999152]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:48:08 mail sshd[3999152]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:48:33 mail sshd[4005113]: Accepted password for root from 45.228.120.239 port 44999 ssh2
+Jun  3 01:48:33 mail sshd[4005113]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:52:19 mail sshd[4005113]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:00:19 mail sshd[4124416]: Accepted password for root from 45.228.120.239 port 43314 ssh2
+Jun  3 02:00:19 mail sshd[4124416]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:00:24 mail sshd[4124416]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:01:06 mail sshd[4131051]: Accepted password for root from 45.228.120.239 port 43297 ssh2
+Jun  3 02:01:06 mail sshd[4131051]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+
+=== ip6tables porta 22 ===
+Chain INPUT (policy DROP)
+target     prot opt source               destination         
+ufw6-before-logging-input  all      ::/0                 ::/0                
+ufw6-before-input  all      ::/0                 ::/0                
+ufw6-after-input  all      ::/0                 ::/0                
+ufw6-after-logging-input  all      ::/0                 ::/0                
+ufw6-reject-input  all      ::/0                 ::/0                
+ufw6-track-input  all      ::/0                 ::/0
+
+=== network interfaces ===
+inet 72.60.10.108/24 brd 72.60.10.255 scope global eth0
+    inet6 2a02:4780:66:e31c::1/48 scope global 
+    inet6 fe80::20e8:d4ff:feb3:9dc8/64 scope link
+
+=== nf_conntrack (tabela de conexoes) ===
+79
+262144

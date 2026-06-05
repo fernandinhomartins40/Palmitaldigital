@@ -1,0 +1,48 @@
+=== memoria ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       279Mi       397Mi       3.2Gi       2.6Gi
+Swap:          4.0Gi       4.0Gi       0.0Ki
+ 03:37:32 up 41 days, 21:07,  0 users,  load average: 2.58, 3.19, 3.62
+
+=== nf_conntrack (conexoes ativas / limite) ===
+136
+262144
+
+=== ss SYN_RECV (conexoes pendentes na porta 22) ===
+1
+
+=== sshd MaxStartups atual ===
+maxauthtries 6
+maxsessions 10
+maxstartups 10:30:100
+persourcemaxstartups none
+
+=== auth.log ultimas conexoes ===
+Jun  4 02:35:01 mail CRON[2056207]: pam_unix(cron:session): session closed for user root
+Jun  4 02:45:01 mail CRON[2155049]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 02:45:01 mail CRON[2155049]: pam_unix(cron:session): session closed for user root
+Jun  4 02:55:01 mail CRON[2254778]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 02:55:01 mail CRON[2254778]: pam_unix(cron:session): session closed for user root
+Jun  4 03:05:01 mail CRON[2351403]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:05:01 mail CRON[2351403]: pam_unix(cron:session): session closed for user root
+Jun  4 03:10:01 mail CRON[2401225]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:10:01 mail CRON[2401225]: pam_unix(cron:session): session closed for user root
+Jun  4 03:15:01 mail CRON[2451414]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:15:01 mail CRON[2451414]: pam_unix(cron:session): session closed for user root
+Jun  4 03:17:01 mail CRON[2471189]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:17:01 mail CRON[2471189]: pam_unix(cron:session): session closed for user root
+Jun  4 03:25:01 mail CRON[2552823]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:25:01 mail CRON[2552823]: pam_unix(cron:session): session closed for user root
+Jun  4 03:35:01 mail CRON[2654604]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:35:01 mail CRON[2654604]: pam_unix(cron:session): session closed for user root
+Jun  4 03:37:31 mail sshd[2680210]: Accepted password for root from 45.228.120.239 port 45076 ssh2
+Jun  4 03:37:31 mail sshd[2680210]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  4 03:37:31 mail systemd-logind[778]: New session 9727 of user root.
+
+=== docker build rodando agora ===
+169
+
+=== load e cpu steal ===
+16  0 4194120 269720 177032 3221804    0    1   155   193    2    0 22 13 46  0 19
+ 3  0 4194120 271536 177032 3221848    0    0     0   192 5132 24199 24 16 50  0 10
+ 4  0 4194120 251760 177180 3225172    0    0  3600   340 4478 14445 33 14 35  1 17

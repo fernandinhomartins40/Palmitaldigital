@@ -51,7 +51,13 @@ function ArticleCard({ article, featured = false }: { article: Article; featured
           <p className="text-mute text-sm line-clamp-2 mb-3">{article.excerpt}</p>
         )}
         <div className="flex items-center gap-3 text-xs text-mute">
-          <span className="font-medium">{article.author.profile.displayName}</span>
+          <Link
+            to={`/news/portal/${article.author.id}`}
+            className="font-medium hover:text-magenta transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {article.author.profile.displayName}
+          </Link>
           <span className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
             {formatDate(article.publishedAt || article.createdAt)}

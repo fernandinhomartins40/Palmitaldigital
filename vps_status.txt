@@ -1,0 +1,50 @@
+=== memoria agora ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       579Mi       396Mi       2.9Gi       2.6Gi
+Swap:          4.0Gi       4.0Gi       0.0Ki
+
+=== disco agora ===
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       194G  128G   66G  67% /
+
+=== docker system df ===
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          70        70        45.77GB   5.721GB (12%)
+Containers      105       105       2.168GB   0B (0%)
+Local Volumes   81        72        33.19GB   20.5GB (61%)
+Build Cache     0         0         0B        0B
+
+=== journalctl sshd ultimas conexoes ===
+-- No entries --
+
+=== ultima tentativa de conexao GitHub Actions ===
+root     pts/0        201.131.187.125  Thu Apr 23 12:33 - 12:34  (00:00)
+root     pts/0        201.131.187.125  Thu Apr 23 12:32 - 12:33  (00:00)
+root     pts/0        201.131.187.125  Thu Apr 23 12:31 - 12:31  (00:00)
+root     pts/0        201.131.187.125  Thu Apr 23 12:30 - 12:30  (00:00)
+root     pts/0        201.131.187.125  Thu Apr 23 12:30 - 12:30  (00:00)
+reboot   system boot  5.15.0-176-gener Thu Apr 23 06:30   still running
+root     pts/0        45.228.120.213   Sat Apr  4 01:19 - 01:19  (00:00)
+root     pts/0        45.228.120.213   Sat Apr  4 01:19 - 01:19  (00:00)
+root     pts/0        45.228.120.213   Sat Apr  4 01:19 - 01:19  (00:00)
+root     pts/0        45.228.120.213   Sat Apr  4 01:19 - 01:19  (00:00)
+reboot   system boot  5.15.0-173-gener Fri Apr  3 06:32   still running
+root     pts/0        45.228.120.213   Thu Apr  2 14:54 - 14:54  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:54 - 14:54  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:54 - 14:54  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:54 - 14:54  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:54 - 14:54  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:53 - 14:53  (00:00)
+root     pts/0        45.228.120.213   Thu Apr  2 14:53 - 14:53  (00:00)
+root     pts/0        45.228.120.216   Tue Feb  3 16:04 - 16:10  (00:05)
+root     pts/0        45.228.120.216   Tue Feb  3 15:57 - 16:00  (00:03)
+
+=== releases existentes ===
+total 16
+drwxr-xr-x 7 1001 1001 4096 Jun  2 21:35 01520cd-20260602213523
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:50 c4b7a2d-20260602195001
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:33 d45080b-20260602193257
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:21 83347d4-20260602192107
+
+=== current ===
+/opt/palmital/releases/01520cd-20260602213523

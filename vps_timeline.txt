@@ -1,0 +1,540 @@
+=== auth.log Jun 2 completo (SSH connections) ===
+Jun  2 00:08:09 mail sshd[1954223]: Accepted password for root from 45.228.120.239 port 45061 ssh2
+Jun  2 00:08:09 mail sshd[1954223]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:08:10 mail sshd[1954223]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:08:39 mail sshd[1959151]: Accepted password for root from 45.228.120.239 port 41416 ssh2
+Jun  2 00:08:39 mail sshd[1959151]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:08:41 mail sshd[1959151]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:09:01 mail sshd[1962656]: Accepted password for root from 45.228.120.239 port 41678 ssh2
+Jun  2 00:09:01 mail sshd[1962656]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:09:02 mail sshd[1962656]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:14:28 mail sshd[1998856]: Invalid user kubernetes from 42.193.185.122 port 42534
+Jun  2 00:14:31 mail sshd[1998856]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 00:14:31 mail sshd[1998856]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122 
+Jun  2 00:14:33 mail sshd[1998856]: Failed password for invalid user kubernetes from 42.193.185.122 port 42534 ssh2
+Jun  2 00:15:41 mail sshd[2023135]: Accepted password for root from 172.214.155.113 port 26632 ssh2
+Jun  2 00:15:41 mail sshd[2023135]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:15:42 mail sshd[2023135]: Received disconnect from 172.214.155.113 port 26632:11: disconnected by user
+Jun  2 00:15:42 mail sshd[2023135]: Disconnected from user root 172.214.155.113 port 26632
+Jun  2 00:15:42 mail sshd[2023135]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:15:43 mail sshd[2023435]: Accepted password for root from 45.228.120.239 port 43050 ssh2
+Jun  2 00:15:43 mail sshd[2023435]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:15:43 mail sshd[2023401]: Accepted password for root from 172.214.155.113 port 26633 ssh2
+Jun  2 00:15:43 mail sshd[2023401]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:15:43 mail sshd[2023435]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:15:44 mail sshd[2023401]: Received disconnect from 172.214.155.113 port 26633:11: disconnected by user
+Jun  2 00:15:44 mail sshd[2023401]: Disconnected from user root 172.214.155.113 port 26633
+Jun  2 00:15:44 mail sshd[2023401]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:15:45 mail sshd[2023814]: Accepted password for root from 172.214.155.113 port 26634 ssh2
+Jun  2 00:15:45 mail sshd[2023814]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:15:54 mail sshd[2025236]: Accepted password for root from 45.228.120.239 port 43193 ssh2
+Jun  2 00:15:54 mail sshd[2025236]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:15:59 mail sshd[2023814]: Received disconnect from 172.214.155.113 port 26634:11: disconnected by user
+Jun  2 00:15:59 mail sshd[2023814]: Disconnected from user root 172.214.155.113 port 26634
+Jun  2 00:15:59 mail sshd[2023814]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:16:00 mail sshd[2026103]: Accepted password for root from 172.214.155.113 port 26633 ssh2
+Jun  2 00:16:00 mail sshd[2026103]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:16:02 mail sshd[2026103]: Received disconnect from 172.214.155.113 port 26633:11: disconnected by user
+Jun  2 00:16:02 mail sshd[2026103]: Disconnected from user root 172.214.155.113 port 26633
+Jun  2 00:16:02 mail sshd[2026103]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:16:03 mail sshd[2026628]: Accepted password for root from 172.214.155.113 port 26635 ssh2
+Jun  2 00:16:03 mail sshd[2026628]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:16:49 mail sshd[2023400]: Invalid user leonardo from 42.193.185.122 port 56488
+Jun  2 00:17:05 mail sshd[2034038]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122  user=root
+Jun  2 00:17:07 mail sshd[2034038]: Failed password for root from 42.193.185.122 port 50012 ssh2
+Jun  2 00:17:10 mail sshd[2034038]: Connection closed by authenticating user root 42.193.185.122 port 50012 [preauth]
+Jun  2 00:19:56 mail sshd[2026628]: Received disconnect from 172.214.155.113 port 26635:11: disconnected by user
+Jun  2 00:19:56 mail sshd[2026628]: Disconnected from user root 172.214.155.113 port 26635
+Jun  2 00:19:56 mail sshd[2026628]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:19:57 mail sshd[2060321]: Accepted password for root from 172.214.155.113 port 26634 ssh2
+Jun  2 00:19:57 mail sshd[2060321]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:19:58 mail sshd[2060321]: Received disconnect from 172.214.155.113 port 26634:11: disconnected by user
+Jun  2 00:19:58 mail sshd[2060321]: Disconnected from user root 172.214.155.113 port 26634
+Jun  2 00:19:58 mail sshd[2060321]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:00 mail sshd[2060781]: Accepted password for root from 172.214.155.113 port 26636 ssh2
+Jun  2 00:20:00 mail sshd[2060781]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:03 mail sshd[2060781]: Received disconnect from 172.214.155.113 port 26636:11: disconnected by user
+Jun  2 00:20:03 mail sshd[2060781]: Disconnected from user root 172.214.155.113 port 26636
+Jun  2 00:20:03 mail sshd[2060781]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:04 mail sshd[2061480]: Accepted password for root from 172.214.155.113 port 26637 ssh2
+Jun  2 00:20:04 mail sshd[2061480]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:05 mail sshd[2061480]: Received disconnect from 172.214.155.113 port 26637:11: disconnected by user
+Jun  2 00:20:05 mail sshd[2061480]: Disconnected from user root 172.214.155.113 port 26637
+Jun  2 00:20:05 mail sshd[2061480]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:06 mail sshd[2061736]: Accepted password for root from 172.214.155.113 port 26638 ssh2
+Jun  2 00:20:06 mail sshd[2061736]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:08 mail sshd[2061736]: Received disconnect from 172.214.155.113 port 26638:11: disconnected by user
+Jun  2 00:20:08 mail sshd[2061736]: Disconnected from user root 172.214.155.113 port 26638
+Jun  2 00:20:08 mail sshd[2061736]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:10 mail sshd[2025236]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:29 mail sshd[2065367]: Accepted password for root from 45.228.120.239 port 43654 ssh2
+Jun  2 00:20:29 mail sshd[2065367]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:30 mail sshd[2065367]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:45 mail sshd[2067803]: Accepted password for root from 45.228.120.239 port 45033 ssh2
+Jun  2 00:20:45 mail sshd[2067803]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:47 mail sshd[2067803]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:20:58 mail sshd[2069895]: Accepted password for root from 45.228.120.239 port 42207 ssh2
+Jun  2 00:20:58 mail sshd[2069895]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 00:20:59 mail sshd[2069895]: pam_unix(sshd:session): session closed for user root
+Jun  2 00:23:27 mail sshd[2087825]: error: kex_exchange_identification: read: Connection reset by peer
+Jun  2 00:23:27 mail sshd[2087825]: Connection reset by 42.193.185.122 port 57464
+Jun  2 00:39:33 mail sshd[2234659]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122  user=root
+Jun  2 00:39:35 mail sshd[2234659]: Failed password for root from 42.193.185.122 port 58926 ssh2
+Jun  2 00:39:36 mail sshd[2234659]: Connection closed by authenticating user root 42.193.185.122 port 58926 [preauth]
+Jun  2 00:41:27 mail sshd[2257470]: error: kex_exchange_identification: Connection closed by remote host
+Jun  2 00:41:27 mail sshd[2257470]: Connection closed by 72.60.195.187 port 50098
+Jun  2 00:44:03 mail sshd[2278452]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122  user=root
+Jun  2 00:44:05 mail sshd[2278452]: Failed password for root from 42.193.185.122 port 41430 ssh2
+Jun  2 00:44:07 mail sshd[2278452]: Connection closed by authenticating user root 42.193.185.122 port 41430 [preauth]
+Jun  2 00:47:13 mail sshd[2309082]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122  user=root
+Jun  2 00:47:15 mail sshd[2309082]: Failed password for root from 42.193.185.122 port 51370 ssh2
+Jun  2 00:49:51 mail sshd[2334617]: Invalid user sysupdate from 42.193.185.122 port 52120
+Jun  2 00:49:52 mail sshd[2334617]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 00:49:52 mail sshd[2334617]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122 
+Jun  2 00:49:53 mail sshd[2334617]: Failed password for invalid user sysupdate from 42.193.185.122 port 52120 ssh2
+Jun  2 00:55:07 mail sshd[2383237]: Invalid user user1 from 42.193.185.122 port 38940
+Jun  2 01:05:07 mail sshd[2462846]: error: kex_exchange_identification: read: Connection reset by peer
+Jun  2 01:05:07 mail sshd[2462846]: Connection reset by 42.193.185.122 port 60738
+Jun  2 01:07:24 mail sshd[2493124]: Invalid user prefect from 42.193.185.122 port 44960
+Jun  2 01:07:25 mail sshd[2493124]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 01:07:25 mail sshd[2493124]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122 
+Jun  2 01:07:27 mail sshd[2493124]: Failed password for invalid user prefect from 42.193.185.122 port 44960 ssh2
+Jun  2 01:07:28 mail sshd[2493124]: Connection closed by invalid user prefect 42.193.185.122 port 44960 [preauth]
+Jun  2 01:12:59 mail sshd[2545902]: Invalid user zimbra from 42.193.185.122 port 37590
+Jun  2 01:12:59 mail sshd[2545902]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 01:12:59 mail sshd[2545902]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122 
+Jun  2 01:13:01 mail sshd[2545902]: Failed password for invalid user zimbra from 42.193.185.122 port 37590 ssh2
+Jun  2 01:13:04 mail sshd[2545902]: Connection closed by invalid user zimbra 42.193.185.122 port 37590 [preauth]
+Jun  2 01:13:55 mail sshd[2554701]: Invalid user bob from 42.193.185.122 port 53094
+Jun  2 01:13:55 mail sshd[2554701]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 01:13:55 mail sshd[2554701]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=42.193.185.122 
+Jun  2 01:13:57 mail sshd[2554701]: Failed password for invalid user bob from 42.193.185.122 port 53094 ssh2
+Jun  2 01:45:44 mail sshd[2856875]: Accepted password for root from 45.228.120.239 port 41677 ssh2
+Jun  2 01:45:44 mail sshd[2856875]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:45:49 mail sshd[2856875]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:48:19 mail sshd[2880972]: Accepted password for root from 172.183.132.64 port 46080 ssh2
+Jun  2 01:48:19 mail sshd[2880972]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:48:19 mail sshd[2881127]: Accepted password for root from 45.228.120.239 port 42968 ssh2
+Jun  2 01:48:19 mail sshd[2881127]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:48:19 mail sshd[2880972]: Received disconnect from 172.183.132.64 port 46080:11: disconnected by user
+Jun  2 01:48:19 mail sshd[2880972]: Disconnected from user root 172.183.132.64 port 46080
+Jun  2 01:48:19 mail sshd[2880972]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:48:20 mail sshd[2881317]: Accepted password for root from 172.183.132.64 port 46081 ssh2
+Jun  2 01:48:20 mail sshd[2881317]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:48:22 mail sshd[2881317]: Received disconnect from 172.183.132.64 port 46081:11: disconnected by user
+Jun  2 01:48:22 mail sshd[2881317]: Disconnected from user root 172.183.132.64 port 46081
+Jun  2 01:48:22 mail sshd[2881317]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:48:23 mail sshd[2881656]: Accepted password for root from 172.183.132.64 port 46082 ssh2
+Jun  2 01:48:23 mail sshd[2881656]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:48:33 mail sshd[2881656]: Received disconnect from 172.183.132.64 port 46082:11: disconnected by user
+Jun  2 01:48:33 mail sshd[2881656]: Disconnected from user root 172.183.132.64 port 46082
+Jun  2 01:48:33 mail sshd[2881656]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:48:34 mail sshd[2883962]: Accepted password for root from 172.183.132.64 port 46080 ssh2
+Jun  2 01:48:34 mail sshd[2883962]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:48:35 mail sshd[2883962]: Received disconnect from 172.183.132.64 port 46080:11: disconnected by user
+Jun  2 01:48:35 mail sshd[2883962]: Disconnected from user root 172.183.132.64 port 46080
+Jun  2 01:48:35 mail sshd[2883962]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:48:36 mail sshd[2884323]: Accepted password for root from 172.183.132.64 port 46083 ssh2
+Jun  2 01:48:36 mail sshd[2884323]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:52:26 mail sshd[2884323]: Received disconnect from 172.183.132.64 port 46083:11: disconnected by user
+Jun  2 01:52:26 mail sshd[2884323]: Disconnected from user root 172.183.132.64 port 46083
+Jun  2 01:52:26 mail sshd[2884323]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:52:27 mail sshd[2918029]: Accepted password for root from 172.183.132.64 port 46080 ssh2
+Jun  2 01:52:27 mail sshd[2918029]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:52:28 mail sshd[2918029]: Received disconnect from 172.183.132.64 port 46080:11: disconnected by user
+Jun  2 01:52:28 mail sshd[2918029]: Disconnected from user root 172.183.132.64 port 46080
+Jun  2 01:52:28 mail sshd[2918029]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:52:29 mail sshd[2918299]: Accepted password for root from 172.183.132.64 port 46084 ssh2
+Jun  2 01:52:29 mail sshd[2918299]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:52:32 mail sshd[2918299]: Received disconnect from 172.183.132.64 port 46084:11: disconnected by user
+Jun  2 01:52:32 mail sshd[2918299]: Disconnected from user root 172.183.132.64 port 46084
+Jun  2 01:52:32 mail sshd[2918299]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:52:33 mail sshd[2919021]: Accepted password for root from 172.183.132.64 port 46085 ssh2
+Jun  2 01:52:33 mail sshd[2919021]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:52:34 mail sshd[2919021]: Received disconnect from 172.183.132.64 port 46085:11: disconnected by user
+Jun  2 01:52:34 mail sshd[2919021]: Disconnected from user root 172.183.132.64 port 46085
+Jun  2 01:52:34 mail sshd[2919021]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:52:35 mail sshd[2919468]: Accepted password for root from 172.183.132.64 port 46086 ssh2
+Jun  2 01:52:35 mail sshd[2919468]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:52:36 mail sshd[2881127]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:52:37 mail sshd[2919468]: Received disconnect from 172.183.132.64 port 46086:11: disconnected by user
+Jun  2 01:52:37 mail sshd[2919468]: Disconnected from user root 172.183.132.64 port 46086
+Jun  2 01:52:37 mail sshd[2919468]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:53:21 mail sshd[2926994]: Accepted password for root from 45.228.120.239 port 42996 ssh2
+Jun  2 01:53:21 mail sshd[2926994]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:53:24 mail sshd[2926994]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:56:39 mail sshd[2957914]: Accepted password for root from 52.160.164.113 port 14344 ssh2
+Jun  2 01:56:39 mail sshd[2957914]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:56:40 mail sshd[2957914]: Received disconnect from 52.160.164.113 port 14344:11: disconnected by user
+Jun  2 01:56:40 mail sshd[2957914]: Disconnected from user root 52.160.164.113 port 14344
+Jun  2 01:56:40 mail sshd[2957914]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:56:41 mail sshd[2958246]: Accepted password for root from 52.160.164.113 port 14345 ssh2
+Jun  2 01:56:41 mail sshd[2958246]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:56:43 mail sshd[2958246]: Received disconnect from 52.160.164.113 port 14345:11: disconnected by user
+Jun  2 01:56:43 mail sshd[2958246]: Disconnected from user root 52.160.164.113 port 14345
+Jun  2 01:56:43 mail sshd[2958246]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:56:45 mail sshd[2958681]: Accepted password for root from 52.160.164.113 port 14346 ssh2
+Jun  2 01:56:45 mail sshd[2958681]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:56:55 mail sshd[2958681]: Received disconnect from 52.160.164.113 port 14346:11: disconnected by user
+Jun  2 01:56:55 mail sshd[2958681]: Disconnected from user root 52.160.164.113 port 14346
+Jun  2 01:56:55 mail sshd[2958681]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:56:56 mail sshd[2960859]: Accepted password for root from 52.160.164.113 port 14345 ssh2
+Jun  2 01:56:56 mail sshd[2960859]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 01:56:57 mail sshd[2960859]: Received disconnect from 52.160.164.113 port 14345:11: disconnected by user
+Jun  2 01:56:57 mail sshd[2960859]: Disconnected from user root 52.160.164.113 port 14345
+Jun  2 01:56:57 mail sshd[2960859]: pam_unix(sshd:session): session closed for user root
+Jun  2 01:56:59 mail sshd[2961582]: Accepted password for root from 52.160.164.113 port 14347 ssh2
+Jun  2 01:56:59 mail sshd[2961582]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 02:00:32 mail sshd[2961582]: Received disconnect from 52.160.164.113 port 14347:11: disconnected by user
+Jun  2 02:00:32 mail sshd[2961582]: Disconnected from user root 52.160.164.113 port 14347
+Jun  2 02:00:32 mail sshd[2961582]: pam_unix(sshd:session): session closed for user root
+Jun  2 02:00:34 mail sshd[2992238]: Accepted password for root from 52.160.164.113 port 14345 ssh2
+Jun  2 02:00:34 mail sshd[2992238]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 02:00:35 mail sshd[2992238]: Received disconnect from 52.160.164.113 port 14345:11: disconnected by user
+Jun  2 02:00:35 mail sshd[2992238]: Disconnected from user root 52.160.164.113 port 14345
+Jun  2 02:00:35 mail sshd[2992238]: pam_unix(sshd:session): session closed for user root
+Jun  2 02:00:36 mail sshd[2992748]: Accepted password for root from 52.160.164.113 port 14346 ssh2
+Jun  2 02:00:36 mail sshd[2992748]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 02:00:40 mail sshd[2992748]: Received disconnect from 52.160.164.113 port 14346:11: disconnected by user
+Jun  2 02:00:40 mail sshd[2992748]: Disconnected from user root 52.160.164.113 port 14346
+Jun  2 02:00:40 mail sshd[2992748]: pam_unix(sshd:session): session closed for user root
+Jun  2 02:00:41 mail sshd[2993300]: Accepted password for root from 52.160.164.113 port 14348 ssh2
+Jun  2 02:00:41 mail sshd[2993300]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 02:00:42 mail sshd[2993300]: Received disconnect from 52.160.164.113 port 14348:11: disconnected by user
+Jun  2 02:00:42 mail sshd[2993300]: Disconnected from user root 52.160.164.113 port 14348
+Jun  2 02:00:42 mail sshd[2993300]: pam_unix(sshd:session): session closed for user root
+Jun  2 02:00:44 mail sshd[2993719]: Accepted password for root from 52.160.164.113 port 14345 ssh2
+Jun  2 02:00:44 mail sshd[2993719]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 02:00:47 mail sshd[2993719]: Received disconnect from 52.160.164.113 port 14345:11: disconnected by user
+Jun  2 02:00:47 mail sshd[2993719]: Disconnected from user root 52.160.164.113 port 14345
+Jun  2 02:00:47 mail sshd[2993719]: pam_unix(sshd:session): session closed for user root
+Jun  2 02:22:28 mail sshd[3187990]: error: kex_exchange_identification: client sent invalid protocol identifier "GET / HTTP/1.1"
+Jun  2 02:22:28 mail sshd[3187990]: banner exchange: Connection from 138.68.80.51 port 59086: invalid format
+Jun  2 02:22:29 mail sshd[3188048]: error: kex_exchange_identification: client sent invalid protocol identifier "GET /favicon.ico HTTP/1.1"
+Jun  2 02:22:29 mail sshd[3188048]: banner exchange: Connection from 138.68.80.51 port 59102: invalid format
+Jun  2 11:17:51 mail sshd[751]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=1.94.148.49  user=root
+Jun  2 11:17:52 mail sshd[751]: Failed password for root from 1.94.148.49 port 38818 ssh2
+Jun  2 11:17:54 mail sshd[751]: Received disconnect from 1.94.148.49 port 38818:11: Bye Bye [preauth]
+Jun  2 11:17:54 mail sshd[751]: Disconnected from authenticating user root 1.94.148.49 port 38818 [preauth]
+Jun  2 11:18:48 mail sshd[9960]: Invalid user monitor from 1.94.148.49 port 47094
+Jun  2 11:18:48 mail sshd[9960]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 11:18:48 mail sshd[9960]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=1.94.148.49 
+Jun  2 11:18:50 mail sshd[9960]: Failed password for invalid user monitor from 1.94.148.49 port 47094 ssh2
+Jun  2 11:18:53 mail sshd[9960]: Received disconnect from 1.94.148.49 port 47094:11: Bye Bye [preauth]
+Jun  2 11:18:53 mail sshd[9960]: Disconnected from invalid user monitor 1.94.148.49 port 47094 [preauth]
+Jun  2 11:28:42 mail sshd[99027]: Invalid user vpn from 1.94.148.49 port 44240
+Jun  2 11:28:42 mail sshd[99027]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 11:28:42 mail sshd[99027]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=1.94.148.49 
+Jun  2 11:28:44 mail sshd[99027]: Failed password for invalid user vpn from 1.94.148.49 port 44240 ssh2
+Jun  2 11:28:46 mail sshd[99027]: Received disconnect from 1.94.148.49 port 44240:11: Bye Bye [preauth]
+Jun  2 11:28:46 mail sshd[99027]: Disconnected from invalid user vpn 1.94.148.49 port 44240 [preauth]
+Jun  2 11:36:15 mail sshd[162217]: Connection closed by 1.94.148.49 port 37488 [preauth]
+Jun  2 11:36:21 mail sshd[168335]: Invalid user lili from 1.94.148.49 port 44030
+Jun  2 11:36:21 mail sshd[168335]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 11:36:21 mail sshd[168335]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=1.94.148.49 
+Jun  2 11:36:23 mail sshd[168335]: Failed password for invalid user lili from 1.94.148.49 port 44030 ssh2
+Jun  2 11:36:23 mail sshd[168335]: Received disconnect from 1.94.148.49 port 44030:11: Bye Bye [preauth]
+Jun  2 11:36:23 mail sshd[168335]: Disconnected from invalid user lili 1.94.148.49 port 44030 [preauth]
+Jun  2 11:38:48 mail sshd[190892]: Invalid user sonarqube from 1.94.148.49 port 58912
+Jun  2 11:38:48 mail sshd[190892]: pam_unix(sshd:auth): check pass; user unknown
+Jun  2 11:38:48 mail sshd[190892]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=1.94.148.49 
+Jun  2 11:38:50 mail sshd[190892]: Failed password for invalid user sonarqube from 1.94.148.49 port 58912 ssh2
+Jun  2 18:59:10 mail sshd[34473]: Accepted password for root from 52.161.82.99 port 64640 ssh2
+Jun  2 18:59:10 mail sshd[34473]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 18:59:11 mail sshd[34473]: Received disconnect from 52.161.82.99 port 64640:11: disconnected by user
+Jun  2 18:59:11 mail sshd[34473]: Disconnected from user root 52.161.82.99 port 64640
+Jun  2 18:59:11 mail sshd[34473]: pam_unix(sshd:session): session closed for user root
+Jun  2 18:59:13 mail sshd[34823]: Accepted password for root from 52.161.82.99 port 64641 ssh2
+Jun  2 18:59:13 mail sshd[34823]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 18:59:14 mail sshd[34823]: Received disconnect from 52.161.82.99 port 64641:11: disconnected by user
+Jun  2 18:59:14 mail sshd[34823]: Disconnected from user root 52.161.82.99 port 64641
+Jun  2 18:59:14 mail sshd[34823]: pam_unix(sshd:session): session closed for user root
+Jun  2 18:59:16 mail sshd[35381]: Accepted password for root from 52.161.82.99 port 64642 ssh2
+Jun  2 18:59:16 mail sshd[35381]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 18:59:18 mail sshd[35987]: Accepted password for root from 45.228.120.239 port 44119 ssh2
+Jun  2 18:59:18 mail sshd[35987]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 18:59:31 mail sshd[35381]: Received disconnect from 52.161.82.99 port 64642:11: disconnected by user
+Jun  2 18:59:31 mail sshd[35381]: Disconnected from user root 52.161.82.99 port 64642
+Jun  2 18:59:31 mail sshd[35381]: pam_unix(sshd:session): session closed for user root
+Jun  2 18:59:32 mail sshd[38160]: Accepted password for root from 52.161.82.99 port 64641 ssh2
+Jun  2 18:59:32 mail sshd[38160]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 18:59:33 mail sshd[38160]: Received disconnect from 52.161.82.99 port 64641:11: disconnected by user
+Jun  2 18:59:33 mail sshd[38160]: Disconnected from user root 52.161.82.99 port 64641
+Jun  2 18:59:33 mail sshd[38160]: pam_unix(sshd:session): session closed for user root
+Jun  2 18:59:35 mail sshd[38537]: Accepted password for root from 52.161.82.99 port 64643 ssh2
+Jun  2 18:59:35 mail sshd[38537]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:04:16 mail sshd[35987]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:04:25 mail sshd[76327]: Accepted password for root from 45.228.120.239 port 45320 ssh2
+Jun  2 19:04:25 mail sshd[76327]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:04:31 mail sshd[76327]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:05:08 mail sshd[38537]: Received disconnect from 52.161.82.99 port 64643:11: disconnected by user
+Jun  2 19:05:08 mail sshd[38537]: Disconnected from user root 52.161.82.99 port 64643
+Jun  2 19:05:08 mail sshd[38537]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:05:09 mail sshd[82841]: Accepted password for root from 52.161.82.99 port 64640 ssh2
+Jun  2 19:05:09 mail sshd[82841]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:05:11 mail sshd[82841]: Received disconnect from 52.161.82.99 port 64640:11: disconnected by user
+Jun  2 19:05:11 mail sshd[82841]: Disconnected from user root 52.161.82.99 port 64640
+Jun  2 19:05:11 mail sshd[82841]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:05:12 mail sshd[83246]: Accepted password for root from 52.161.82.99 port 64641 ssh2
+Jun  2 19:05:12 mail sshd[83246]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:05:15 mail sshd[83246]: Received disconnect from 52.161.82.99 port 64641:11: disconnected by user
+Jun  2 19:05:15 mail sshd[83246]: Disconnected from user root 52.161.82.99 port 64641
+Jun  2 19:05:15 mail sshd[83246]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:05:16 mail sshd[83849]: Accepted password for root from 52.161.82.99 port 64642 ssh2
+Jun  2 19:05:16 mail sshd[83849]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:05:17 mail sshd[83849]: Received disconnect from 52.161.82.99 port 64642:11: disconnected by user
+Jun  2 19:05:17 mail sshd[83849]: Disconnected from user root 52.161.82.99 port 64642
+Jun  2 19:05:17 mail sshd[83849]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:05:19 mail sshd[84364]: Accepted password for root from 52.161.82.99 port 64640 ssh2
+Jun  2 19:05:19 mail sshd[84364]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:05:20 mail sshd[84364]: Received disconnect from 52.161.82.99 port 64640:11: disconnected by user
+Jun  2 19:05:20 mail sshd[84364]: Disconnected from user root 52.161.82.99 port 64640
+Jun  2 19:05:20 mail sshd[84364]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:06:24 mail sshd[94971]: Accepted password for root from 45.228.120.239 port 42469 ssh2
+Jun  2 19:06:24 mail sshd[94971]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:06:30 mail sshd[94971]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:06:39 mail sshd[97398]: Accepted password for root from 45.228.120.239 port 42592 ssh2
+Jun  2 19:06:39 mail sshd[97398]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:06:50 mail sshd[97398]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:07:02 mail sshd[101142]: Accepted password for root from 45.228.120.239 port 42788 ssh2
+Jun  2 19:07:02 mail sshd[101142]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:07:13 mail sshd[101142]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:07:22 mail sshd[104318]: Accepted password for root from 45.228.120.239 port 42971 ssh2
+Jun  2 19:07:22 mail sshd[104318]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:07:33 mail sshd[104318]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:07:53 mail sshd[109199]: Accepted password for root from 45.228.120.239 port 43279 ssh2
+Jun  2 19:07:53 mail sshd[109199]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:07:54 mail sshd[109199]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:10:49 mail sshd[136458]: Accepted password for root from 45.228.120.239 port 44771 ssh2
+Jun  2 19:10:49 mail sshd[136458]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:10:55 mail sshd[136458]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:21:11 mail sshd[232762]: Accepted password for root from 172.208.127.88 port 8192 ssh2
+Jun  2 19:21:11 mail sshd[232762]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:21:12 mail sshd[232762]: Received disconnect from 172.208.127.88 port 8192:11: disconnected by user
+Jun  2 19:21:12 mail sshd[232762]: Disconnected from user root 172.208.127.88 port 8192
+Jun  2 19:21:12 mail sshd[232762]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:21:13 mail sshd[233019]: Accepted password for root from 172.208.127.88 port 8193 ssh2
+Jun  2 19:21:13 mail sshd[233019]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:21:14 mail sshd[233019]: Received disconnect from 172.208.127.88 port 8193:11: disconnected by user
+Jun  2 19:21:14 mail sshd[233019]: Disconnected from user root 172.208.127.88 port 8193
+Jun  2 19:21:14 mail sshd[233019]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:21:15 mail sshd[233296]: Accepted password for root from 172.208.127.88 port 8194 ssh2
+Jun  2 19:21:15 mail sshd[233296]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:21:26 mail sshd[233296]: Received disconnect from 172.208.127.88 port 8194:11: disconnected by user
+Jun  2 19:21:26 mail sshd[233296]: Disconnected from user root 172.208.127.88 port 8194
+Jun  2 19:21:26 mail sshd[233296]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:21:27 mail sshd[235364]: Accepted password for root from 172.208.127.88 port 8193 ssh2
+Jun  2 19:21:27 mail sshd[235364]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:21:28 mail sshd[235364]: Received disconnect from 172.208.127.88 port 8193:11: disconnected by user
+Jun  2 19:21:28 mail sshd[235364]: Disconnected from user root 172.208.127.88 port 8193
+Jun  2 19:21:28 mail sshd[235364]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:21:29 mail sshd[235921]: Accepted password for root from 172.208.127.88 port 8195 ssh2
+Jun  2 19:21:29 mail sshd[235921]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:24:25 mail sshd[235921]: Received disconnect from 172.208.127.88 port 8195:11: disconnected by user
+Jun  2 19:24:25 mail sshd[235921]: Disconnected from user root 172.208.127.88 port 8195
+Jun  2 19:24:25 mail sshd[235921]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:24:26 mail sshd[263884]: Accepted password for root from 172.208.127.88 port 8194 ssh2
+Jun  2 19:24:26 mail sshd[263884]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:24:27 mail sshd[263884]: Received disconnect from 172.208.127.88 port 8194:11: disconnected by user
+Jun  2 19:24:27 mail sshd[263884]: Disconnected from user root 172.208.127.88 port 8194
+Jun  2 19:24:27 mail sshd[263884]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:24:28 mail sshd[264281]: Accepted password for root from 172.208.127.88 port 8196 ssh2
+Jun  2 19:24:28 mail sshd[264281]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:24:31 mail sshd[264281]: Received disconnect from 172.208.127.88 port 8196:11: disconnected by user
+Jun  2 19:24:31 mail sshd[264281]: Disconnected from user root 172.208.127.88 port 8196
+Jun  2 19:24:31 mail sshd[264281]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:24:32 mail sshd[264899]: Accepted password for root from 172.208.127.88 port 8197 ssh2
+Jun  2 19:24:32 mail sshd[264899]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:24:33 mail sshd[264899]: Received disconnect from 172.208.127.88 port 8197:11: disconnected by user
+Jun  2 19:24:33 mail sshd[264899]: Disconnected from user root 172.208.127.88 port 8197
+Jun  2 19:24:33 mail sshd[264899]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:24:34 mail sshd[265246]: Accepted password for root from 172.208.127.88 port 8198 ssh2
+Jun  2 19:24:34 mail sshd[265246]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:24:35 mail sshd[265246]: Received disconnect from 172.208.127.88 port 8198:11: disconnected by user
+Jun  2 19:24:35 mail sshd[265246]: Disconnected from user root 172.208.127.88 port 8198
+Jun  2 19:24:35 mail sshd[265246]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:33:03 mail sshd[343432]: Accepted password for root from 74.235.151.3 port 8200 ssh2
+Jun  2 19:33:03 mail sshd[343432]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:33:04 mail sshd[343432]: Received disconnect from 74.235.151.3 port 8200:11: disconnected by user
+Jun  2 19:33:04 mail sshd[343432]: Disconnected from user root 74.235.151.3 port 8200
+Jun  2 19:33:04 mail sshd[343432]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:33:05 mail sshd[343776]: Accepted password for root from 74.235.151.3 port 8201 ssh2
+Jun  2 19:33:05 mail sshd[343776]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:33:06 mail sshd[343776]: Received disconnect from 74.235.151.3 port 8201:11: disconnected by user
+Jun  2 19:33:06 mail sshd[343776]: Disconnected from user root 74.235.151.3 port 8201
+Jun  2 19:33:06 mail sshd[343776]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:33:07 mail sshd[344230]: Accepted password for root from 74.235.151.3 port 8202 ssh2
+Jun  2 19:33:07 mail sshd[344230]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:33:16 mail sshd[344230]: Received disconnect from 74.235.151.3 port 8202:11: disconnected by user
+Jun  2 19:33:16 mail sshd[344230]: Disconnected from user root 74.235.151.3 port 8202
+Jun  2 19:33:16 mail sshd[344230]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:33:17 mail sshd[346152]: Accepted password for root from 74.235.151.3 port 8203 ssh2
+Jun  2 19:33:17 mail sshd[346152]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:33:18 mail sshd[346152]: Received disconnect from 74.235.151.3 port 8203:11: disconnected by user
+Jun  2 19:33:18 mail sshd[346152]: Disconnected from user root 74.235.151.3 port 8203
+Jun  2 19:33:18 mail sshd[346152]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:33:19 mail sshd[346509]: Accepted password for root from 74.235.151.3 port 8204 ssh2
+Jun  2 19:33:19 mail sshd[346509]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:35:57 mail sshd[346509]: Received disconnect from 74.235.151.3 port 8204:11: disconnected by user
+Jun  2 19:35:57 mail sshd[346509]: Disconnected from user root 74.235.151.3 port 8204
+Jun  2 19:35:57 mail sshd[346509]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:35:58 mail sshd[371539]: Accepted password for root from 74.235.151.3 port 8202 ssh2
+Jun  2 19:35:58 mail sshd[371539]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:36:00 mail sshd[371539]: Received disconnect from 74.235.151.3 port 8202:11: disconnected by user
+Jun  2 19:36:00 mail sshd[371539]: Disconnected from user root 74.235.151.3 port 8202
+Jun  2 19:36:00 mail sshd[371539]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:36:01 mail sshd[372025]: Accepted password for root from 74.235.151.3 port 8203 ssh2
+Jun  2 19:36:01 mail sshd[372025]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:36:04 mail sshd[372025]: Received disconnect from 74.235.151.3 port 8203:11: disconnected by user
+Jun  2 19:36:04 mail sshd[372025]: Disconnected from user root 74.235.151.3 port 8203
+Jun  2 19:36:04 mail sshd[372025]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:36:05 mail sshd[372593]: Accepted password for root from 74.235.151.3 port 8205 ssh2
+Jun  2 19:36:05 mail sshd[372593]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:36:06 mail sshd[372593]: Received disconnect from 74.235.151.3 port 8205:11: disconnected by user
+Jun  2 19:36:06 mail sshd[372593]: Disconnected from user root 74.235.151.3 port 8205
+Jun  2 19:36:06 mail sshd[372593]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:36:07 mail sshd[372991]: Accepted password for root from 74.235.151.3 port 8206 ssh2
+Jun  2 19:36:07 mail sshd[372991]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:36:09 mail sshd[372991]: Received disconnect from 74.235.151.3 port 8206:11: disconnected by user
+Jun  2 19:36:09 mail sshd[372991]: Disconnected from user root 74.235.151.3 port 8206
+Jun  2 19:36:09 mail sshd[372991]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:50:04 mail sshd[506532]: Accepted password for root from 172.185.167.38 port 56640 ssh2
+Jun  2 19:50:04 mail sshd[506532]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:50:05 mail sshd[506532]: Received disconnect from 172.185.167.38 port 56640:11: disconnected by user
+Jun  2 19:50:05 mail sshd[506532]: Disconnected from user root 172.185.167.38 port 56640
+Jun  2 19:50:05 mail sshd[506532]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:50:07 mail sshd[506911]: Accepted password for root from 172.185.167.38 port 56641 ssh2
+Jun  2 19:50:07 mail sshd[506911]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:50:09 mail sshd[506911]: Received disconnect from 172.185.167.38 port 56641:11: disconnected by user
+Jun  2 19:50:09 mail sshd[506911]: Disconnected from user root 172.185.167.38 port 56641
+Jun  2 19:50:09 mail sshd[506911]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:50:10 mail sshd[507420]: Accepted password for root from 172.185.167.38 port 56642 ssh2
+Jun  2 19:50:10 mail sshd[507420]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:50:25 mail sshd[507420]: Received disconnect from 172.185.167.38 port 56642:11: disconnected by user
+Jun  2 19:50:25 mail sshd[507420]: Disconnected from user root 172.185.167.38 port 56642
+Jun  2 19:50:25 mail sshd[507420]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:50:26 mail sshd[510000]: Accepted password for root from 172.185.167.38 port 56641 ssh2
+Jun  2 19:50:26 mail sshd[510000]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:50:28 mail sshd[510000]: Received disconnect from 172.185.167.38 port 56641:11: disconnected by user
+Jun  2 19:50:28 mail sshd[510000]: Disconnected from user root 172.185.167.38 port 56641
+Jun  2 19:50:28 mail sshd[510000]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:50:29 mail sshd[510455]: Accepted password for root from 172.185.167.38 port 56643 ssh2
+Jun  2 19:50:29 mail sshd[510455]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:53:59 mail sshd[510455]: Received disconnect from 172.185.167.38 port 56643:11: disconnected by user
+Jun  2 19:53:59 mail sshd[510455]: Disconnected from user root 172.185.167.38 port 56643
+Jun  2 19:53:59 mail sshd[510455]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:54:00 mail sshd[541949]: Accepted password for root from 172.185.167.38 port 56644 ssh2
+Jun  2 19:54:00 mail sshd[541949]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:54:02 mail sshd[541949]: Received disconnect from 172.185.167.38 port 56644:11: disconnected by user
+Jun  2 19:54:02 mail sshd[541949]: Disconnected from user root 172.185.167.38 port 56644
+Jun  2 19:54:02 mail sshd[541949]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:54:04 mail sshd[542382]: Accepted password for root from 172.185.167.38 port 56645 ssh2
+Jun  2 19:54:04 mail sshd[542382]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:54:07 mail sshd[542382]: Received disconnect from 172.185.167.38 port 56645:11: disconnected by user
+Jun  2 19:54:07 mail sshd[542382]: Disconnected from user root 172.185.167.38 port 56645
+Jun  2 19:54:07 mail sshd[542382]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:54:08 mail sshd[543068]: Accepted password for root from 172.185.167.38 port 56646 ssh2
+Jun  2 19:54:08 mail sshd[543068]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:54:09 mail sshd[543068]: Received disconnect from 172.185.167.38 port 56646:11: disconnected by user
+Jun  2 19:54:09 mail sshd[543068]: Disconnected from user root 172.185.167.38 port 56646
+Jun  2 19:54:09 mail sshd[543068]: pam_unix(sshd:session): session closed for user root
+Jun  2 19:54:10 mail sshd[543590]: Accepted password for root from 172.185.167.38 port 56647 ssh2
+Jun  2 19:54:10 mail sshd[543590]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 19:54:12 mail sshd[543590]: Received disconnect from 172.185.167.38 port 56647:11: disconnected by user
+Jun  2 19:54:12 mail sshd[543590]: Disconnected from user root 172.185.167.38 port 56647
+Jun  2 19:54:12 mail sshd[543590]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:35:25 mail sshd[1475464]: Accepted password for root from 20.109.87.114 port 42000 ssh2
+Jun  2 21:35:25 mail sshd[1475464]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:35:28 mail sshd[1475464]: Received disconnect from 20.109.87.114 port 42000:11: disconnected by user
+Jun  2 21:35:28 mail sshd[1475464]: Disconnected from user root 20.109.87.114 port 42000
+Jun  2 21:35:28 mail sshd[1475464]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:35:29 mail sshd[1476096]: Accepted password for root from 20.109.87.114 port 42001 ssh2
+Jun  2 21:35:29 mail sshd[1476096]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:35:30 mail sshd[1476096]: Received disconnect from 20.109.87.114 port 42001:11: disconnected by user
+Jun  2 21:35:30 mail sshd[1476096]: Disconnected from user root 20.109.87.114 port 42001
+Jun  2 21:35:30 mail sshd[1476096]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:35:31 mail sshd[1476553]: Accepted password for root from 20.109.87.114 port 42002 ssh2
+Jun  2 21:35:31 mail sshd[1476553]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:35:43 mail sshd[1476553]: Received disconnect from 20.109.87.114 port 42002:11: disconnected by user
+Jun  2 21:35:43 mail sshd[1476553]: Disconnected from user root 20.109.87.114 port 42002
+Jun  2 21:35:43 mail sshd[1476553]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:35:44 mail sshd[1478827]: Accepted password for root from 20.109.87.114 port 42003 ssh2
+Jun  2 21:35:44 mail sshd[1478827]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:35:45 mail sshd[1478827]: Received disconnect from 20.109.87.114 port 42003:11: disconnected by user
+Jun  2 21:35:45 mail sshd[1478827]: Disconnected from user root 20.109.87.114 port 42003
+Jun  2 21:35:45 mail sshd[1478827]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:35:46 mail sshd[1479207]: Accepted password for root from 20.109.87.114 port 42007 ssh2
+Jun  2 21:35:46 mail sshd[1479207]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:38:23 mail sshd[1479207]: Received disconnect from 20.109.87.114 port 42007:11: disconnected by user
+Jun  2 21:38:23 mail sshd[1479207]: Disconnected from user root 20.109.87.114 port 42007
+Jun  2 21:38:23 mail sshd[1479207]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:38:24 mail sshd[1505232]: Accepted password for root from 20.109.87.114 port 42003 ssh2
+Jun  2 21:38:24 mail sshd[1505232]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:38:25 mail sshd[1505232]: Received disconnect from 20.109.87.114 port 42003:11: disconnected by user
+Jun  2 21:38:25 mail sshd[1505232]: Disconnected from user root 20.109.87.114 port 42003
+Jun  2 21:38:25 mail sshd[1505232]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:38:26 mail sshd[1505644]: Accepted password for root from 20.109.87.114 port 42008 ssh2
+Jun  2 21:38:26 mail sshd[1505644]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:38:29 mail sshd[1505644]: Received disconnect from 20.109.87.114 port 42008:11: disconnected by user
+Jun  2 21:38:29 mail sshd[1505644]: Disconnected from user root 20.109.87.114 port 42008
+Jun  2 21:38:29 mail sshd[1505644]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:38:30 mail sshd[1506256]: Accepted password for root from 20.109.87.114 port 42010 ssh2
+Jun  2 21:38:30 mail sshd[1506256]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:38:31 mail sshd[1506256]: Received disconnect from 20.109.87.114 port 42010:11: disconnected by user
+Jun  2 21:38:31 mail sshd[1506256]: Disconnected from user root 20.109.87.114 port 42010
+Jun  2 21:38:31 mail sshd[1506256]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:38:32 mail sshd[1506567]: Accepted password for root from 20.109.87.114 port 42014 ssh2
+Jun  2 21:38:32 mail sshd[1506567]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  2 21:38:33 mail sshd[1506567]: Received disconnect from 20.109.87.114 port 42014:11: disconnected by user
+Jun  2 21:38:33 mail sshd[1506567]: Disconnected from user root 20.109.87.114 port 42014
+Jun  2 21:38:33 mail sshd[1506567]: pam_unix(sshd:session): session closed for user root
+Jun  2 21:49:40 mail sshd[1616718]: error: kex_exchange_identification: read: Connection reset by peer
+Jun  2 21:49:40 mail sshd[1616718]: Connection reset by 151.61.231.131 port 53182
+
+=== syslog Jun 2 19:00-22:00 UTC (erros kernel/OOM/network) ===
+Jun  2 00:00:26 mail logrotate[1884248]: error: stat of /var/log/nginx/studio-*_access.log failed: No such file or directory
+Jun  2 00:00:26 mail logrotate[1884248]: error: stat of /var/log/nginx/studio-*_error.log failed: No such file or directory
+Jun  2 00:19:30 mail dockerd[896]: time="2026-06-02T00:19:30.123904449Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=ff5b1f514248ccff63444a4938b575de8161cdabe0a51a1623bcff80528849a8 daemonShuttingDown=false error="restart canceled" execDuration=26m14.28699206s exitStatus="{137 2026-06-02 00:19:30.027698257 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 00:19:40 mail dockerd[896]: time="2026-06-02T00:19:40.968927159Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=64709113dc8c74bd905f8758202cab552fe6743ba15ddcee058b0228e85f763d daemonShuttingDown=false error="restart canceled" execDuration=26m31.021304479s exitStatus="{137 2026-06-02 00:19:40.63730548 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 01:51:59 mail dockerd[896]: time="2026-06-02T01:51:59.749327447Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=101477f497c575731976c36b638e99d241c401f34cf2abce3eb472167823bf5f daemonShuttingDown=false error="restart canceled" execDuration=1h32m11.010085231s exitStatus="{137 2026-06-02 01:51:59.658565796 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 01:52:10 mail dockerd[896]: time="2026-06-02T01:52:10.451716953Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=b948c4fd9638e10ef0b0f58d3bd8030380e0638d9e53843860e4ca7f37a68d8d daemonShuttingDown=false error="restart canceled" execDuration=1h32m27.913595501s exitStatus="{137 2026-06-02 01:52:10.18337355 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 01:57:53 mail certbot[2960063]: Failed to renew certificate painelcheckar.com.br with error: Could not bind TCP port 80 because it is already in use by another process on this system (such as a web server). Please stop the program in question and then try again.
+Jun  2 01:58:04 mail certbot[2960063]: Failed to renew certificate urbanmail.com.br with error: Some challenges have failed.
+Jun  2 01:59:52 mail dockerd[896]: time="2026-06-02T01:59:52.121351238Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=24ac4b0f8b90a6299a06f6559a84d5d65d98619c644b056a548b936710cde08a daemonShuttingDown=false error="restart canceled" execDuration=7m33.685741862s exitStatus="{0 2026-06-02 01:59:51.972411619 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 02:00:10 mail dockerd[896]: time="2026-06-02T02:00:10.241974720Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=8f88ff452386a2c1f69d59a7530248dd0505626a803d5d0ce15b733900099489 daemonShuttingDown=false error="restart canceled" execDuration=7m58.068126866s exitStatus="{137 2026-06-02 02:00:04.138634827 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 05:03:23 mail certbot.renew[501934]: Failed to renew certificate painelcheckar.com.br with error: Could not bind TCP port 80 because it is already in use by another process on this system (such as a web server). Please stop the program in question and then try again.
+Jun  2 05:03:32 mail certbot.renew[501934]: Failed to renew certificate urbanmail.com.br with error: Some challenges have failed.
+Jun  2 17:36:37 mail certbot[3384468]: Failed to renew certificate painelcheckar.com.br with error: Could not bind TCP port 80 because it is already in use by another process on this system (such as a web server). Please stop the program in question and then try again.
+Jun  2 17:36:44 mail certbot[3384468]: Failed to renew certificate urbanmail.com.br with error: Some challenges have failed.
+Jun  2 19:04:01 mail dockerd[896]: time="2026-06-02T19:04:01.213260397Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=436ab455d04951b48d8cb726160117851b3d6f2c310bfaf65c7515cf3229c76f daemonShuttingDown=false error="restart canceled" execDuration=17h3m39.762735318s exitStatus="{137 2026-06-02 19:04:01.083069367 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:04:11 mail dockerd[896]: time="2026-06-02T19:04:11.708982243Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=d71d166d63f216fa1fb1becda0d20e35e233ade2e297f228ae1396e844ee3186 daemonShuttingDown=false error="restart canceled" execDuration=17h3m56.420173754s exitStatus="{137 2026-06-02 19:04:11.631032311 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:23:39 mail dockerd[896]: time="2026-06-02T19:23:39.307410231Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=a98fb8513e5bd21a01fa57d3f3697ab95f3f82fab228baf0497b4ebfc7a0371b daemonShuttingDown=false error="restart canceled" execDuration=19m20.160730368s exitStatus="{137 2026-06-02 19:23:39.208917387 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:23:49 mail dockerd[896]: time="2026-06-02T19:23:49.831336562Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=b8b3d94d641bfeae790bac6de9a6e7bf08889f3f84fcdcfc556c512f355a0f4b daemonShuttingDown=false error="restart canceled" execDuration=19m36.647716666s exitStatus="{137 2026-06-02 19:23:49.721446014 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:35:31 mail dockerd[896]: time="2026-06-02T19:35:31.854051942Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=3813f1c64aa7e18db23a73f2bd7473171959ec6c53f76ec6c625be6002ebabb6 daemonShuttingDown=false error="restart canceled" execDuration=11m34.314958315s exitStatus="{137 2026-06-02 19:35:31.747999105 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:35:42 mail dockerd[896]: time="2026-06-02T19:35:42.548425936Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=a52d1c8edb018dae77224215a5b5720182a748b930808e581630072a2828c363 daemonShuttingDown=false error="restart canceled" execDuration=11m50.99906564s exitStatus="{137 2026-06-02 19:35:42.42387519 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:53:33 mail dockerd[896]: time="2026-06-02T19:53:33.743091399Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=f88206465c9570476437bad2565f1c746cc6e2bce3c2dca10302a3385e1fcec1 daemonShuttingDown=false error="restart canceled" execDuration=17m43.704320229s exitStatus="{0 2026-06-02 19:53:33.659604027 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:53:44 mail dockerd[896]: time="2026-06-02T19:53:44.432396380Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=6b0ab3457f16acd71427eb019d3158a021402d464323b4d4f83b12ac5d56ed2b daemonShuttingDown=false error="restart canceled" execDuration=18m0.283241134s exitStatus="{137 2026-06-02 19:53:44.363735288 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 19:54:04 mail systemd[1]: snap.certbot.renew.service: Main process exited, code=killed, status=15/TERM
+Jun  2 21:37:58 mail dockerd[896]: time="2026-06-02T21:37:58.238557280Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=389ab6b892d06045c0832afa6da8875771f4aefd8f4142e447651adef79af9b6 daemonShuttingDown=false error="restart canceled" execDuration=1h44m6.680149349s exitStatus="{137 2026-06-02 21:37:58.137187461 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+Jun  2 21:38:08 mail dockerd[896]: time="2026-06-02T21:38:08.832752870Z" level=warning msg="ShouldRestart failed, container will not be restarted" container=1968b3a63aedba06a4ecc9649500bef045724df5aacb4209dbca098b9cea88dd daemonShuttingDown=false error="restart canceled" execDuration=1h44m23.192108895s exitStatus="{137 2026-06-02 21:38:08.708766953 +0000 UTC}" hasBeenManuallyStopped=true restartCount=0
+
+=== deploy lock file ===
+-rw-r--r-- 1 root root 0 Jun  2 21:35 /opt/palmital/deploy.lock
+lock livre
+
+=== deploy state ===
+total 12
+drwxr-xr-x 2 root root 4096 Jun  2 21:38 .
+drwxr-xr-x 4 root root 4096 Jun  2 21:38 ..
+-rw-r--r-- 1 root root   23 Jun  2 21:38 last-successful-release
+01520cd-20260602213523
+
+=== containers com restart count alto ===
+
+[STDERR] failed to execute template: template: :1:31: executing "" at <.RestartCount>: can't evaluate field RestartCount in type *formatter.ContainerContext
+
+=== horario do release 01520cd na VPS ===
+Modify: 2026-06-02 21:35:46.969306430 +0000
+
+=== processos docker build ativos ===
+nenhum

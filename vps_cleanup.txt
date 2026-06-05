@@ -1,0 +1,49 @@
+=== docker system df ===
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          70        70        45.77GB   5.721GB (12%)
+Containers      105       105       2.168GB   0B (0%)
+Local Volumes   81        72        33.19GB   20.5GB (61%)
+Build Cache     329       0         20.13GB   20.13GB
+
+=== imagens palmital antigas ===
+palmital-api                               01520cd-20260602213523                     88c84cbac5c4   4 hours ago     436MB
+palmital-web                               01520cd-20260602213523                     c786f0932a2c   4 hours ago     63.7MB
+
+=== docker image prune (dangling) ===
+Total reclaimed space: 0B
+
+=== releases antes da limpeza ===
+total 20
+drwxr-xr-x 7 1001 1001 4096 Jun  2 21:35 01520cd-20260602213523
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:50 c4b7a2d-20260602195001
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:33 d45080b-20260602193257
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:21 83347d4-20260602192107
+drwxr-xr-x 7 1001 1001 4096 Jun  2 18:59 8a7748b-20260602185907
+
+=== limpando releases antigas ===
+Removendo: 8a7748b-20260602185907
+
+=== liberando page cache ===
+page cache liberado
+
+=== memoria depois ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       1.9Gi       396Mi       1.5Gi       2.6Gi
+Swap:          4.0Gi       4.0Gi          0B
+
+=== top 10 processos por memoria ===
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+www-data 4076019  0.0  8.8 5714544 1441932 ?     Sl   May19   3:21 uwsgi --ini uwsgi.ini
+www-data 4076018  0.0  8.7 5841712 1430768 ?     Sl   May19   2:33 uwsgi --ini uwsgi.ini
+ubuntu    490710  1.4  7.2 4632176 1190040 ?     SLsl May11 459:23 /usr/share/opensearch/jdk/bin/java -Xshare:auto -Dopensearch.networkaddress.cache.ttl=60 -Dopensearch.networkaddress.cache.negative.ttl=10 -XX:+AlwaysPreTouch -Xss1m -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djna.nosys=true -XX:-OmitStackTraceInFastThrow -XX:+ShowCodeDetailsInExceptionMessages -Dio.netty.noUnsafe=true -Dio.netty.noKeySetOptimization=true -Dio.netty.recycler.maxCapacityPerThread=0 -Dio.netty.allocator.numDirectArenas=0 -Dlog4j.shutdownHookEnabled=false -Dlog4j2.disable.jmx=true -Djava.security.manager=allow -Djava.locale.providers=SPI,COMPAT -Xms1g -Xmx1g -XX:+UseG1GC -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -Djava.io.tmpdir=/tmp/opensearch-11787797176830705513 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=data -XX:ErrorFile=logs/hs_err_pid%p.log -Xlog:gc*,gc+age=trace,safepoint:file=logs/gc.log:utctime,pid,tags:filecount=32,filesize=64m -Djava.security.manager=allow --add-modules=jdk.incubator.vector -Djava.util.concurrent.ForkJoinPool.common.threadFactory=org.opensearch.secure_sm.SecuredForkJoinWorkerThreadFactory -Dclk.tck=100 -Djdk.attach.allowAttachSelf=true -Djava.security.policy=/usr/share/opensearch/config/opensearch-performance-analyzer/opensearch_security.policy --add-opens=jdk.attach/sun.tools.attach=ALL-UNNAMED -Dopensearch.cgroups.hierarchy.override=/ -Xms512m -Xmx512m -XX:MaxDirectMemorySize=268435456 -Dopensearch.path.home=/usr/share/opensearch -Dopensearch.path.conf=/usr/share/opensearch/config -Dopensearch.distribution.type=tar -Dopensearch.bundled_jdk=true -cp /usr/share/opensearch/lib/* org.opensearch.bootstrap.OpenSearch -Eplugins.security.disabled=true -Enode.name=prices-node -Ebootstrap.memory_lock=true -Ecluster.name=cidadi-prices-cluster -Ediscovery.type=single-node
+root     4063870  0.0  6.4 2998416 1061272 ?     Ssl  May19   5:32 /app/llama-server --host 0.0.0.0 --port 8080 -hf ggml-org/Qwen3-1.7B-GGUF:Q4_K_M --jinja -c 3072 -n 180 --parallel 1 --batch-size 512 --ubatch-size 128 --threads 4
+root         896  6.1  4.4 6691556 720868 ?      Ssl  Apr23 3632:40 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root     4085640  0.6  3.8 8035616 625092 ?      Sl   May19 129:44 java -Xmx4g -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /home/app.jar
+1001     4101429  0.1  3.2 13156076 539280 ?     Sl   May19  28:15 node /app/backend/dist/index.js
+www-data  507518  0.0  2.9 5841720 488700 ?      Sl   May11   3:28 uwsgi --ini uwsgi.ini
+root     4086107  0.6  2.9 4827264 487832 ?      Sl   May19 128:59 java -Xmx1g -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /home/app.jar
+www-data  507519  0.0  2.8 5841716 462984 ?      Sl   May11   4:47 uwsgi --ini uwsgi.ini
+root      519086  0.5  2.0 4762756 337332 ?      Sl   May11 193:07 java -Xmx1g -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /home/app.jar
+root      518861  0.5  1.3 8030484 224052 ?      Sl   May11 192:02 java -Xmx4g -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar /home/app.jar
+1002     4101430  0.0  0.9 22811008 150068 ?     Sl   May19   1:40 next-server (v14.2.32)
+70        491182  0.0  0.8 174060 139580 ?       Ss   May11   1:39 postgres: checkpointer

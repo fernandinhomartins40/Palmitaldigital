@@ -1,0 +1,60 @@
+=== CONTAINERS COMPREFACE ===
+NAMES                           IMAGE                                 STATUS                 PORTS
+compreface-ui                   exadel/compreface-fe:1.2.0            Up 2 weeks (healthy)   0.0.0.0:8000->80/tcp, [::]:8000->80/tcp
+compreface-admin                exadel/compreface-admin:1.2.0         Up 2 weeks             
+compreface-api                  exadel/compreface-api:1.2.0           Up 2 weeks             
+compreface-core                 exadel/compreface-core:1.2.0          Up 2 weeks (healthy)   3000/tcp
+compreface-postgres-db          exadel/compreface-postgres-db:1.2.0   Up 2 weeks             5432/tcp
+cidadi-compreface-ui            exadel/compreface-fe:1.2.0            Up 3 weeks (healthy)   80/tcp
+cidadi-compreface-admin         exadel/compreface-admin:1.2.0         Up 3 weeks             
+cidadi-compreface-api           exadel/compreface-api:1.2.0           Up 3 weeks             
+cidadi-compreface-postgres-db   exadel/compreface-postgres-db:1.2.0   Up 3 weeks             5432/tcp
+cidadi-compreface-core          exadel/compreface-core:1.2.0          Up 3 weeks (healthy)   3000/tcp
+
+=== LABELS DOS CONTAINERS COMPREFACE (projeto compose) ===
+/compreface-ui | project=digiurban | dir=/root/digiurban
+/compreface-admin | project=digiurban | dir=/root/digiurban
+/compreface-api | project=digiurban | dir=/root/digiurban
+/compreface-core | project=digiurban | dir=/root/digiurban
+/compreface-postgres-db | project=digiurban | dir=/root/digiurban
+/cidadi-compreface-ui | project=cidadi | dir=/root/cidadi
+/cidadi-compreface-admin | project=cidadi | dir=/root/cidadi
+/cidadi-compreface-api | project=cidadi | dir=/root/cidadi
+/cidadi-compreface-postgres-db | project=cidadi | dir=/root/cidadi
+/cidadi-compreface-core | project=cidadi | dir=/root/cidadi
+
+=== ARQUIVOS COMPOSE COM COMPREFACE ===
+/root/digiurban/docker-compose.vps.yml
+/root/cidadi/docker-compose.vps.yml
+
+=== DIRETORIOS DOS PROJETOS COMPREFACE ===
+/root/cidadi
+/root/digiurban
+
+=== PROJETOS QUE USAM COMPREFACE ===
+cidadi
+digiurban
+
+=== UPTIME DE CADA CONTAINER COMPREFACE ===
+compreface-ui rodando ha 2 weeks ago
+compreface-admin rodando ha 2 weeks ago
+compreface-api rodando ha 2 weeks ago
+compreface-core rodando ha 2 weeks ago
+compreface-postgres-db rodando ha 2 weeks ago
+cidadi-compreface-ui rodando ha 3 weeks ago
+cidadi-compreface-admin rodando ha 3 weeks ago
+cidadi-compreface-api rodando ha 3 weeks ago
+cidadi-compreface-postgres-db rodando ha 3 weeks ago
+cidadi-compreface-core rodando ha 3 weeks ago
+
+=== MEMORIA COMPREFACE ===
+compreface-ui: 5.391MiB / 15.61GiB (0.03%)
+compreface-admin: 481MiB / 15.61GiB (3.01%)
+compreface-api: 616.4MiB / 15.61GiB (3.86%)
+compreface-core: 2.759GiB / 15.61GiB (17.67%)
+compreface-postgres-db: 34.03MiB / 15.61GiB (0.21%)
+cidadi-compreface-ui: 12.9MiB / 15.61GiB (0.08%)
+cidadi-compreface-admin: 347.3MiB / 15.61GiB (2.17%)
+cidadi-compreface-api: 241.3MiB / 15.61GiB (1.51%)
+cidadi-compreface-postgres-db: 28.21MiB / 15.61GiB (0.18%)
+cidadi-compreface-core: 1009MiB / 15.61GiB (6.31%)

@@ -1,0 +1,57 @@
+=== auth.log Jun 3 (conexoes SSH) ===
+Jun  3 01:18:21 mail sshd[3691193]: error: kex_exchange_identification: Connection closed by remote host
+Jun  3 01:18:21 mail sshd[3691193]: Connection closed by 2607:8500:faca:de::117 port 57566
+Jun  3 01:45:52 mail sshd[3977654]: Accepted password for root from 45.228.120.239 port 43269 ssh2
+Jun  3 01:45:52 mail sshd[3977654]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:45:56 mail sshd[3977654]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:46:18 mail sshd[3981720]: Accepted password for root from 45.228.120.239 port 43508 ssh2
+Jun  3 01:46:18 mail sshd[3981720]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:46:21 mail sshd[3981720]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:46:50 mail sshd[3987474]: Accepted password for root from 45.228.120.239 port 43822 ssh2
+Jun  3 01:46:50 mail sshd[3987474]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:46:51 mail sshd[3987474]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:47:17 mail sshd[3992026]: Accepted password for root from 45.228.120.239 port 44198 ssh2
+Jun  3 01:47:17 mail sshd[3992026]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:47:21 mail sshd[3992026]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:47:56 mail sshd[3999152]: Accepted password for root from 45.228.120.239 port 44592 ssh2
+Jun  3 01:47:56 mail sshd[3999152]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:48:08 mail sshd[3999152]: pam_unix(sshd:session): session closed for user root
+Jun  3 01:48:33 mail sshd[4005113]: Accepted password for root from 45.228.120.239 port 44999 ssh2
+Jun  3 01:48:33 mail sshd[4005113]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 01:52:19 mail sshd[4005113]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:00:19 mail sshd[4124416]: Accepted password for root from 45.228.120.239 port 43314 ssh2
+Jun  3 02:00:19 mail sshd[4124416]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:00:24 mail sshd[4124416]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:01:06 mail sshd[4131051]: Accepted password for root from 45.228.120.239 port 43297 ssh2
+Jun  3 02:01:06 mail sshd[4131051]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:01:07 mail sshd[4131051]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:01:35 mail sshd[4135405]: Accepted password for root from 45.228.120.239 port 45078 ssh2
+Jun  3 02:01:35 mail sshd[4135405]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:01:35 mail sshd[4135405]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:01:51 mail sshd[4137960]: Accepted password for root from 45.228.120.239 port 45223 ssh2
+Jun  3 02:01:51 mail sshd[4137960]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:01:52 mail sshd[4137960]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:06:31 mail sshd[4183818]: Invalid user admin from 207.175.67.215 port 40646
+Jun  3 02:06:31 mail sshd[4183818]: pam_unix(sshd:auth): check pass; user unknown
+Jun  3 02:06:31 mail sshd[4183818]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=207.175.67.215 
+Jun  3 02:06:33 mail sshd[4183818]: Failed password for invalid user admin from 207.175.67.215 port 40646 ssh2
+Jun  3 02:06:34 mail sshd[4183818]: Connection closed by invalid user admin 207.175.67.215 port 40646 [preauth]
+Jun  3 02:06:37 mail sshd[4183684]: Connection closed by 207.175.67.215 port 40634 [preauth]
+Jun  3 02:07:20 mail sshd[4192384]: Accepted password for root from 45.228.120.239 port 44843 ssh2
+Jun  3 02:07:20 mail sshd[4192384]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+Jun  3 02:07:22 mail sshd[4192384]: pam_unix(sshd:session): session closed for user root
+Jun  3 02:08:56 mail sshd[15180]: Accepted password for root from 45.228.120.239 port 41462 ssh2
+Jun  3 02:08:56 mail sshd[15180]: pam_unix(sshd:session): session opened for user root(uid=0) by (uid=0)
+
+=== releases hoje ===
+total 16
+drwxr-xr-x 7 1001 1001 4096 Jun  2 21:35 01520cd-20260602213523
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:50 c4b7a2d-20260602195001
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:33 d45080b-20260602193257
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:21 83347d4-20260602192107
+
+=== memoria agora ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       373Mi       396Mi       3.1Gi       2.5Gi
+Swap:          4.0Gi       4.0Gi       0.0Ki
+ 02:08:57 up 40 days, 19:38,  0 users,  load average: 3.70, 3.88, 3.99

@@ -173,13 +173,14 @@ export class NewsService {
     return this.prisma.article.delete({ where: { id: articleId } });
   }
 
-  async listPublic(filters: { categoryId?: string; tag?: string; featured?: boolean }) {
+  async listPublic(filters: { categoryId?: string; tag?: string; featured?: boolean; authorId?: string; limit?: number }) {
     return this.prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         categoryId: filters.categoryId || undefined,
         tags: filters.tag ? { has: filters.tag } : undefined,
         isFeatured: filters.featured ? true : undefined,
+        authorId: filters.authorId || undefined,
       },
       include: {
         author: { include: { profile: true } },
@@ -187,7 +188,7 @@ export class NewsService {
         _count: { select: { comments: true } },
       },
       orderBy: { publishedAt: 'desc' },
-      take: 50,
+      take: filters.limit ?? 50,
     });
   }
 

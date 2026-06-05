@@ -1,0 +1,84 @@
+=== TOP PROCESSOS POR RAM (MB) ===
+
+[ERR] awk: cmd. line:1: {printf "%s	%.0f MB	%s
+awk: cmd. line:1:         ^ unterminated string
+awk: cmd. line:1: {printf "%s	%.0f MB	%s
+awk: cmd. line:1:         ^ syntax error
+
+=== DOCKER CONTAINERS - MEM USAGE ===
+56184f7-20260531143115-postgres-1 21.16MiB / 15.61GiB
+7914c1c-20260509111806-postgres-1 9.539MiB / 15.61GiB
+289cb5b-20260509114459-postgres-1 8.371MiB / 15.61GiB
+25f0505-20260509115257-postgres-1 8.988MiB / 15.61GiB
+8c1dc40-20260509113805-postgres-1 8.41MiB / 15.61GiB
+8c1dc40-20260509113805-api-1 7.203MiB / 15.61GiB
+8c1dc40-20260509113600-postgres-1 8.527MiB / 15.61GiB
+8c1dc40-20260509113600-api-1 7.453MiB / 15.61GiB
+vox_web 22.09MiB / 15.61GiB
+vox_nginx 3.699MiB / 15.61GiB
+vox_db 14.78MiB / 15.61GiB
+vox_api 33.26MiB / 15.61GiB
+vigiaescolar-web-1 26.56MiB / 15.61GiB
+vigiaescolar-retention-worker-1 17.66MiB / 15.61GiB
+vigiaescolar-notification-worker-1 22.89MiB / 15.61GiB
+vigiaescolar-nginx-1 4.934MiB / 15.61GiB
+vigiaescolar-mediamtx-1 13.21MiB / 15.61GiB
+vigiaescolar-face-server-1 43.26MiB / 15.61GiB
+vigiaescolar-face-db-1 19.8MiB / 15.61GiB
+vigiaescolar-db-1 44.51MiB / 15.61GiB
+vigiaescolar-camera-gateway-1 29.76MiB / 15.61GiB
+vigiaescolar-api-1 47.41MiB / 15.61GiB
+vigiaescolar-absence-worker-1 35.03MiB / 15.61GiB
+ultrazend-smtp 54.55MiB / 15.61GiB
+ultrazend-postgres 49.57MiB / 15.61GiB
+ultrazend-messages 86.7MiB / 15.61GiB
+ultrazend-face 40.71MiB / 15.61GiB
+ultrazend-api 110.4MiB / 512MiB
+tagarelinha-web 29.46MiB / 15.61GiB
+tagarelinha-redis 4.879MiB / 15.61GiB
+
+=== SOMA DE CONTAINERS POR PREFIXO ===
+2826 MiB  compreface-core
+1076 MiB  cidadi-opensearch
+1050 MiB  digiurban-llamacpp
+1009 MiB  cidadi-compreface-core
+893 MiB  digiurban
+759 MiB  cidadi
+650 MiB  compreface
+481 MiB  compreface-admin
+347 MiB  cidadi-compreface-admin
+342 MiB  ultrazend
+269 MiB  cidadi-compreface
+264 MiB  ferraco-crm
+186 MiB  vigiaescolar
+164 MiB  m2centerauto
+152 MiB  revendeo
+147 MiB  moria
+112 MiB  rebequi
+104 MiB  palmital
+103 MiB  fusehotel
+93 MiB  tagarelinha
+83 MiB  gymflow-minio
+74 MiB  vox
+56 MiB  evoluir
+53 MiB  marcela_minio
+43 MiB  gymflow
+42 MiB  culturaviva
+37 MiB  marcela
+35 MiB  vigiaescolar-absence
+32 MiB  8c1dc40
+30 MiB  vigiaescolar-camera
+29 MiB  ferraco
+23 MiB  vigiaescolar-notification
+21 MiB  56184f7
+18 MiB  vigiaescolar-retention
+13 MiB  vigiaescolar-mediamtx-1
+13 MiB  cidadi-compreface-ui
+11 MiB  a6c3fa0
+10 MiB  7914c1c
+9 MiB  25f0505
+8 MiB  289cb5b
+5 MiB  compreface-ui
+5 MiB  jmeletrica
+3 MiB  marcela_admin
+3 MiB  marcela_patient

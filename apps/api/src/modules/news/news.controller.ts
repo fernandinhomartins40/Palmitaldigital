@@ -69,11 +69,15 @@ export class NewsController {
     @Query('categoryId') categoryId?: string,
     @Query('tag') tag?: string,
     @Query('featured') featured?: string,
+    @Query('authorId') authorId?: string,
+    @Query('limit') limit?: string,
   ) {
     return this.news.listPublic({
       categoryId,
       tag,
       featured: featured === 'true',
+      authorId,
+      limit: limit ? parseInt(limit, 10) : undefined,
     });
   }
 

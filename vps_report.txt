@@ -1,0 +1,154 @@
+=== sshd status ===
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+     Active: active (running) since Thu 2026-04-30 06:14:26 UTC; 1 month 3 days ago
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+   Main PID: 3556122 (sshd)
+      Tasks: 1 (limit: 19136)
+     Memory: 4.3M
+        CPU: 2min 27.946s
+     CGroup: /system.slice/ssh.service
+             └─3556122 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Jun 02 21:38:31 mail.urbanmail.com.br sshd[1506256]: Disconnected from user root 20.109.87.114 port 42010
+Jun 02 21:38:31 mail.urbanmail.com.br sshd[1506256]: pam_unix(sshd:session): session closed for user root
+Jun 02 21:38:32 mail.urbanmail.com.br sshd[1506567]: Accepted password for root from 20.109.87.114 port 42014 ssh2
+
+=== ufw status ===
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+80                         ALLOW       Anywhere                  
+443                        ALLOW       Anywhere                  
+53                         ALLOW       Anywhere                  
+53/tcp                     ALLOW       Anywhere                  
+53/udp                     ALLOW       Anywhere                  
+8109                       ALLOW       Anywhere                  
+3001                       ALLOW       Anywhere                  
+25/tcp                     ALLOW       Anywhere                   # SMTP
+465/tcp                    ALLOW       Anywhere                   # SMTPS
+587/tcp                    ALLOW       Anywhere                   # SMTP Submission
+993/tcp                    ALLOW       Anywhere                   # IMAPS
+995/tcp                    ALLOW       Anywhere                   # POP3S
+172.24.0.1 5432/tcp on br-abe90336db8b ALLOW       172.24.0.0/16             
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+80 (v6)                    ALLOW       Anywhere (v6)             
+443 (v6)                   ALLOW       Anywhere (v6)             
+53 (v6)                    ALLOW       Anywhere (v6)             
+53/tcp (v6)                ALLOW       Anywhere (v6)             
+53/udp (v6)                ALLOW       Anywhere (v6)             
+8109 (v6)                  ALLOW       Anywhere (v6)             
+3001 (v6)                  ALLOW       Anywhere (v6)             
+25/tcp (v6)                ALLOW       Anywhere (v6)              # SMTP
+465/tcp (v6)               ALLOW       Anywhere (v6)              # SMTPS
+587/tcp (v6)               ALLOW       Anywhere (v6)              # SMTP Submission
+993/tcp (v6)               ALLOW       Anywhere (v6)              # IMAPS
+995/tcp (v6)               ALLOW       Anywhere (v6)              # POP3S
+
+=== iptables porta 22 ===
+Chain INPUT (policy DROP)
+num  target     prot opt source               destination         
+1    f2b-sshd   tcp  --  0.0.0.0/0            0.0.0.0/0            multiport dports 22
+2    ufw-before-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+3    ufw-before-input  all  --  0.0.0.0/0            0.0.0.0/0           
+4    ufw-after-input  all  --  0.0.0.0/0            0.0.0.0/0           
+5    ufw-after-logging-input  all  --  0.0.0.0/0            0.0.0.0/0           
+6    ufw-reject-input  all  --  0.0.0.0/0            0.0.0.0/0           
+7    ufw-track-input  all  --  0.0.0.0/0            0.0.0.0/0
+
+=== memoria / load ===
+total        used        free      shared  buff/cache   available
+Mem:            15Gi        12Gi       247Mi       396Mi       3.2Gi       2.6Gi
+Swap:          4.0Gi       4.0Gi          0B
+ 01:46:19 up 40 days, 19:16,  0 users,  load average: 2.95, 3.30, 3.44
+
+=== disco ===
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       194G  150G   45G  78% /
+
+=== palmital containers logs (api) ===
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/rides/:id/complete, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/rides/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/rides/:id/rating, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/rides/:id/locations, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mDeliveryController {/api/v1/delivery}:[39m[38;5;3m +2ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/restaurants, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/restaurants/me, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/restaurants/me, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/restaurants, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/restaurants/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/menu/sections, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/menu/sections/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/menu/items, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/menu/items/:id, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/menu/items/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/orders, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/orders/my, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/orders/restaurant, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/orders/:id, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/delivery/orders/:id/status, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mNewsController {/api/v1/news}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/apply, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/apply/me, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/applications, GET} route[39m[38;5;3m +14ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/applications/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/categories, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/categories, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/mine, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id/submit, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/articles/:id/review, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments/:commentId, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +197ms[39m
+API running on http://localhost:3001/api/v1
+
+=== palmital containers logs (web) ===
+172.29.0.1 - - [02/Jun/2026:21:43:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:43:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:44:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:44:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:45:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:45:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:46:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:46:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:47:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:47:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:48:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:48:42 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:49:12 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:49:43 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:50:13 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:50:43 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:51:13 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:51:43 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:21:52:13 +0000] "GET /api/v1/chat/conversations HTTP/1.1" 304 0 "https://www.palmitaldigital.com.br/feed" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" "45.228.120.239"
+172.29.0.1 - - [02/Jun/2026:22:26:12 +0000] "GET / HTTP/1.1" 200 653 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36" "23.94.179.91"
+
+=== ultimo deploy em /opt/palmital/releases ===
+total 20
+drwxr-xr-x 7 1001 1001 4096 Jun  2 21:35 01520cd-20260602213523
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:50 c4b7a2d-20260602195001
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:33 d45080b-20260602193257
+drwxr-xr-x 7 1001 1001 4096 Jun  2 19:21 83347d4-20260602192107
+drwxr-xr-x 7 1001 1001 4096 Jun  2 18:59 8a7748b-20260602185907
+
+=== current symlink ===
+lrwxrwxrwx 1 root root 45 Jun  2 21:38 /opt/palmital/current -> /opt/palmital/releases/01520cd-20260602213523
+
+=== processo na porta 22 ===
+LISTEN 0      128                                        0.0.0.0:22         0.0.0.0:*    users:(("sshd",pid=3556122,fd=3))                                                                                                                  
+LISTEN 0      128                                           [::]:22            [::]:*    users:(("sshd",pid=3556122,fd=4))
+
+=== nginx status ===
+active
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful

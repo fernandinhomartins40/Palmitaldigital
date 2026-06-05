@@ -49,6 +49,7 @@ const NewsPortalPage = lazy(() => import('./pages/news/NewsPortalPage').then((m)
 const ArticlePage = lazy(() => import('./pages/news/ArticlePage').then((m) => ({ default: m.ArticlePage })));
 const WriteArticlePage = lazy(() => import('./pages/news/WriteArticlePage').then((m) => ({ default: m.WriteArticlePage })));
 const JournalistApplyPage = lazy(() => import('./pages/news/JournalistApplyPage').then((m) => ({ default: m.JournalistApplyPage })));
+const JournalistPortalPage = lazy(() => import('./pages/news/JournalistPortalPage').then((m) => ({ default: m.JournalistPortalPage })));
 
 const Loader = () => (
   <div className="flex h-screen items-center justify-center">
@@ -123,6 +124,7 @@ export const router = createBrowserRouter([
       // News
       { path: '/news', element: <Page><NewsPortalPage /></Page> },
       { path: '/news/article/:slug', element: <Page><ArticlePage /></Page> },
+      { path: '/news/portal/:authorId', element: <Page><JournalistPortalPage /></Page> },
       { path: '/news/write', element: <Page><WriteArticlePage /></Page> },
       { path: '/news/apply', element: <Page><JournalistApplyPage /></Page> },
     ],

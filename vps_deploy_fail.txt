@@ -1,0 +1,847 @@
+=== diretorios em releases (incluindo parciais) ===
+/opt/palmital/releases
+/opt/palmital/releases/01520cd-20260602213523
+/opt/palmital/releases/83347d4-20260602192107
+/opt/palmital/releases/c4b7a2d-20260602195001
+/opt/palmital/releases/d45080b-20260602193257
+
+=== docker logs palmital-api-1 tail ===
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mNewsController {/api/v1/news}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/apply, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/apply/me, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/applications, GET} route[39m[38;5;3m +14ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/applications/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/categories, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/categories, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/mine, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:slug, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id, PATCH} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id/submit, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/admin/articles/:id/review, PATCH} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/articles/:id, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/v1/news/:articleId/comments/:commentId, DELETE} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 1  - [39m06/02/2026, 9:38:12 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +197ms[39m
+API running on http://localhost:3001/api/v1
+
+=== syslog Jun 3 01:40-02:15 ===
+Jun  3 00:00:15 mail systemd[1]: Starting Daily dpkg database backup service...
+Jun  3 00:00:15 mail systemd[1]: Starting Rotate log files...
+Jun  3 00:00:18 mail systemd[1]: dpkg-db-backup.service: Deactivated successfully.
+Jun  3 00:00:18 mail systemd[1]: Finished Daily dpkg database backup service.
+Jun  3 00:00:38 mail logrotate[2898168]: error: stat of /var/log/nginx/studio-*_access.log failed: No such file or directory
+Jun  3 00:00:38 mail logrotate[2898168]: error: stat of /var/log/nginx/studio-*_error.log failed: No such file or directory
+Jun  3 00:00:38 mail systemd[1]: logrotate.service: Main process exited, code=exited, status=1/FAILURE
+Jun  3 00:00:38 mail systemd[1]: logrotate.service: Failed with result 'exit-code'.
+Jun  3 00:00:38 mail systemd[1]: Failed to start Rotate log files.
+Jun  3 00:00:38 mail systemd[1]: logrotate.service: Consumed 9.053s CPU time.
+Jun  3 00:02:11 mail kernel: [3519153.235973] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=35.203.210.135 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=30390 PROTO=TCP SPT=52307 DPT=49714 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:02:55 mail kernel: [3519196.819121] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=153.246.220.255 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=235 ID=11935 PROTO=TCP SPT=40710 DPT=5001 WINDOW=1300 RES=0x00 SYN URGP=0 
+Jun  3 00:03:32 mail kernel: [3519233.689414] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=147.185.133.176 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=22909 PROTO=TCP SPT=52448 DPT=24754 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:03:39 mail kernel: [3519241.333047] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.149.229 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=58199 PROTO=TCP SPT=54502 DPT=47634 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:04:18 mail kernel: [3519280.534212] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.149.13 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=63924 PROTO=TCP SPT=53336 DPT=51534 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:04:40 mail kernel: [3519302.473078] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=77.28.75.184 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=48 ID=45293 PROTO=TCP SPT=4816 DPT=23 WINDOW=57503 RES=0x00 SYN URGP=0 
+Jun  3 00:05:01 mail CRON[2941739]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+Jun  3 00:06:29 mail kernel: [3519411.262534] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.150.247 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=62528 PROTO=TCP SPT=50811 DPT=39002 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:07:48 mail kernel: [3519489.872866] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.149.75 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=39378 PROTO=TCP SPT=51498 DPT=13990 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:08:40 mail kernel: [3519541.921561] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=177.16.128.89 DST=72.60.10.108 LEN=624 TOS=0x00 PREC=0x00 TTL=53 ID=48048 DF PROTO=UDP SPT=34685 DPT=27378 LEN=604 
+Jun  3 00:09:21 mail kernel: [3519583.574991] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=146.190.77.70 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=244 ID=35112 PROTO=TCP SPT=53298 DPT=30597 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:12:04 mail kernel: [3519746.082496] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.149.191 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=19644 PROTO=TCP SPT=55178 DPT=4214 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:12:17 mail kernel: [3519758.864067] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:86:dd SRC=2001:41d0:033d:9200:0000:0000:0000:0409 DST=2a02:4780:0066:e31c:0000:0000:0000:0001 LEN=80 TC=0 HOPLIMIT=47 FLOWLBL=329442 PROTO=TCP SPT=14012 DPT=104 WINDOW=5840 RES=0x00 SYN URGP=0 
+Jun  3 00:12:21 mail kernel: [3519763.286627] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:86:dd SRC=2a06:4880:a000:0000:0000:0000:0000:00c2 DST=2a02:4780:0066:e31c:0000:0000:0000:0001 LEN=64 TC=40 HOPLIMIT=239 FLOWLBL=210636 PROTO=TCP SPT=47697 DPT=58603 WINDOW=14600 RES=0x00 SYN URGP=0 
+Jun  3 00:12:31 mail kernel: [3519773.591330] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=147.185.133.201 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=23127 PROTO=TCP SPT=51396 DPT=62402 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:13:04 mail kernel: [3519806.236061] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=35.203.210.96 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=16883 PROTO=TCP SPT=53389 DPT=39990 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:13:06 mail kernel: [3519807.889360] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=167.94.146.75 DST=72.60.10.108 LEN=60 TOS=0x00 PREC=0x00 TTL=52 ID=33803 PROTO=TCP SPT=52051 DPT=32194 WINDOW=42340 RES=0x00 SYN URGP=0 
+Jun  3 00:13:14 mail kernel: [3519815.718008] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=71.6.134.236 DST=72.60.10.108 LEN=52 TOS=0x00 PREC=0x00 TTL=44 ID=22211 PROTO=TCP SPT=59210 DPT=2222 WINDOW=65535 RES=0x00 SYN URGP=0 
+Jun  3 00:13:25 mail kernel: [3519826.786052] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=162.216.149.46 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=247 ID=57158 PROTO=TCP SPT=50332 DPT=678 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:13:37 mail qemu-ga: info: guest-file-open called, filepath: /.hstgr-1780445617.scanner.py, mode: w
+Jun  3 00:13:37 mail qemu-ga: info: guest-file-open, handle: 3928
+Jun  3 00:13:37 mail qemu-ga: info: guest-file-close called, handle: 3928
+Jun  3 00:13:37 mail qemu-ga: info: guest-exec called: "/bin/sh -c trap 'rm /.hstgr-1780445617.scanner.py' 0; /usr/bin/env python3 /.hstgr-1780445617.scanner.py"
+Jun  3 00:13:37 mail qemu-ga: info: guest-exec-status called, pid: 3027042
+Jun  3 00:13:46 mail kernel: [3519848.640511] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=1.33.206.197 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=236 ID=65094 PROTO=TCP SPT=51689 DPT=50000 WINDOW=1300 RES=0x00 SYN URGP=0 
+Jun  3 00:13:55 mail kernel: [3519857.114084] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=45.55.83.120 DST=72.60.10.108 LEN=40 TOS=0x00 PREC=0x00 TTL=244 ID=8376 PROTO=TCP SPT=46940 DPT=8080 WINDOW=1024 RES=0x00 SYN URGP=0 
+Jun  3 00:13:38 mail qemu-ga: message repeated 7 times: [ info: guest-exec-status called, pid: 3027042]
+Jun  3 00:15:01 mail CRON[3041816]: (root) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)
+Jun  3 00:15:35 mail kernel: [3519957.069086] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=122.175.42.218 DST=72.60.10.108 LEN=552 TOS=0x00 PREC=0x00 TTL=56 ID=13002 PROTO=TCP SPT=32909 DPT=32846 WINDOW=59131 RES=0x00 SYN URGP=0 
+Jun  3 00:15:35 mail kernel: [3519957.644745] [UFW BLOCK] IN=eth0 OUT= MAC=22:e8:d4:b3:9d:c8:44:38:39:ff:ff:41:08:00 SRC=35.203.210.126 DST=72.60.10.108 LEN=44 TOS=0x00 PREC=0x00 TTL=246 ID=58905 PROTO=TCP SPT=55156 DPT=16174 WINDOW=1024 RES=0x00 SYN URGP=0
+
+=== docker events Jun 3 01:45-02:10 UTC ===
+1780452546 container exec_die vigiaescolar-db-1
+1780452546 container exec_create: /bin/sh -c node -e "fetch('http://127.0.0.1:3000').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-web-1
+1780452546 container exec_start: /bin/sh -c node -e "fetch('http://127.0.0.1:3000').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-web-1
+1780452546 container exec_die revendeo-web-1
+1780452547 container exec_create: /bin/sh -c ollama list >/dev/null 2>&1 || exit 1 cidadi-ollama
+1780452547 container exec_start: /bin/sh -c ollama list >/dev/null 2>&1 || exit 1 cidadi-ollama
+1780452547 container exec_create: redis-cli ping digiurban-redis
+1780452547 container exec_start: redis-cli ping digiurban-redis
+1780452547 container exec_die cidadi-ollama
+1780452547 container exec_die digiurban-redis
+1780452547 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452547 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452547 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452547 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452547 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452547 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452547 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452547 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452547 container exec_die digiurban-postgres
+1780452547 container exec_die ferraco-postgres
+1780452547 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452547 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452547 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452547 container exec_die 25f0505-20260509115257-postgres-1
+1780452547 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452547 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452547 container exec_die m2centerauto-alpr-1
+1780452547 container exec_die m2centerauto-postgres-1
+1780452547 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452547 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452548 container exec_die 289cb5b-20260509114459-postgres-1
+1780452548 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452548 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452548 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452548 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452548 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452548 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452548 container exec_die compreface-core
+1780452548 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452548 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452548 container exec_die cidadi-postgres
+1780452548 container exec_die vox_db
+1780452548 container exec_die m2centerauto-gateway-1
+1780452549 container exec_create: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452549 container exec_start: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452549 container exec_die rebequi-postgres
+1780452549 container exec_create: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452549 container exec_start: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452549 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452549 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452549 container exec_die gymflow-postgres
+1780452549 container exec_die evoluir_api
+1780452551 container exec_create: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452551 container exec_start: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452551 container exec_create: redis-cli ping cidadi-redis
+1780452551 container exec_start: redis-cli ping cidadi-redis
+1780452551 container exec_die marcela_postgres
+1780452551 container exec_die cidadi-redis
+1780452551 container exec_create: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452551 container exec_start: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452551 container exec_die gymflow-redis
+1780452552 container exec_create: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) ultrazend-smtp
+1780452552 container exec_start: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) ultrazend-smtp
+1780452552 container exec_create: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-face
+1780452552 container exec_start: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-face
+1780452552 container exec_die ultrazend-smtp
+1780452552 container exec_die cidadi-face
+1780452552 container exec_create: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452552 container exec_start: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452552 container exec_create: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452552 container exec_start: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452552 container exec_die evoluir_postgres
+1780452552 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452552 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452552 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452552 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452552 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452552 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452553 container exec_die moria-postgres
+1780452553 container exec_die 8c1dc40-20260509113600-postgres-1
+1780452553 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452553 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452553 container exec_die m2centerauto-postgres-1
+1780452553 container exec_create: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452553 container exec_start: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452553 container exec_die m2centerauto-frontend-1
+1780452553 container exec_create: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452553 container exec_start: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452553 container exec_create: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452553 container exec_start: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452553 container exec_create: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452553 container exec_start: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452553 container exec_die cidadi-compreface-core
+1780452553 container exec_die m2centerauto-backend-1
+1780452553 container exec_create: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452553 container exec_start: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452553 container exec_die tagarelinha-postgres
+1780452553 container exec_die vox_api
+1780452553 container exec_die a6c3fa0-20260509132846-postgres-1
+1780452553 container exec_die vigiaescolar-face-db-1
+1780452553 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452553 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452553 container exec_die vox_db
+1780452553 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()" moria-alpr
+1780452553 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()" moria-alpr
+1780452554 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452554 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452554 container exec_die cidadi-compreface-ui
+1780452554 container exec_die moria-alpr
+1780452554 container exec_create: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-messages
+1780452554 container exec_start: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-messages
+1780452554 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452554 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452554 container exec_create: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452554 container exec_start: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452554 container exec_die compreface-ui
+1780452554 container exec_die cidadi-messages
+1780452554 container exec_die cidadi-opensearch
+1780452554 container exec_create: node -e require('http').get('http://localhost:9003/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-flow
+1780452554 container exec_start: node -e require('http').get('http://localhost:9003/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-flow
+1780452555 container exec_create: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452555 container exec_start: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452555 container exec_die cidadi-flow
+1780452555 container exec_die culturaviva-postgres-1
+1780452555 container exec_create: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452555 container exec_start: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452555 container exec_die 7914c1c-20260509111806-postgres-1
+1780452555 container exec_create: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1 rebequi-api
+1780452555 container exec_start: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1 rebequi-api
+1780452555 container exec_create: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452555 container exec_start: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452555 container exec_die rebequi-api
+1780452555 container exec_create: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452555 container exec_start: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452555 container exec_die tagarelinha-redis
+1780452556 container exec_die fusehotel-postgres-vps
+1780452556 container exec_create: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452556 container exec_start: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452556 container exec_die vigiaescolar-db-1
+1780452556 container exec_create: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) cidadi-smtp
+1780452556 container exec_start: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) cidadi-smtp
+1780452556 container exec_die cidadi-smtp
+1780452557 container exec_create: curl -f http://localhost:8080/health digiurban-llamacpp
+1780452557 container exec_start: curl -f http://localhost:8080/health digiurban-llamacpp
+1780452557 container exec_die digiurban-llamacpp
+1780452557 container exec_create: redis-cli ping digiurban-redis
+1780452557 container exec_start: redis-cli ping digiurban-redis
+1780452557 container exec_die digiurban-redis
+1780452557 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452557 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452557 container exec_die digiurban-postgres
+1780452557 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452557 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452557 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452557 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452557 container exec_create: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-face
+1780452557 container exec_start: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-face
+1780452557 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452557 container exec_die ferraco-postgres
+1780452557 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452557 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452557 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452557 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452557 container exec_die 25f0505-20260509115257-postgres-1
+1780452558 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452558 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452558 container exec_die ultrazend-face
+1780452558 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452558 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452558 container exec_die m2centerauto-postgres-1
+1780452558 container exec_die 289cb5b-20260509114459-postgres-1
+1780452558 container exec_die m2centerauto-alpr-1
+1780452558 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452558 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452558 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452558 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452558 container exec_die compreface-core
+1780452558 container exec_die cidadi-postgres
+1780452558 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452558 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452558 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452558 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452558 container exec_die m2centerauto-gateway-1
+1780452558 container exec_die vox_db
+1780452558 container exec_create: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-messages
+1780452558 container exec_start: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-messages
+1780452558 container exec_create: /bin/sh -c node -e "require('http').get('http://localhost:3001/api/health/simple', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ultrazend-api
+1780452558 container exec_start: /bin/sh -c node -e "require('http').get('http://localhost:3001/api/health/simple', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ultrazend-api
+1780452559 container exec_die ultrazend-messages
+1780452559 container exec_die ultrazend-api
+1780452559 container exec_create: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452559 container exec_start: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452559 container exec_create: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452559 container exec_start: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452559 container exec_die rebequi-postgres
+1780452560 container exec_die gymflow-postgres
+1780452561 container exec_create: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452561 container exec_start: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452561 container exec_create: redis-cli ping cidadi-redis
+1780452561 container exec_start: redis-cli ping cidadi-redis
+1780452561 container exec_die marcela_postgres
+1780452561 container exec_create: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452561 container exec_start: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452561 container exec_die cidadi-redis
+1780452561 container exec_die gymflow-redis
+1780452562 container exec_create: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 palmital-postgres-1
+1780452562 container exec_start: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 palmital-postgres-1
+1780452562 container exec_create: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-ai
+1780452562 container exec_start: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-ai
+1780452562 container exec_die palmital-postgres-1
+1780452562 container exec_die cidadi-ai
+1780452562 container exec_create: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452562 container exec_start: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452563 container exec_die evoluir_postgres
+1780452563 container exec_create: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452563 container exec_start: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452563 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452563 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452563 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452563 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452563 container exec_die moria-postgres
+1780452563 container exec_die 8c1dc40-20260509113600-postgres-1
+1780452563 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452563 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452563 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452563 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452563 container exec_die m2centerauto-frontend-1
+1780452563 container exec_create: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452563 container exec_start: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452563 container exec_create: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452563 container exec_start: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452563 container exec_create: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452563 container exec_start: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452563 container exec_create: wget --no-verbose --tries=1 --spider http://localhost:3001/health tagarelinha-api
+1780452563 container exec_start: wget --no-verbose --tries=1 --spider http://localhost:3001/health tagarelinha-api
+1780452563 container exec_create: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452563 container exec_start: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452563 container exec_die m2centerauto-backend-1
+1780452563 container exec_create: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452563 container exec_start: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452563 container exec_die cidadi-compreface-core
+1780452563 container exec_die m2centerauto-postgres-1
+1780452563 container exec_create: node -e require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)) fusehotel-api-vps
+1780452563 container exec_start: node -e require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)) fusehotel-api-vps
+1780452563 container exec_die tagarelinha-postgres
+1780452563 container exec_die vox_api
+1780452563 container exec_die tagarelinha-api
+1780452563 container exec_die vigiaescolar-face-db-1
+1780452563 container exec_die a6c3fa0-20260509132846-postgres-1
+1780452563 container exec_die fusehotel-api-vps
+1780452563 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452563 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452563 container exec_create: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1 rebequi-web
+1780452563 container exec_start: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1 rebequi-web
+1780452564 container exec_die vox_db
+1780452564 container exec_die rebequi-web
+1780452564 container exec_create: /bin/sh -c node -e "require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))" vigiaescolar-face-server-1
+1780452564 container exec_start: /bin/sh -c node -e "require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))" vigiaescolar-face-server-1
+1780452564 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452564 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452564 container exec_die vigiaescolar-face-server-1
+1780452564 container exec_die evoluir_api
+1780452565 container exec_create: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452565 container exec_start: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452565 container exec_die culturaviva-postgres-1
+1780452565 container exec_create: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452565 container exec_start: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452565 container exec_create: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 56184f7-20260531143115-postgres-1
+1780452565 container exec_start: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 56184f7-20260531143115-postgres-1
+1780452565 container exec_die 7914c1c-20260509111806-postgres-1
+1780452565 container exec_die 56184f7-20260531143115-postgres-1
+1780452565 container exec_create: /bin/sh -c nc -z localhost 1936 || exit 1 vigiaescolar-mediamtx-1
+1780452565 container exec_start: /bin/sh -c nc -z localhost 1936 || exit 1 vigiaescolar-mediamtx-1
+1780452565 container exec_die vigiaescolar-mediamtx-1
+1780452565 container exec_create: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452565 container exec_start: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452566 container exec_die tagarelinha-redis
+1780452566 container exec_create: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452566 container exec_start: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452566 container exec_die fusehotel-postgres-vps
+1780452566 container exec_create: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452566 container exec_start: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452566 container exec_die vigiaescolar-db-1
+1780452566 container exec_create: wget --no-verbose --tries=1 --spider http://127.0.0.1:3050/health ferraco-crm-vps
+1780452566 container exec_start: wget --no-verbose --tries=1 --spider http://127.0.0.1:3050/health ferraco-crm-vps
+1780452566 container exec_die ferraco-crm-vps
+1780452567 container exec_create: curl -f http://localhost:9000/minio/health/live gymflow-minio
+1780452567 container exec_start: curl -f http://localhost:9000/minio/health/live gymflow-minio
+1780452567 container exec_die gymflow-minio
+1780452567 container exec_create: redis-cli ping digiurban-redis
+1780452567 container exec_start: redis-cli ping digiurban-redis
+1780452567 container exec_die digiurban-redis
+1780452567 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452567 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452567 container exec_create: /bin/sh -c curl -fsS http://127.0.0.1:3000/health | grep -q '"status":"ok"' || exit 1 palmital-web-1
+1780452567 container exec_start: /bin/sh -c curl -fsS http://127.0.0.1:3000/health | grep -q '"status":"ok"' || exit 1 palmital-web-1
+1780452567 container exec_die digiurban-postgres
+1780452567 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452567 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452567 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452567 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452567 container exec_create: /bin/sh -c wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1 fusehotel-nginx-vps
+1780452567 container exec_start: /bin/sh -c wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1 fusehotel-nginx-vps
+1780452567 container exec_die palmital-web-1
+1780452567 container exec_die fusehotel-nginx-vps
+1780452567 container exec_die ferraco-postgres
+1780452567 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452567 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452567 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452568 container exec_die 25f0505-20260509115257-postgres-1
+1780452568 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452568 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452568 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 revendeo-nginx-1
+1780452568 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 revendeo-nginx-1
+1780452568 container exec_die 289cb5b-20260509114459-postgres-1
+1780452568 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452568 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452568 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452568 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452568 container exec_die revendeo-nginx-1
+1780452568 container exec_die m2centerauto-postgres-1
+1780452568 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452568 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452568 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452568 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452568 container exec_die compreface-core
+1780452568 container exec_die m2centerauto-alpr-1
+1780452568 container exec_die cidadi-postgres
+1780452568 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452568 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452568 container exec_create: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) digiurban-ai
+1780452568 container exec_start: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) digiurban-ai
+1780452568 container exec_die m2centerauto-gateway-1
+1780452569 container exec_die digiurban-ai
+1780452569 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452569 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452569 container exec_die vox_db
+1780452569 container exec_create: curl -f http://127.0.0.1/health cidadi-vps
+1780452569 container exec_start: curl -f http://127.0.0.1/health cidadi-vps
+1780452569 container exec_die cidadi-vps
+1780452569 container exec_create: /bin/sh -c curl -fsS http://127.0.0.1:3001/health | grep -q '"status":"ok"' || exit 1 palmital-api-1
+1780452569 container exec_start: /bin/sh -c curl -fsS http://127.0.0.1:3001/health | grep -q '"status":"ok"' || exit 1 palmital-api-1
+1780452569 container exec_create: curl -f http://localhost:9002/api/v1/health cidadi-prices
+1780452569 container exec_start: curl -f http://localhost:9002/api/v1/health cidadi-prices
+1780452569 container exec_die cidadi-prices
+1780452569 container exec_die palmital-api-1
+1780452569 container exec_create: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452569 container exec_start: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452570 container exec_create: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452570 container exec_start: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452570 container exec_die rebequi-postgres
+1780452570 container exec_die gymflow-postgres
+1780452570 container exec_create: /bin/sh -c curl -fsS http://127.0.0.1:3090/health >/dev/null || exit 1 moria-vps
+1780452570 container exec_start: /bin/sh -c curl -fsS http://127.0.0.1:3090/health >/dev/null || exit 1 moria-vps
+1780452570 container exec_die moria-vps
+1780452570 container exec_create: curl -f http://127.0.0.1/health digiurban-vps
+1780452570 container exec_start: curl -f http://127.0.0.1/health digiurban-vps
+1780452571 container exec_die digiurban-vps
+1780452571 container exec_create: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452571 container exec_start: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452571 container exec_create: redis-cli ping cidadi-redis
+1780452571 container exec_start: redis-cli ping cidadi-redis
+1780452571 container exec_die marcela_postgres
+1780452571 container exec_die cidadi-redis
+1780452571 container exec_create: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452571 container exec_start: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452571 container exec_die gymflow-redis
+1780452573 container exec_create: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452573 container exec_start: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452573 container exec_create: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452573 container exec_start: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452573 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452573 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452573 container exec_create: /bin/sh -c node -e "fetch('http://127.0.0.1:3001/health').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-api-1
+1780452573 container exec_start: /bin/sh -c node -e "fetch('http://127.0.0.1:3001/health').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-api-1
+1780452573 container exec_die evoluir_postgres
+1780452573 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452573 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452573 container exec_die 8c1dc40-20260509113600-postgres-1
+1780452573 container exec_create: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452573 container exec_start: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452573 container exec_die moria-postgres
+1780452573 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452573 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452573 container exec_die m2centerauto-frontend-1
+1780452573 container exec_create: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452573 container exec_start: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452573 container exec_create: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452573 container exec_start: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452573 container exec_die m2centerauto-backend-1
+1780452573 container exec_die vox_api
+1780452573 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452573 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452573 container exec_create: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452573 container exec_start: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452573 container exec_create: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452573 container exec_start: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452573 container exec_die cidadi-compreface-core
+1780452573 container exec_die tagarelinha-postgres
+1780452573 container exec_die a6c3fa0-20260509132846-postgres-1
+1780452573 container exec_die revendeo-api-1
+1780452573 container exec_die m2centerauto-postgres-1
+1780452573 container exec_die vigiaescolar-face-db-1
+1780452574 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452574 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452574 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452574 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452574 container exec_die vox_db
+1780452574 container exec_die cidadi-compreface-ui
+1780452574 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452574 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452574 container exec_create: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452574 container exec_start: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452574 container exec_die compreface-ui
+1780452574 container exec_die cidadi-opensearch
+1780452575 container exec_create: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452575 container exec_start: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452575 container exec_die culturaviva-postgres-1
+1780452575 container exec_create: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452575 container exec_start: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452575 container exec_die 7914c1c-20260509111806-postgres-1
+1780452575 container exec_create: wget --no-verbose --tries=1 --spider http://localhost:3000 tagarelinha-web
+1780452575 container exec_start: wget --no-verbose --tries=1 --spider http://localhost:3000 tagarelinha-web
+1780452576 container exec_create: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452576 container exec_start: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452576 container exec_die tagarelinha-web
+1780452576 container exec_die tagarelinha-redis
+1780452576 container exec_create: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452576 container exec_start: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452576 container exec_die fusehotel-postgres-vps
+1780452576 container exec_create: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452576 container exec_start: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452576 container exec_die vigiaescolar-db-1
+1780452576 container exec_create: /bin/sh -c node -e "fetch('http://127.0.0.1:3000').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-web-1
+1780452576 container exec_start: /bin/sh -c node -e "fetch('http://127.0.0.1:3000').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))" revendeo-web-1
+1780452577 container exec_die revendeo-web-1
+1780452577 container exec_create: /bin/sh -c ollama list >/dev/null 2>&1 || exit 1 cidadi-ollama
+1780452577 container exec_start: /bin/sh -c ollama list >/dev/null 2>&1 || exit 1 cidadi-ollama
+1780452577 container exec_die cidadi-ollama
+1780452577 container exec_create: redis-cli ping digiurban-redis
+1780452577 container exec_start: redis-cli ping digiurban-redis
+1780452577 container exec_die digiurban-redis
+1780452577 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452577 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452577 container exec_die digiurban-postgres
+1780452577 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452577 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452577 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452577 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452578 container exec_die ferraco-postgres
+1780452578 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452578 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452578 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452578 container exec_die 25f0505-20260509115257-postgres-1
+1780452578 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452578 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452578 container exec_die 289cb5b-20260509114459-postgres-1
+1780452578 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452578 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452578 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452578 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452578 container exec_die m2centerauto-postgres-1
+1780452578 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452578 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452578 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452578 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452578 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452578 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452578 container exec_die compreface-core
+1780452578 container exec_die cidadi-postgres
+1780452578 container exec_die m2centerauto-gateway-1
+1780452579 container exec_die m2centerauto-alpr-1
+1780452579 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452579 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452579 container exec_die vox_db
+1780452579 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452579 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452580 container exec_die evoluir_api
+1780452580 container exec_create: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452580 container exec_start: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452580 container exec_die rebequi-postgres
+1780452580 container exec_create: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452580 container exec_start: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452580 container exec_die gymflow-postgres
+1780452581 container exec_create: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452581 container exec_start: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452581 container exec_create: redis-cli ping cidadi-redis
+1780452581 container exec_start: redis-cli ping cidadi-redis
+1780452581 container exec_die marcela_postgres
+1780452581 container exec_die cidadi-redis
+1780452581 container exec_create: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452581 container exec_start: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452581 container exec_die gymflow-redis
+1780452582 container exec_create: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) ultrazend-smtp
+1780452582 container exec_start: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) ultrazend-smtp
+1780452582 container exec_die ultrazend-smtp
+1780452582 container exec_create: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-face
+1780452582 container exec_start: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-face
+1780452582 container exec_die cidadi-face
+1780452583 container exec_create: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452583 container exec_start: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452583 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452583 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452583 container exec_die evoluir_postgres
+1780452583 container exec_create: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452583 container exec_start: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452583 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452583 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452583 container exec_die 8c1dc40-20260509113600-postgres-1
+1780452583 container exec_create: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452583 container exec_start: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452583 container exec_die moria-postgres
+1780452583 container exec_create: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452583 container exec_start: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452583 container exec_die m2centerauto-frontend-1
+1780452583 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452583 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452583 container exec_die m2centerauto-backend-1
+1780452583 container exec_create: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452583 container exec_start: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452583 container exec_die vox_api
+1780452583 container exec_create: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452583 container exec_start: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452583 container exec_die cidadi-compreface-core
+1780452583 container exec_die tagarelinha-postgres
+1780452583 container exec_create: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452583 container exec_start: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452583 container exec_die a6c3fa0-20260509132846-postgres-1
+1780452583 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452583 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452583 container exec_die vigiaescolar-face-db-1
+1780452583 container exec_die m2centerauto-postgres-1
+1780452584 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()" moria-alpr
+1780452584 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()" moria-alpr
+1780452584 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452584 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452584 container exec_die vox_db
+1780452584 container exec_die moria-alpr
+1780452584 container exec_create: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-messages
+1780452584 container exec_start: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-messages
+1780452584 container exec_die cidadi-messages
+1780452585 container exec_create: node -e require('http').get('http://localhost:9003/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-flow
+1780452585 container exec_start: node -e require('http').get('http://localhost:9003/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-flow
+1780452585 container exec_die cidadi-flow
+1780452585 container exec_create: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452585 container exec_start: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452585 container exec_die culturaviva-postgres-1
+1780452585 container exec_create: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452585 container exec_start: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452585 container exec_die 7914c1c-20260509111806-postgres-1
+1780452585 container exec_create: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1 rebequi-api
+1780452585 container exec_start: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1 rebequi-api
+1780452585 container exec_die rebequi-api
+1780452586 container exec_create: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452586 container exec_start: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452586 container exec_die tagarelinha-redis
+1780452586 container exec_create: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452586 container exec_start: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452586 container exec_die fusehotel-postgres-vps
+1780452586 container exec_create: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452586 container exec_start: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452586 container exec_die vigiaescolar-db-1
+1780452586 container exec_create: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) cidadi-smtp
+1780452586 container exec_start: node -e require('net').connect(587, 'localhost').on('connect', () => process.exit(0)).on('error', () => process.exit(1)) cidadi-smtp
+1780452587 container exec_die cidadi-smtp
+1780452587 container exec_create: curl -f http://localhost:8080/health digiurban-llamacpp
+1780452587 container exec_start: curl -f http://localhost:8080/health digiurban-llamacpp
+1780452587 container exec_die digiurban-llamacpp
+1780452587 container exec_create: redis-cli ping digiurban-redis
+1780452587 container exec_start: redis-cli ping digiurban-redis
+1780452587 container exec_die digiurban-redis
+1780452587 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452587 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452587 container exec_die digiurban-postgres
+1780452588 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452588 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452588 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452588 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452588 container exec_create: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-face
+1780452588 container exec_start: node -e require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-face
+1780452588 container exec_die ferraco-postgres
+1780452588 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452588 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452588 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452588 container exec_die 25f0505-20260509115257-postgres-1
+1780452588 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452588 container exec_die ultrazend-face
+1780452588 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452588 container exec_die 289cb5b-20260509114459-postgres-1
+1780452588 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452588 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452588 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452588 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452588 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452588 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452588 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452588 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452589 container exec_die m2centerauto-postgres-1
+1780452589 container exec_die compreface-core
+1780452589 container exec_die cidadi-postgres
+1780452589 container exec_die m2centerauto-gateway-1
+1780452589 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452589 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452589 container exec_create: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-messages
+1780452589 container exec_start: node -e require('http').get('http://localhost:9001/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) ultrazend-messages
+1780452589 container exec_create: /bin/sh -c node -e "require('http').get('http://localhost:3001/api/health/simple', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ultrazend-api
+1780452589 container exec_start: /bin/sh -c node -e "require('http').get('http://localhost:3001/api/health/simple', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ultrazend-api
+1780452589 container exec_die ultrazend-messages
+1780452589 container exec_die ultrazend-api
+1780452589 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452589 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452589 container exec_die m2centerauto-alpr-1
+1780452589 container exec_die vox_db
+1780452590 container exec_create: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452590 container exec_start: /bin/sh -c pg_isready -U $POSTGRES_USER -d $POSTGRES_DB rebequi-postgres
+1780452590 container exec_create: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452590 container exec_start: /bin/sh -c pg_isready -U gymflow gymflow-postgres
+1780452590 container exec_die rebequi-postgres
+1780452590 container exec_die gymflow-postgres
+1780452591 container exec_create: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452591 container exec_start: /bin/sh -c pg_isready -U marcela -d marcela_glow marcela_postgres
+1780452591 container exec_create: redis-cli ping cidadi-redis
+1780452591 container exec_start: redis-cli ping cidadi-redis
+1780452591 container exec_create: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452591 container exec_start: redis-cli -a 65abd0b3ccf90e85d1e5ce9924227c69b9d80e8fa1545195 ping gymflow-redis
+1780452591 container exec_die cidadi-redis
+1780452591 container exec_die marcela_postgres
+1780452591 container exec_die gymflow-redis
+1780452592 container exec_create: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 palmital-postgres-1
+1780452592 container exec_start: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 palmital-postgres-1
+1780452592 container exec_die palmital-postgres-1
+1780452592 container exec_create: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-ai
+1780452592 container exec_start: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) cidadi-ai
+1780452593 container exec_die cidadi-ai
+1780452593 container exec_create: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452593 container exec_start: /bin/sh -c pg_isready -U evoluir -d evoluir_db evoluir_postgres
+1780452593 container exec_die evoluir_postgres
+1780452593 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452593 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113600-postgres-1
+1780452593 container exec_create: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452593 container exec_start: /bin/sh -c pg_isready -U moria -d moria moria-postgres
+1780452593 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452593 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1 m2centerauto-frontend-1
+1780452593 container exec_create: wget --no-verbose --tries=1 --spider http://localhost:3001/health tagarelinha-api
+1780452593 container exec_start: wget --no-verbose --tries=1 --spider http://localhost:3001/health tagarelinha-api
+1780452593 container exec_die 8c1dc40-20260509113600-postgres-1
+1780452593 container exec_create: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452593 container exec_start: /bin/sh -c curl -fsS http://localhost:3001/health || exit 1 m2centerauto-backend-1
+1780452593 container exec_die moria-postgres
+1780452593 container exec_die tagarelinha-api
+1780452593 container exec_create: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452593 container exec_start: /bin/sh -c wget -qO- http://localhost:3001/health || exit 1 vox_api
+1780452593 container exec_die m2centerauto-frontend-1
+1780452593 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452593 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 cidadi-compreface-core
+1780452593 container exec_create: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452593 container exec_start: /bin/sh -c pg_isready -U tagarelinha -d tagarelinha_db tagarelinha-postgres
+1780452593 container exec_die m2centerauto-backend-1
+1780452593 container exec_die vox_api
+1780452593 container exec_create: node -e require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)) fusehotel-api-vps
+1780452593 container exec_start: node -e require('http').get('http://localhost:3001/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)) fusehotel-api-vps
+1780452593 container exec_create: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452593 container exec_start: /bin/sh -c pg_isready -U flowcraft a6c3fa0-20260509132846-postgres-1
+1780452593 container exec_die cidadi-compreface-core
+1780452593 container exec_die tagarelinha-postgres
+1780452593 container exec_create: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452593 container exec_start: /bin/sh -c pg_isready -U face -d faceplatform vigiaescolar-face-db-1
+1780452593 container exec_die a6c3fa0-20260509132846-postgres-1
+1780452593 container exec_die vigiaescolar-face-db-1
+1780452593 container exec_die fusehotel-api-vps
+1780452594 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452594 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452594 container exec_create: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1 rebequi-web
+1780452594 container exec_start: /bin/sh -c wget --no-verbose --tries=1 --spider http://127.0.0.1/health || exit 1 rebequi-web
+1780452594 container exec_die m2centerauto-postgres-1
+1780452594 container exec_die rebequi-web
+1780452594 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452594 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 cidadi-compreface-ui
+1780452594 container exec_die cidadi-compreface-ui
+1780452594 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452594 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452594 container exec_die vox_db
+1780452594 container exec_create: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452594 container exec_start: /bin/sh -c curl -fsS http://localhost/ >/dev/null || exit 1 compreface-ui
+1780452594 container exec_create: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452594 container exec_start: /bin/sh -c curl -fsS 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' >/dev/null || exit 1 cidadi-opensearch
+1780452594 container exec_die compreface-ui
+1780452594 container exec_die cidadi-opensearch
+1780452594 container exec_create: /bin/sh -c node -e "require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))" vigiaescolar-face-server-1
+1780452594 container exec_start: /bin/sh -c node -e "require('http').get('http://localhost:9006/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))" vigiaescolar-face-server-1
+1780452595 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452595 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1:3001/api/health || exit 1 evoluir_api
+1780452595 container exec_die vigiaescolar-face-server-1
+1780452595 container exec_die evoluir_api
+1780452595 container exec_create: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452595 container exec_start: /bin/sh -c pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} culturaviva-postgres-1
+1780452595 container exec_create: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 56184f7-20260531143115-postgres-1
+1780452595 container exec_start: /bin/sh -c pg_isready -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -h 127.0.0.1 || exit 1 56184f7-20260531143115-postgres-1
+1780452595 container exec_create: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452595 container exec_start: /bin/sh -c pg_isready -U flowcraft 7914c1c-20260509111806-postgres-1
+1780452595 container exec_die culturaviva-postgres-1
+1780452595 container exec_die 56184f7-20260531143115-postgres-1
+1780452595 container exec_die 7914c1c-20260509111806-postgres-1
+1780452595 container exec_create: /bin/sh -c nc -z localhost 1936 || exit 1 vigiaescolar-mediamtx-1
+1780452595 container exec_start: /bin/sh -c nc -z localhost 1936 || exit 1 vigiaescolar-mediamtx-1
+1780452595 container exec_die vigiaescolar-mediamtx-1
+1780452596 container exec_create: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452596 container exec_start: redis-cli -a YSwWUgwHvJn5HdHqPfqsibF7Ae3hvvd2 ping tagarelinha-redis
+1780452596 container exec_create: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452596 container exec_start: /bin/sh -c pg_isready -U fusehotel fusehotel-postgres-vps
+1780452596 container exec_die tagarelinha-redis
+1780452596 container exec_die fusehotel-postgres-vps
+1780452596 container exec_create: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452596 container exec_start: /bin/sh -c pg_isready -U vigia -d vigiaescolar vigiaescolar-db-1
+1780452596 container exec_die vigiaescolar-db-1
+1780452596 container exec_create: wget --no-verbose --tries=1 --spider http://127.0.0.1:3050/health ferraco-crm-vps
+1780452596 container exec_start: wget --no-verbose --tries=1 --spider http://127.0.0.1:3050/health ferraco-crm-vps
+1780452597 container exec_die ferraco-crm-vps
+1780452597 container exec_create: curl -f http://localhost:9000/minio/health/live gymflow-minio
+1780452597 container exec_start: curl -f http://localhost:9000/minio/health/live gymflow-minio
+1780452597 container exec_die gymflow-minio
+1780452597 container exec_create: redis-cli ping digiurban-redis
+1780452597 container exec_start: redis-cli ping digiurban-redis
+1780452597 container exec_create: /bin/sh -c curl -fsS http://127.0.0.1:3000/health | grep -q '"status":"ok"' || exit 1 palmital-web-1
+1780452597 container exec_start: /bin/sh -c curl -fsS http://127.0.0.1:3000/health | grep -q '"status":"ok"' || exit 1 palmital-web-1
+1780452597 container exec_die digiurban-redis
+1780452597 container exec_die palmital-web-1
+1780452597 container exec_create: /bin/sh -c wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1 fusehotel-nginx-vps
+1780452597 container exec_start: /bin/sh -c wget --quiet --tries=1 --spider http://127.0.0.1:80/ || exit 1 fusehotel-nginx-vps
+1780452597 container exec_create: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452597 container exec_start: /bin/sh -c pg_isready -U digiurban digiurban-postgres
+1780452598 container exec_die fusehotel-nginx-vps
+1780452598 container exec_die digiurban-postgres
+1780452598 container exec_create: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452598 container exec_start: /bin/sh -c pg_isready -U ferraco -d ferraco_crm ferraco-postgres
+1780452598 container exec_create: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452598 container exec_start: /bin/sh -c pg_isready -U flowcraft 8c1dc40-20260509113805-postgres-1
+1780452598 container exec_die ferraco-postgres
+1780452598 container exec_die 8c1dc40-20260509113805-postgres-1
+1780452598 container exec_create: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452598 container exec_start: /bin/sh -c pg_isready -U flowcraft 25f0505-20260509115257-postgres-1
+1780452598 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 revendeo-nginx-1
+1780452598 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 revendeo-nginx-1
+1780452598 container exec_create: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452598 container exec_start: /bin/sh -c pg_isready -U flowcraft 289cb5b-20260509114459-postgres-1
+1780452598 container exec_die 25f0505-20260509115257-postgres-1
+1780452598 container exec_die revendeo-nginx-1
+1780452598 container exec_die 289cb5b-20260509114459-postgres-1
+1780452599 container exec_create: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) digiurban-ai
+1780452599 container exec_start: node -e require('http').get('http://localhost:9004/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)) digiurban-ai
+1780452599 container exec_create: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452599 container exec_start: /bin/sh -c curl --fail http://localhost:3000/healthcheck || exit 1 compreface-core
+1780452599 container exec_create: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452599 container exec_start: /bin/sh -c pg_isready -U digiurban cidadi-postgres
+1780452599 container exec_create: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452599 container exec_start: /bin/sh -c wget -qO- http://127.0.0.1/health >/dev/null 2>&1 || exit 1 m2centerauto-gateway-1
+1780452599 container exec_die cidadi-postgres
+1780452599 container exec_create: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452599 container exec_start: /bin/sh -c pg_isready -U m2 -d m2_auto_hub m2centerauto-postgres-1
+1780452599 container exec_die compreface-core
+1780452599 container exec_die digiurban-ai
+1780452599 container exec_die m2centerauto-gateway-1
+1780452599 container exec_die m2centerauto-postgres-1
+1780452599 container exec_create: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452599 container exec_start: /bin/sh -c python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1 m2centerauto-alpr-1
+1780452599 container exec_create: curl -f http://127.0.0.1/health cidadi-vps
+1780452599 container exec_start: curl -f http://127.0.0.1/health cidadi-vps
+1780452599 container exec_create: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452599 container exec_start: /bin/sh -c pg_isready -U vox -d voxcelular vox_db
+1780452599 container exec_die cidadi-vps
+1780452599 container exec_die vox_db
+1780452599 container exec_create: /bin/sh -c curl -fsS http://127.0.0.1:3001/health | grep -q '"status":"ok"' || exit 1 palmital-api-1
+1780452599 container exec_start: /bin/sh -c curl -fsS http://127.0.0.1:3001/health | grep -q '"status":"ok"' || exit 1 palmital-api-1
+1780452599 container exec_create: curl -f http://localhost:9002/api/v1/health cidadi-prices
+1780452599 container exec_start: curl -f http://localhost:9002/api/v1/health cidadi-prices
