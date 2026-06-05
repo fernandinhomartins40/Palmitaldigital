@@ -46,13 +46,13 @@ export interface JournalistApplication {
 
 export const newsApi = {
   listPublic: (params?: { categoryId?: string; q?: string; page?: number }) =>
-    api.get<{ articles: Article[]; total: number; pages: number }>('/news/articles', { params }),
+    api.get<Article[]>('/news', { params }),
 
   getCategories: () =>
     api.get<NewsCategory[]>('/news/categories'),
 
   getArticle: (slug: string) =>
-    api.get<Article>(`/news/articles/${slug}`),
+    api.get<Article>(`/news/${slug}`),
 
   createArticle: (data: {
     title: string;

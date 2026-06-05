@@ -15,7 +15,7 @@ export function useNewsPortal(categoryId?: string, q?: string) {
         newsApi.listPublic({ categoryId, q }),
         newsApi.getCategories(),
       ]);
-      setArticles(artRes.data.articles);
+      setArticles(Array.isArray(artRes.data) ? artRes.data : (artRes.data as any).articles ?? []);
       setCategories(catRes.data);
     } catch {
       setError('Erro ao carregar notícias');
