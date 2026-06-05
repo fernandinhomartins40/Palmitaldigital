@@ -45,7 +45,7 @@ export interface JournalistApplication {
 }
 
 export const newsApi = {
-  listPublic: (params?: { categoryId?: string; q?: string; page?: number }) =>
+  listPublic: (params?: { categoryId?: string; q?: string; page?: number; limit?: number }) =>
     api.get<Article[]>('/news', { params }),
 
   listFeedArticles: (limit = 6) =>

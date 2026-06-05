@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { ArrowLeft, Clock, MessageCircle, Share2, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, MessageCircle, Share2, Send, Trash2, Newspaper } from 'lucide-react';
 import { useArticle } from '../../hooks/useNews';
-import { newsApi, type ArticleComment } from '../../services/newsApi';
+import { newsApi, type Article, type ArticleComment } from '../../services/newsApi';
 import { useAuthStore } from '../../store/authStore';
 
 function formatDate(d: string) {
@@ -14,6 +14,108 @@ function formatDate(d: string) {
     year: 'numeric',
   });
 }
+
+function formatShort(d: string) {
+  return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+}
+
+// ─── Sugestões ────────────────────────────────────────────────────────────────
+
+function SuggestionCard({ article }: { article: Article }) {
+  return (
+    <Link
+      to={`/news/article/${article.slug}`}
+      className="group flex gap-3 rounded-2xl border border-line p-3 hover:bg-ink/[0.02] dark:hover:bg-white/[0.03] transition-colors"
+    >
+      {article.coverUrl ? (
+        <img
+          src={article.coverUrl}
+          alt=""
+          className="h-16 w-20 shrink-0 rounded-xl object-cover"
+        />
+      ) : (
+        <div className="flex h-16 w-20 shrink-0 items-center justify-center rounded-xl bg-magenta/10">
+          <Newspaper size={18} className="text-magenta/40" />
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        {article.category && (
+          <span
+            className="chip text-[10px] mb-1 inline-block"
+            style={{ background: `${article.category.color}20`, color: article.category.color }}
+          >
+            {article.category.name}
+          </span>
+        )}
+        <h4 className="text-sm font-semibold text-ink leading-snug line-clamp-2 group-hover:text-magenta transition-colors">
+          {article.title}
+        </h4>
+        <p className="text-[11px] text-mute mt-1 flex items-center gap-1">
+          <Clock size={10} />
+          {formatShort(article.publishedAt ?? article.createdAt)}
+          <span className="mx-1">·</span>
+          {article.author.profile.displayName}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function RelatedArticles({ current }: { current: Article }) {
+  const [suggestions, setSuggestions] = useState<Article[]>([]);
+
+  useEffect(() => {
+    // Buscar por categoria + por autor, mesclar e deduplicar
+    const reqs: Promise<Article[]>[] = [
+      newsApi.listPublic({ limit: 8 }).then((r) => r.data),
+    ];
+    if (current.category) {
+      reqs.push(newsApi.listPublic({ categoryId: current.category.id, limit: 6 }).then((r) => r.data));
+    }
+    reqs.push(newsApi.listByAuthor(current.author.id).then((r) => r.data));
+
+    Promise.all(reqs).then((results) => {
+      const seen = new Set<string>([current.id]);
+      const merged: Article[] = [];
+      // Prioridade: mesma categoria + mesmo autor
+      const byCat = results[1] ?? [];
+      const byAuthor = results[results.length - 1] ?? [];
+      const byRecent = results[0] ?? [];
+
+      for (const a of [...byCat, ...byAuthor, ...byRecent]) {
+        if (!seen.has(a.id) && merged.length < 6) {
+          seen.add(a.id);
+          merged.push(a);
+        }
+      }
+      setSuggestions(merged);
+    });
+  }, [current.id, current.category?.id, current.author.id]);
+
+  if (suggestions.length === 0) return null;
+
+  return (
+    <section className="space-y-3">
+      <h3 className="font-semibold text-sm text-ink flex items-center gap-2">
+        <Newspaper size={15} className="text-magenta" />
+        Leia também
+      </h3>
+      <div className="space-y-2">
+        {suggestions.map((a) => (
+          <SuggestionCard key={a.id} article={a} />
+        ))}
+      </div>
+      <Link
+        to="/news"
+        className="block text-center text-sm text-magenta hover:underline pt-1"
+      >
+        Ver todas as notícias →
+      </Link>
+    </section>
+  );
+}
+
+// ─── Comentários ──────────────────────────────────────────────────────────────
 
 function CommentSection({ articleId }: { articleId: string }) {
   const [comments, setComments] = useState<ArticleComment[]>([]);
@@ -95,6 +197,8 @@ function CommentSection({ articleId }: { articleId: string }) {
     </section>
   );
 }
+
+// ─── Página do artigo ─────────────────────────────────────────────────────────
 
 export function ArticlePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -184,7 +288,6 @@ export function ArticlePage() {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="border-t border-line" />
 
       {/* Content */}
@@ -205,7 +308,12 @@ export function ArticlePage() {
 
       <div className="border-t border-line" />
 
-      {/* Comments */}
+      {/* Sugestões de leitura */}
+      <RelatedArticles current={article} />
+
+      <div className="border-t border-line" />
+
+      {/* Comentários */}
       <CommentSection articleId={article.id} />
     </article>
   );

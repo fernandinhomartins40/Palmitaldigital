@@ -1,13 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, PenLine, Clock, MessageCircle, ChevronRight } from 'lucide-react';
+import { Search, PenLine, Clock, MessageCircle, ChevronRight, Newspaper } from 'lucide-react';
 import { useNewsPortal } from '../../hooks/useNews';
 import { useAuthStore } from '../../store/authStore';
+import { newsApi } from '../../services/newsApi';
 import type { Article, NewsCategory } from '../../services/newsApi';
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
 }
+
+// ─── Portais dos jornalistas (scroll horizontal) ──────────────────────────────
+
+interface JournalistInfo {
+  id: string;
+  name: string;
+  articleCount: number;
+  latestCategory?: { name: string; color: string } | null;
+  avatarUrl?: string | null;
+}
+
+function buildJournalistInfos(articles: Article[]): JournalistInfo[] {
+  const map = new Map<string, JournalistInfo>();
+  for (const a of articles) {
+    const id = a.author.id;
+    if (!map.has(id)) {
+      map.set(id, {
+        id,
+        name: a.author.profile.displayName,
+        articleCount: 0,
+        latestCategory: a.category ?? null,
+        avatarUrl: a.author.profile.avatarUrl ?? null,
+      });
+    }
+    map.get(id)!.articleCount++;
+  }
+  return Array.from(map.values()).sort((a, b) => b.articleCount - a.articleCount);
+}
+
+function PortalCard({ info }: { info: JournalistInfo }) {
+  const color = info.latestCategory?.color ?? 'var(--magenta)';
+  return (
+    <Link
+      to={`/news/portal/${info.id}`}
+      className="flex flex-col items-center gap-2 w-24 shrink-0 group"
+    >
+      <div
+        className="relative h-16 w-16 rounded-2xl flex items-center justify-center text-white font-display text-xl font-bold shadow-sm transition-transform group-hover:scale-105"
+        style={{ background: info.avatarUrl ? undefined : color }}
+      >
+        {info.avatarUrl ? (
+          <img src={info.avatarUrl} alt="" className="h-full w-full rounded-2xl object-cover" />
+        ) : (
+          info.name[0]
+        )}
+        <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-surface shadow">
+          <Newspaper size={10} className="text-magenta" />
+        </span>
+      </div>
+      <div className="text-center">
+        <p className="text-xs font-semibold text-ink leading-tight line-clamp-2 group-hover:text-magenta transition-colors">
+          {info.name}
+        </p>
+        <p className="text-[10px] text-mute mt-0.5">
+          {info.articleCount} {info.articleCount === 1 ? 'matéria' : 'matérias'}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function PortalsRow({ articles }: { articles: Article[] }) {
+  const infos = buildJournalistInfos(articles);
+  if (infos.length === 0) return null;
+
+  return (
+    <div className="glass rounded-3xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-sm text-ink">Portais de Notícias</h2>
+        <span className="text-xs text-mute">{infos.length} {infos.length === 1 ? 'portal' : 'portais'}</span>
+      </div>
+      <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-hide">
+        {infos.map((info) => (
+          <PortalCard key={info.id} info={info} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Card de artigo ───────────────────────────────────────────────────────────
 
 function ArticleCard({ article, featured = false }: { article: Article; featured?: boolean }) {
   return (
@@ -62,7 +144,7 @@ function ArticleCard({ article, featured = false }: { article: Article; featured
             <Clock className="w-3 h-3" />
             {formatDate(article.publishedAt || article.createdAt)}
           </span>
-          {article._count && (
+          {article._count && article._count.comments > 0 && (
             <span className="flex items-center gap-1">
               <MessageCircle className="w-3 h-3" />
               {article._count.comments}
@@ -74,15 +156,9 @@ function ArticleCard({ article, featured = false }: { article: Article; featured
   );
 }
 
-function CategoryPill({
-  cat,
-  active,
-  onClick,
-}: {
-  cat: NewsCategory;
-  active: boolean;
-  onClick: () => void;
-}) {
+// ─── Filtro de categoria ──────────────────────────────────────────────────────
+
+function CategoryPill({ cat, active, onClick }: { cat: NewsCategory; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
@@ -98,6 +174,8 @@ function CategoryPill({
   );
 }
 
+// ─── Página principal ─────────────────────────────────────────────────────────
+
 export function NewsPortalPage() {
   const [activeCat, setActiveCat] = useState<string | undefined>();
   const [q, setQ] = useState('');
@@ -105,6 +183,12 @@ export function NewsPortalPage() {
   const { articles, categories, loading } = useNewsPortal(activeCat, search || undefined);
   const user = useAuthStore((s) => s.user);
   const isJournalist = user?.role === 'JOURNALIST' || user?.role === 'ADMIN';
+
+  // Buscar TODOS os artigos para montar os portais (sem filtro de categoria)
+  const [allArticles, setAllArticles] = useState<Article[]>([]);
+  useEffect(() => {
+    newsApi.listPublic().then((r) => setAllArticles(r.data)).catch(() => {});
+  }, []);
 
   const featured = articles[0];
   const rest = articles.slice(1);
@@ -174,6 +258,9 @@ export function NewsPortalPage() {
           </div>
         )}
       </div>
+
+      {/* Portais — scroll horizontal */}
+      {allArticles.length > 0 && <PortalsRow articles={allArticles} />}
 
       {/* Loading skeleton */}
       {loading && (
