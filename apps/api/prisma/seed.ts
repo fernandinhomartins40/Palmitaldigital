@@ -1527,9 +1527,20 @@ async function cleanupSeedNamespace() {
   }
 
   if (companyIds.length) {
+    await prisma.companyOrderItem.deleteMany({ where: { order: { companyId: { in: companyIds } } } });
+    await prisma.companyOrder.deleteMany({ where: { companyId: { in: companyIds } } });
     await prisma.product.deleteMany({ where: { companyId: { in: companyIds } } });
     await prisma.company.deleteMany({ where: { id: { in: companyIds } } });
   }
+
+  // Also clean up restaurant-related data from seed-extra
+  await prisma.orderItem.deleteMany({ where: { order: { restaurant: { owner: { email: { endsWith: TEST_DOMAIN } } } } } });
+  await prisma.order.deleteMany({ where: { restaurant: { owner: { email: { endsWith: TEST_DOMAIN } } } } });
+  await prisma.menuItem.deleteMany({ where: { restaurant: { owner: { email: { endsWith: TEST_DOMAIN } } } } });
+  await prisma.menuSection.deleteMany({ where: { restaurant: { owner: { email: { endsWith: TEST_DOMAIN } } } } });
+  await prisma.restaurant.deleteMany({ where: { owner: { email: { endsWith: TEST_DOMAIN } } } });
+  await prisma.article.deleteMany({ where: { author: { email: { endsWith: TEST_DOMAIN } } } });
+  await prisma.articleCategory.deleteMany({});
 
   await prisma.user.deleteMany({ where: { id: { in: userIds } } });
 }
